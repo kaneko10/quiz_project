@@ -13,3 +13,7 @@ class Choice(models.Model):
 
 class PlayTime(models.Model):
     play_time = models.CharField(max_length=30)
+
+class QuizAnswerTime(models.Model):
+    answer = models.CharField(max_length=50)
+    time = models.CharField(max_length=30)

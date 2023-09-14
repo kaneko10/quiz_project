@@ -11,10 +11,20 @@
     </div>
     <form method="post" action="{% url 'quiz_movie' %}">
         {% csrf_token %}
-        <button type="button" id="playButton" onclick="playVideo()">再生</button>
+        <button type="button" id="playButton" onclick="playVideo('play')">再生</button>
     </form>
     <!-- <button id="playButton" onclick="playVideo()">再生</button> -->
     <div id="endMessage" style="display: none;">アンケートに答えてください</div>
+
+    <!-- クイズの解答フォーム -->
+    <div id="quizForm">
+        <h2>クイズに回答する</h2>
+        <form method="post" action="{% url 'quiz_movie' %}">
+            <label for="answer">回答：</label>
+            <input type="text" id="answer" name="answer">
+            <button type="button" id="submitButton" onclick="sendAnswer('answer')">送信</button>
+        </form>
+    </div>
 
     <script>
         var player;
@@ -60,11 +70,13 @@
         }
 
         // 動画を再生する関数
-        function playVideo() {
+        function playVideo(action) {
             // POSTリクエストを送信してボタンが押された時刻をデータベースに保存
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "{% url 'quiz_movie' %}", true);
             xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");  // JSONデータを送信することを指定
+
             xhr.onload = function() {
                 if (xhr.status === 200) {
                     // ボタンが押されたら動画を表示して再生
@@ -77,8 +89,33 @@
                     }
                 }
             };
-            xhr.send();
+            var data = JSON.stringify({ action: action });  // JSONデータとして識別子を送信
+            xhr.send(data);
         }
+
+        function sendAnswer(action) {
+            // フォームの内容を取得
+            var answer = document.getElementById("answer").value;
+            // POSTリクエストを送信してデータをサーバーに送信
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "{% url 'quiz_movie' %}", true);
+            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");  // JSONデータを送信することを指定
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    // レスポンスの処理（任意）
+                    console.log("サーバーレスポンス: " + xhr.responseText);
+                }
+                // フォームをリセット
+                var textForm = document.getElementById("answer");
+                textForm.value = '';
+            };
+
+            var data = JSON.stringify({ action: action, answer: answer });  // JSONデータとしてアクションと回答を送信
+            xhr.send(data);
+        }
+
     </script>
 </body>
 </html>

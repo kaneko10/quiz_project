@@ -6,11 +6,12 @@ from django.shortcuts import render
 from django.views import View
 from django.http import JsonResponse
 
-from .models import Question, PlayTime
+from .models import Question, PlayTime, QuizAnswerTime
 
 import cv2
 import datetime
 import pytz
+import json
 
 
 def index(request):
@@ -81,18 +82,32 @@ def generate_frame():
 
 def quiz_movie_view(request):
     if request.method == "POST":
-        print("save play movie time")
-        # POSTリクエストからボタンが押された時刻を取得
-        # 日本時間のタイムゾーンを取得
-        jst = pytz.timezone('Asia/Tokyo')
-        jst_now = datetime.datetime.now(jst)
-        timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
-        
-        # ボタンが押された時刻をデータベースに保存
-        PlayTime.objects.create(play_time=timestamp)
-        
-        # JSONレスポンスを返す（Ajaxリクエストに対応）
-        return JsonResponse({"message": "Success"})
+        print("POSTリクエスト")
+        data = json.loads(request.body.decode('utf-8'))  # JSONデータを解析
+        action = data.get('action')
+
+        if action == 'play':
+            # POSTリクエストからボタンが押された時刻を取得
+            # 日本時間のタイムゾーンを取得
+            jst = pytz.timezone('Asia/Tokyo')
+            jst_now = datetime.datetime.now(jst)
+            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
+            # ボタンが押された時刻をデータベースに保存
+            PlayTime.objects.create(play_time=timestamp)
+            print("save play movie time")
+            
+            # JSONレスポンスを返す（Ajaxリクエストに対応）
+            return JsonResponse({"message": "Success"})
+        elif action == 'answer':
+            answer = data.get('answer')
+            jst = pytz.timezone('Asia/Tokyo')
+            jst_now = datetime.datetime.now(jst)
+            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
+            QuizAnswerTime.objects.create(answer=answer, time=timestamp)
+            print("save quiz answer and time")
+
+            # JSONレスポンスを返す（Ajaxリクエストに対応）
+            return JsonResponse({"message": "Success"})
 
     print("first access quiz_movie.html")
     template = loader.get_template("quiz/quiz_movie.html")
