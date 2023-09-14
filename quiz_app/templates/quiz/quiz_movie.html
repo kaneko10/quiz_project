@@ -6,9 +6,14 @@
 
 <body>
     <h1>{{text}}</h1>
-    <div id="player"></div>
-    <button id="playButton" onclick="playVideo()">再生</button>
-    <button onclick="pauseVideo()">一時停止</button>
+    <div id="playerContainer" style="display: none;">
+        <div id="player"></div>
+    </div>
+    <form method="post" action="{% url 'quiz_movie' %}">
+        {% csrf_token %}
+        <button type="button" id="playButton" onclick="playVideo()">再生</button>
+    </form>
+    <!-- <button id="playButton" onclick="playVideo()">再生</button> -->
     <div id="endMessage" style="display: none;">アンケートに答えてください</div>
 
     <!-- <iframe width="560" height="315" src="https://www.youtube.com/embed/4t8JCicyYfc?enablejsapi=1" title="YouTube video player" frameborder="0" allowfullscreen
@@ -30,12 +35,17 @@
                     'disablekb': 1,  // キーボード操作を無効にする
                     'showinfo': 0,   // タイトルとアップロード者情報を非表示にする
                     'rel': 0,        // 関連動画を非表示にする
-                    'autoplay': 1,   // 自動再生を有効にする
+                    'autoplay': 0,   // 自動再生を有効にする
                     'playsinline': 1  // iOSデバイスでインライン再生を有効にする
                 },
                 events: {
                     'onReady': function(event) {
-                        event.target.playVideo();  // 動画を自動再生
+                        // event.target.playVideo();  // 動画を自動再生
+                        // ページ初期表示時は非表示
+                        var playerContainer = document.getElementById("playerContainer");
+                        if (playerContainer) {
+                            playerContainer.style.display = "none";
+                        }
                     },
                     'onStateChange': function(event) {
                         if (event.data === YT.PlayerState.PAUSED) {
@@ -56,22 +66,49 @@
 
         // 動画を再生する関数
         function playVideo() {
-            if (player && player.playVideo) {
-                player.playVideo();
-                // 再生ボタンを非表示にする
-                var playButton = document.getElementById("playButton");
-                if (playButton) {
-                    playButton.style.display = "none";
+            // POSTリクエストを送信してボタンが押された時刻をデータベースに保存
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "{% url 'quiz_movie' %}", true);
+            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    // ボタンが押されたら動画を表示して再生
+                    var playerContainer = document.getElementById("playerContainer");
+                    var playButton = document.getElementById("playButton");
+                    if (playerContainer && playButton) {
+                        playerContainer.style.display = "block";
+                        playButton.style.display = "none";
+                        player.playVideo();
+                    }
                 }
-            }
+            };
+            xhr.send();
         }
 
-        // 動画を一時停止する関数
-        function pauseVideo() {
-            if (player && player.pauseVideo) {
-                player.pauseVideo();
-            }
-        }
+        // // 動画を再生する関数
+        // function playVideo() {
+        //     if (player && player.playVideo) {
+        //         player.playVideo();
+        //         // 再生ボタンを非表示にする
+        //         var playButton = document.getElementById("playButton");
+        //         if (playButton) {
+        //             playButton.style.display = "none";
+        //         }
+        //     }
+        // }
+
+        // // ページ読み込み時に動画を表示するか判定
+        // window.onload = function() {
+        //     if ("{{ isPlaying }}") {
+        //         var playerContainer = document.getElementById("playerContainer");
+        //         if (playerContainer) {
+        //             playerContainer.style.display = "block";
+        //         }
+        //         if (player && player.playVideo) {
+        //             player.playVideo();
+        //         }
+        //     }
+        // }
     </script>
 </body>
 </html>

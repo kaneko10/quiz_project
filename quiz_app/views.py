@@ -4,11 +4,13 @@ from django.template import loader
 
 from django.shortcuts import render
 from django.views import View
+from django.http import JsonResponse
 
-from .models import Question
+from .models import Question, PlayTime
 
 import cv2
 import datetime
+import pytz
 
 
 def index(request):
@@ -52,7 +54,9 @@ def generate_frame():
             break
         
         # 現在の時刻を取得
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        jst = pytz.timezone('Asia/Tokyo')
+        jst_now = datetime.datetime.now(jst)
+        timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
         
         # タイムスタンプをフレーム上にオーバーレイ
         cv2.putText(frame, timestamp, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
@@ -108,9 +112,45 @@ def generate_frame():
 #                b'Content-Type: image/jpeg\r\n\r\n' + byte_frame + b'\r\n\r\n')
 #     capture.release()
 
+# def quiz_movie_view(request):
+#     if request.method == "POST":
+#         print("PlayTime")
+#         # ボタンが押された時刻をデータベースに保存
+#         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+#         PlayTime.objects.create(play_time=timestamp)
+#         context = {
+#             "text": "text",
+#             "isPlaying": True
+#         }
+#         return render(request, "quiz/quiz_movie.html", context)
+    
+#     print("aaaaa")
+#     template = loader.get_template("quiz/quiz_movie.html")
+#     context = {
+#         "text": "text",
+#         "isPlaying": False
+#     }
+#     return HttpResponse(template.render(context, request))
+
 def quiz_movie_view(request):
+    if request.method == "POST":
+        print("save play movie time")
+        # POSTリクエストからボタンが押された時刻を取得
+        # 日本時間のタイムゾーンを取得
+        jst = pytz.timezone('Asia/Tokyo')
+        jst_now = datetime.datetime.now(jst)
+        timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
+        
+        # ボタンが押された時刻をデータベースに保存
+        PlayTime.objects.create(play_time=timestamp)
+        
+        # JSONレスポンスを返す（Ajaxリクエストに対応）
+        return JsonResponse({"message": "Success"})
+
+    print("first access quiz_movie.html")
     template = loader.get_template("quiz/quiz_movie.html")
     context = {
         "text": "text",
+        "isPlaying": False
     }
     return HttpResponse(template.render(context, request))
