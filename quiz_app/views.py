@@ -46,6 +46,12 @@ def video_feed_view(request):
 def generate_frame():
     capture = cv2.VideoCapture(0)  # USBカメラから
 
+    #     fps = int(capture.get(cv2.CAP_PROP_FPS))                    # カメラのFPSを取得
+    #     w = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))              # カメラの横幅を取得
+    #     h = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))             # カメラの縦幅を取得
+    #     fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')        # 動画保存時のfourcc設定（mp4用）
+    #     video = cv2.VideoWriter('video.mp4', fourcc, fps, (w, h))  # 動画の仕様（ファイル名、fourcc, FPS, サイズ）
+
     while True:
         ret, frame = capture.read()
         
@@ -72,65 +78,6 @@ def generate_frame():
         # フレーム生成速度を調整するための一時停止
         # time.sleep(0.1)  # 0.1秒待機
     capture.release()
-
-
-
-# # ストリーミング画像を定期的に返却するview
-# def video_feed_view():
-#     return lambda _: StreamingHttpResponse(generate_frame(), content_type='multipart/x-mixed-replace; boundary=frame')
-
-# # フレーム生成・返却する処理
-# def generate_frame():
-#     capture = cv2.VideoCapture(0)  # USBカメラから
-
-#     fps = int(capture.get(cv2.CAP_PROP_FPS))                    # カメラのFPSを取得
-#     w = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))              # カメラの横幅を取得
-#     h = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))             # カメラの縦幅を取得
-#     fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')        # 動画保存時のfourcc設定（mp4用）
-#     video = cv2.VideoWriter('video.mp4', fourcc, fps, (w, h))  # 動画の仕様（ファイル名、fourcc, FPS, サイズ）
-
-#     while True:
-#         if not capture.isOpened():
-#             print("Capture is not opened.")
-#             break
-#         # カメラからフレーム画像を取得
-#         ret, frame = capture.read()
-#          # 現在の時刻を取得
-#         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-#         # タイムスタンプをフレーム上にオーバーレイ
-#         cv2.putText(frame, timestamp, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-#         video.write(frame)                                     # 動画を1フレームずつ保存する
-#         if not ret:
-#             print("Failed to read frame.")
-#             break
-#         # フレーム画像バイナリに変換
-#         ret, jpeg = cv2.imencode('.jpg', frame)
-#         byte_frame = jpeg.tobytes()
-#         # フレーム画像のバイナリデータをユーザーに送付する
-#         yield (b'--frame\r\n'
-#                b'Content-Type: image/jpeg\r\n\r\n' + byte_frame + b'\r\n\r\n')
-#     capture.release()
-
-# def quiz_movie_view(request):
-#     if request.method == "POST":
-#         print("PlayTime")
-#         # ボタンが押された時刻をデータベースに保存
-#         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-#         PlayTime.objects.create(play_time=timestamp)
-#         context = {
-#             "text": "text",
-#             "isPlaying": True
-#         }
-#         return render(request, "quiz/quiz_movie.html", context)
-    
-#     print("aaaaa")
-#     template = loader.get_template("quiz/quiz_movie.html")
-#     context = {
-#         "text": "text",
-#         "isPlaying": False
-#     }
-#     return HttpResponse(template.render(context, request))
 
 def quiz_movie_view(request):
     if request.method == "POST":

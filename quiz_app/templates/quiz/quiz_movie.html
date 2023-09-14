@@ -16,13 +16,6 @@
     <!-- <button id="playButton" onclick="playVideo()">再生</button> -->
     <div id="endMessage" style="display: none;">アンケートに答えてください</div>
 
-    <!-- <iframe width="560" height="315" src="https://www.youtube.com/embed/4t8JCicyYfc?enablejsapi=1" title="YouTube video player" frameborder="0" allowfullscreen
-    allow="autoplay; encrypted-media" 
-    modestbranding="1"
-    controls="0"
-    disablekb="1">
-    </iframe> -->
-
     <script>
         var player;
 
@@ -84,31 +77,6 @@
             };
             xhr.send();
         }
-
-        // // 動画を再生する関数
-        // function playVideo() {
-        //     if (player && player.playVideo) {
-        //         player.playVideo();
-        //         // 再生ボタンを非表示にする
-        //         var playButton = document.getElementById("playButton");
-        //         if (playButton) {
-        //             playButton.style.display = "none";
-        //         }
-        //     }
-        // }
-
-        // // ページ読み込み時に動画を表示するか判定
-        // window.onload = function() {
-        //     if ("{{ isPlaying }}") {
-        //         var playerContainer = document.getElementById("playerContainer");
-        //         if (playerContainer) {
-        //             playerContainer.style.display = "block";
-        //         }
-        //         if (player && player.playVideo) {
-        //             player.playVideo();
-        //         }
-        //     }
-        // }
     </script>
 </body>
 </html>
