@@ -95,9 +95,13 @@ def quiz_movie_view(request):
             # ボタンが押された時刻をデータベースに保存
             PlayTime.objects.create(play_time=timestamp)
             print("save play movie time")
+
+            quizIndex = data.get('quizIndex')
+            quizIndex += 1
+            print(f"Next Quiz Number {quizIndex}")
             
             # JSONレスポンスを返す（Ajaxリクエストに対応）
-            return JsonResponse({"message": "Success"})
+            return JsonResponse({"message": "Success", "quizIndex": quizIndex})
         elif action == 'answer':
             answer = data.get('answer')
             jst = pytz.timezone('Asia/Tokyo')
