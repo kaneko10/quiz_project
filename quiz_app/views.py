@@ -45,13 +45,15 @@ def video_feed_view(request):
 
 # フレーム生成・返却する処理
 def generate_frame():
+    global capture, video  # capture と video をグローバル変数として使用
+
     capture = cv2.VideoCapture(0)  # USBカメラから
 
-    #     fps = int(capture.get(cv2.CAP_PROP_FPS))                    # カメラのFPSを取得
-    #     w = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))              # カメラの横幅を取得
-    #     h = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))             # カメラの縦幅を取得
-    #     fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')        # 動画保存時のfourcc設定（mp4用）
-    #     video = cv2.VideoWriter('video.mp4', fourcc, fps, (w, h))  # 動画の仕様（ファイル名、fourcc, FPS, サイズ）
+    fps = int(capture.get(cv2.CAP_PROP_FPS))                    # カメラのFPSを取得
+    w = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))              # カメラの横幅を取得
+    h = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))             # カメラの縦幅を取得
+    fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')        # 動画保存時のfourcc設定（mp4用）
+    video = cv2.VideoWriter('video.mp4', fourcc, fps, (w, h))  # 動画の仕様（ファイル名、fourcc, FPS, サイズ）
 
     while True:
         ret, frame = capture.read()
@@ -67,6 +69,7 @@ def generate_frame():
         
         # タイムスタンプをフレーム上にオーバーレイ
         cv2.putText(frame, timestamp, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        video.write(frame)
         
         # フレーム画像バイナリに変換
         ret, jpeg = cv2.imencode('.jpg', frame)
@@ -79,6 +82,28 @@ def generate_frame():
         # フレーム生成速度を調整するための一時停止
         # time.sleep(0.1)  # 0.1秒待機
     capture.release()
+    video.release()
+
+def stop_recording(request):
+    global capture, video  # capture と video をグローバル変数として使用
+
+    if capture and video:
+        # カメラのキャプチャと動画保存を停止
+        capture.release()
+        video.release()
+        capture = None
+        video = None
+
+        # video.mp4 ファイルをダウンロードさせる
+        with open('video.mp4', 'rb') as file:
+            print("ファイルをダウンロード")
+            response = HttpResponse(file.read(), content_type='video/mp4')
+            response['Content-Disposition'] = 'attachment; filename="video.mp4"'
+    
+        return response
+    else:
+        # キャプチャと動画が正しく初期化されていない場合の処理
+        return HttpResponse("Recording not started.", status=400)
 
 def quiz_movie_view(request):
     if request.method == "POST":

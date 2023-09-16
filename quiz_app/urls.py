@@ -14,5 +14,7 @@ urlpatterns = [
     path('video_feed/', views.video_feed_view, name="video_feed"),
     path('quiz_movie/', views.quiz_movie_view, name="quiz_movie"),
     path('webcamera/', views.WebCameraView.as_view(), name="webcamera"),
+    # 録画停止用の URL パターン
+    path('stop_recording/', views.stop_recording, name='stop_recording'),
 ]
 urlpatterns += staticfiles_urlpatterns()

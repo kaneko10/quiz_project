@@ -2,14 +2,61 @@
 <html>
 <head>
     <script src="https://www.youtube.com/iframe_api"></script>
+    <style>
+        #webcamera_container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh; /* ビューポートの高さいっぱいに要素を広げる */
+            text-align: center;
+        }
+
+        #webcamera_container > * {
+            margin: 10px; /* 要素間の余白を設定（適宜調整してください） */
+        }
+
+        #playerContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 50vh; /* ビューポートの高さいっぱいに要素を広げる */
+            text-align: center;
+        }
+
+        #quizForm {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        #playVideoForm {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+    </style>
 </head>
 
 <body>
     <h1>{{text}}</h1>
+    <div id="webcamera_container">
+        <div id="image_area">
+            <img src="/quiz/video_feed/" width="810" height="540"/>
+        </div>
+        <button id="stop_recording">録画停止</button>
+        <a id="download_link" style="display: none;" download="video.mp4">動画をダウンロード</a>
+    </div>
+
     <div id="playerContainer" style="display: none;">
         <!-- <div id="player"></div> -->
     </div>
-    <form method="post" action="{% url 'quiz_movie' %}">
+    <form method="post" action="{% url 'quiz_movie' %}" id="playVideoForm">
         {% csrf_token %}
         <button type="button" id="playButton" style="display: none;" onclick="playVideo('play')">再生</button>
     </form>
@@ -33,6 +80,9 @@
         var player;
 
         var quiz_movie_ids = [
+            'DFttkTzOFL8',
+            'Sn6pIAkn50c',
+            'wLl6b3JaAvU',
             '4t8JCicyYfc', 
             'qPHSalN8k0I',
             'Ns8-e-5Ll6c',
@@ -167,7 +217,7 @@
                                 endMessage.style.display = "block";
                             }
                             // 動画再生が終了したときに新しいタブで指定リンクを開く
-                            window.open('https://www.library.metro.tokyo.lg.jp/', '_blank');
+                            window.open('https://docs.google.com/forms/d/e/1FAIpQLSdnFFQIqY782gk1XMCYFhWKdOMsMFPaYdxABGaFscjp2FaZyg/viewform?usp=sf_link', '_blank');
 
                             // 動画を非表示
                             removePlayer(); // id=player の div 要素を削除
@@ -284,6 +334,29 @@
 
             var data = JSON.stringify({ action: action, answer: answer });  // JSONデータとしてアクションと回答を送信
             xhr.send(data);
+        }
+
+        // webcamera 録画機能
+        // 録画停止ボタンをクリックしたときの処理
+        document.getElementById("stop_recording").addEventListener("click", stopRecording);
+
+        function stopRecording() {
+            // 動画の停止要求を送信
+            fetch("/quiz/stop_recording/") // サーバーに録画停止の要求を送信
+                .then(response => {
+                    if (response.ok) {
+                        // ダウンロードリンクを表示
+                        document.getElementById("download_link").style.display = "block";
+
+                        // ダウンロードリンクの URL を設定
+                        document.getElementById("download_link").href = "/quiz/stop_recording/";
+                    } else {
+                        console.error("録画停止エラー:", response.statusText);
+                    }
+                })
+                .catch(error => {
+                    console.error("録画停止エラー:", error);
+                });
         }
 
     </script>
