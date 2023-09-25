@@ -128,7 +128,7 @@ def stop_recording(request):
     else:
         # キャプチャと動画が正しく初期化されていない場合の処理
         return HttpResponse("Recording not started.", status=400)
-
+    
 def quiz_movie_view(request, person_id):
     if request.method == "POST":
         print("POSTリクエスト")
@@ -218,4 +218,55 @@ def quiz_movie_view(request, person_id):
     param1 = request.GET.get("person_id")
     # return HttpResponse(f"POST: {person_id} <br>GET: {param1}")
     return HttpResponse(template.render(context, request))
-    return HttpResponse("You're looking at question %s." % person_id)
+
+# 実験1：表情を作成してもらう実験
+def make_expression_view(request, person_id):
+    if request.method == "POST":
+        print("POSTリクエスト")
+        data = json.loads(request.body.decode('utf-8'))  # JSONデータを解析
+        action = data.get('action')
+        person_id = data.get('person_id')
+
+        if action == 'play':
+            # POSTリクエストからボタンが押された時刻を取得
+            # 日本時間のタイムゾーンを取得
+            jst = pytz.timezone('Asia/Tokyo')
+            jst_now = datetime.datetime.now(jst)
+            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
+            # ボタンが押された時刻をデータベースに保存
+            PlayTime.objects.create(person_id=person_id, play_time=timestamp)
+            print("save play movie time")
+
+            quizIndex = data.get('quizIndex')
+            quizIndex += 1
+            print(f"Next Quiz Number {quizIndex}")
+            
+            # JSONレスポンスを返す（Ajaxリクエストに対応）
+            return JsonResponse({"message": "Success", "quizIndex": quizIndex})
+
+    print("first access make_expression.html")
+    person_id = request.GET.get('person_id', '')
+    print("person_id: " + person_id)
+    template = loader.get_template("quiz/make_expression.html")
+    context = {
+        "person_id": person_id,
+    }
+    return HttpResponse(template.render(context, request))
+
+# 実験1：一番最初にアクセスして被験者の識別子を入力するview
+def save_name_expt1(request):
+    if request.method == 'POST':
+        form = PersonForm(request.POST)
+        if form.is_valid():
+            form.save()  # フォームのデータをデータベースに保存
+            name = form.cleaned_data['name']
+            print("person_id(save_name): " + name)
+
+            redirect_url = redirect("make_expression", person_id=name)
+            parameters = urlencode({"person_id": name})
+            url = f"{redirect_url['Location']}?{parameters}"
+            return redirect(url)
+    else:
+        form = PersonForm()
+
+    return render(request, 'quiz/save_name_expt1.html', {'form': form})

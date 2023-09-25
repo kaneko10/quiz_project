@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <style>
+        #webcameraContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh; /* ビューポートの高さいっぱいに要素を広げる */
+            text-align: center;
+        }
+
+        #webcameraContainer > * {
+            margin: 10px; /* 要素間の余白を設定（適宜調整してください） */
+        }
+
+        #playerContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 50vh; /* ビューポートの高さいっぱいに要素を広げる */
+            text-align: center;
+        }
+
+        #playVideoForm {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 実験1：基本感情を取る -->
+
+    <h1>実験1</h1>
+    <!-- webカメラ -->
+    <div id="webcameraContainer">
+        <div id="image_area">
+            <img src="/quiz/video_feed/" width="810" height="540"/>
+        </div>
+        <!-- <a href="/quiz/stop_recording/" download="video.mp4" id="downloadLink">動画をダウンロード</a> -->
+    </div>
+
+    <!-- クイズ動画再生エリア -->
+    <div id="playerContainer" style="display: none;">
+        <!-- <div id="player"></div> -->
+    </div>
+    <form method="post" action="{% url 'quiz_movie' person_id=person_id %}" id="playVideoForm">
+        {% csrf_token %}
+        <!-- 1つ目の動画再生ボタン -->
+        <button type="button" id="playButton" style="display: block;" onclick="playVideo('play', true)">再生</button>
+    </form>
+
+
+    <script>
+        var player;
+
+        var quizIndex = 0;
+        var person_id = "";
+
+        var quiz_movie_ids = [
+            "mUclq_zlD8s"
+        ]
+
+        // YouTube APIがロードされたときに実行されるコールバック関数
+        function onYouTubeIframeAPIReady() {
+            // player オブジェクトを生成
+            console.log("YouTube APIが初期化されました。")
+
+            // 現在のURLを取得
+            var currentURL = window.location.href;
+
+            // 正規表現を使用してperson_idの値を抽出
+            var regex = /person_id=([^&]+)/;
+            var match = currentURL.match(regex);
+
+            // person_idの値を取得
+            var personId = match && match[1];
+            person_id = personId;
+            console.log("person_idの値は: " + person_id);
+
+            createNewPlayer(true);
+        }
+
+        // 動画再生が終了したときに id=player の div 要素を削除する関数
+        function removePlayer() {
+            let playerContainer = document.getElementById("playerContainer");
+            let playerDiv =  document.getElementById("player");
+            if (playerContainer) {
+                playerContainer.removeChild(playerDiv);
+            }
+        }
+
+        // 新しいプレーヤーを生成する関数
+        // firstPlay -> true : 1回目の再生
+        function createNewPlayer(firstPlay) {
+            var playerContainer = document.getElementById("playerContainer");
+            var playerDiv = document.createElement("div");
+            playerDiv.id = "player";
+            playerContainer.appendChild(playerDiv);
+
+            if (player) {
+                // 現在のプレーヤーが存在する場合、削除します
+                player.destroy();
+                console.log("destroy player")
+            }
+
+            videoId = quiz_movie_ids[0]
+            player = new YT.Player('player', {
+                videoId: videoId,  // 埋め込むYouTube動画のIDを指定
+                playerVars: {
+                    // 'controls': 0,  // コントロールを非表示にする
+                    'disablekb': 1,  // キーボード操作を無効にする
+                    'showinfo': 0,   // タイトルとアップロード者情報を非表示にする
+                    'rel': 0,        // 関連動画を非表示にする
+                    'autoplay': 0,   // 自動再生を有効にする
+                    'playsinline': 1  // iOSデバイスでインライン再生を有効にする
+                },
+                events: {
+                    'onReady': function(event) {
+                        // event.target.playVideo();  // 動画を自動再生
+                        if (!firstPlay) {
+                            event.target.playVideo(); // 自動再生
+                        } else {
+                            console.log("プレーヤーの準備が完了しました。")
+                        }
+                    },
+                    'onStateChange': function(event) {
+                        console.log("onStateChange createNewPlayer")
+                        if (event.data === YT.PlayerState.PAUSED) {
+                            // 動画が一時停止されたときに再度再生
+                            event.target.playVideo();
+                        }
+                        if (event.data === YT.PlayerState.ENDED) {
+                            console.log("動画の再生が終了しました");
+                            // 動画を非表示
+                            removePlayer(); // id=player の div 要素を削除
+                            var playerContainer = document.getElementById("playerContainer");
+                            if (playerContainer) {
+                                playerContainer.style.display = "none";
+                            }
+
+                            // webカメラの映像を表示
+                            var webCamera = document.getElementById("webcameraContainer");
+                            if (webCamera) {
+                                webCamera.style.display = "block";
+                            }
+
+                            // ダウンロードリンクを作成
+                            var downloadLink = document.createElement("a");
+                            downloadLink.href = "/quiz/stop_recording/";
+                            downloadLink.download = "video.mp4";
+                            downloadLink.textContent = "動画をダウンロード";
+
+                            var webcameraContainer = document.getElementById("webcameraContainer");
+
+                            if (webcameraContainer) {
+                                webcameraContainer.appendChild(downloadLink);
+                            }
+                        }
+                    }
+                }
+            });
+        }        
+
+        // 動画を再生する関数
+        function playVideo(action, firstPlay) {
+            if (firstPlay) {
+                // webカメラの映像を非表示
+                var webCamera = document.getElementById("webcameraContainer");
+                if (webCamera) {
+                    webCamera.style.display = "none";
+                }
+
+                // 再生ボタンを非表示（本当は最初の1回目だけでいい）
+                var playButton = document.getElementById("playButton");
+                if (playButton) {
+                    playButton.style.display = "none";
+                }
+            }
+            console.log("quizIndex playVideo: " + quizIndex)
+            if (quizIndex != 0) {
+                if (player) {
+                    player = null
+                }
+                if(player == null) {
+                    console.log("player is null")
+                    // player オブジェクトが存在しない場合、新たに生成
+                    createNewPlayer(false);
+                    console.log("createNewPlayer playVideo")
+                }
+            }
+
+            // POSTリクエストを送信してボタンが押された時刻をデータベースに保存
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "{% url 'quiz_movie' person_id=person_id %}", true);
+            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");  // JSONデータを送信することを指定
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    // quizIndexの値をインクリメント
+                    var responseData = JSON.parse(xhr.responseText);
+                    quizIndex = responseData.quizIndex;
+                    console.log("Received quizIndex: " + quizIndex);
+
+                    // ボタンが押されたら動画を表示して再生
+                    var playerContainer = document.getElementById("playerContainer");
+                    // var playButton = document.getElementById("playButton");
+                    if (playerContainer) {
+                        playerContainer.style.display = "block";
+                        console.log("make movie playVideo")
+                        // playButton.style.display = "none";
+                        console.log("player: ")
+                        console.log(player)
+
+                        if(player) {
+                            console.log("playVideo")
+                            player.playVideo();
+                        }         
+                    }
+                }
+            };
+            var data = JSON.stringify({ action: action, quizIndex: quizIndex, person_id: person_id, });  // JSONデータとして識別子を送信
+            xhr.send(data);
+        }
+
+        function playNextVideo(action) {
+            if (quizIndex < quiz_movie_ids.length) {
+                console.log("次の動画を再生");
+                playVideo('play', false);
+            } else {
+                var webCamera = document.getElementById("webcameraContainer");
+                if (webCamera) {
+                    webCamera.style.display = "block";
+                }
+
+                // ダウンロードリンクを作成
+                var downloadLink = document.createElement("a");
+                downloadLink.href = "/quiz/stop_recording/";
+                downloadLink.download = "video.mp4";
+                downloadLink.textContent = "動画をダウンロード";
+
+                var webcameraContainer = document.getElementById("webcameraContainer");
+
+                if (webcameraContainer) {
+                    webcameraContainer.appendChild(downloadLink);
+                }
+            }
+            console.log("次の動画を再生完了");
+        }
+
+    </script>
+</body>
+</html>
+

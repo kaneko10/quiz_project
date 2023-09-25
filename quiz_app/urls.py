@@ -17,5 +17,7 @@ urlpatterns = [
     # 録画停止用の URL パターン
     path('stop_recording/', views.stop_recording, name='stop_recording'),
     path('save_name/', views.save_name, name='save_name'),
+    path('make_expression/<str:person_id>/', views.make_expression_view, name='make_expression'),
+    path('save_name_expt1/', views.save_name_expt1, name='save_name_expt1'),
 ]
 urlpatterns += staticfiles_urlpatterns()
