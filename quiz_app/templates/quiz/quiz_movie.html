@@ -192,7 +192,7 @@
         var quizIndex = 0;
 
         const questionnaireTime = 5000; // (ms)
-
+        
         // YouTube APIがロードされたときに実行されるコールバック関数
         function onYouTubeIframeAPIReady() {
             // player オブジェクトを生成
@@ -277,7 +277,7 @@
                             setTimeout(function() {
                                 console.log(`${questionnaireTime}秒経過しました`);
                                 // アンケートを送信
-                                submitForm();
+                                submitForm('questionnaire');
                                 // 次の動画を再生
                                 playNextVideo('play');
                             }, questionnaireTime);
@@ -391,16 +391,36 @@
         }
 
         // フォーム送信
-        function submitForm() {
+        function submitForm(action) {
             console.log("アンケートを送信");
             // アンケートの回答を取得
-            getRadioButtonValue("q1");
-            getRadioButtonValue("q2_que");
-            getRadioButtonValue("q2_ans");
-            getRadioButtonValue("q3");
-            getRadioButtonValue("q4");
+            var context = {
+                action: action,
+                q1: getRadioButtonValue("q1"),
+                q2_que: getRadioButtonValue("q2_que"),
+                q2_ans: getRadioButtonValue("q2_ans"),
+                q3: getRadioButtonValue("q3"),
+                q4: getRadioButtonValue("q4"),
+            };
 
-            // データベースに保存
+            // POSTリクエストを送信してデータをサーバーに送信
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "{% url 'quiz_movie' %}", true);
+            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");  // JSONデータを送信することを指定
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    // レスポンスの処理（任意）
+                    console.log("サーバーレスポンス: " + xhr.responseText);
+                }
+                // フォームをリセット
+                var textForm = document.getElementById("answer");
+                textForm.value = '';
+            };
+
+            var data = JSON.stringify(context);  // JSONデータとしてアクションと回答を送信
+            xhr.send(data);
 
             // アンケートを非表示
             var questionnaire = document.getElementById("questionnaire");
