@@ -193,6 +193,7 @@
             createNewPlayer(true);
         }
 
+        // ランダムな順番にした動画IDを生成
         function makeQuizMovieIDs() {
             const quiz_movie = [
                 'DFttkTzOFL8',
@@ -222,6 +223,30 @@
             for (i = 0; i < randoms.length; i++) {
                 quiz_movie_ids[i] = quiz_movie[randoms[i]];
             }
+
+            // POSTリクエストを送信して動画の順番データデータをサーバーに送信
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "{% url 'quiz_movie' %}", true);
+            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");  // JSONデータを送信することを指定
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    // レスポンスの処理（任意）
+                    console.log("サーバーレスポンス: " + xhr.responseText);
+                }
+                // フォームをリセット
+                var textForm = document.getElementById("answer");
+                textForm.value = '';
+            };
+
+            var context = { 
+                action: 'quiz_order', 
+                randoms: randoms,
+                movie_ids: quiz_movie_ids, 
+            };
+            var data = JSON.stringify(context);  // JSONデータとしてアクションと回答を送信
+            xhr.send(data);
 
             return quiz_movie_ids;
         }
