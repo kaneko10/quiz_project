@@ -61,7 +61,7 @@
     <form method="post" action="{% url 'quiz_movie' %}" id="playVideoForm">
         {% csrf_token %}
         <!-- 1つ目の動画再生ボタン -->
-        <button type="button" id="playButton" style="display: block;" onclick="playVideo('play')">再生</button>
+        <button type="button" id="playButton" style="display: block;" onclick="playVideo('play', true)">再生</button>
     </form>
 
     <!-- クイズの解答フォーム -->
@@ -252,12 +252,6 @@
                         }
                         if (event.data === YT.PlayerState.ENDED) {
                             console.log("動画の再生が終了しました");
-                            // 再生ボタンを非表示（本当は最初の1回目だけでいい）
-                            var playButton = document.getElementById("playButton");
-                            if (playButton) {
-                                playButton.style.display = "none";
-                            }
-
                             // 動画を非表示
                             removePlayer(); // id=player の div 要素を削除
                             var playerContainer = document.getElementById("playerContainer");
@@ -288,7 +282,14 @@
         }        
 
         // 動画を再生する関数
-        function playVideo(action) {
+        function playVideo(action, firstPlay) {
+            if (firstPlay) {
+                // 再生ボタンを非表示（本当は最初の1回目だけでいい）
+                var playButton = document.getElementById("playButton");
+                if (playButton) {
+                    playButton.style.display = "none";
+                }
+            }
             console.log("quizIndex playVideo: " + quizIndex)
             if (quizIndex != 0) {
                 if (player) {
@@ -339,7 +340,7 @@
         function playNextVideo(action) {
             if (quizIndex < quiz_movie_ids.length) {
                 console.log("次の動画を再生");
-                playVideo('play');
+                playVideo('play', false);
             }
             console.log("次の動画を再生完了");
         }
