@@ -12,14 +12,17 @@ class Choice(models.Model):
     votes = models.IntegerField(default=0)
 
 class PlayTime(models.Model):
+    person_id = models.CharField(max_length=30)
     play_time = models.CharField(max_length=30)
 
 class QuizAnswerTime(models.Model):
+    person_id = models.CharField(max_length=30)
     answer = models.CharField(max_length=50)
     time = models.CharField(max_length=30)
 
 # アンケート
 class Questionnaire(models.Model):
+    person_id = models.CharField(max_length=30)
     q1 = models.CharField(max_length=30)
     q2_que = models.CharField(max_length=30)
     q2_ans = models.CharField(max_length=30)
@@ -28,6 +31,7 @@ class Questionnaire(models.Model):
     time = models.CharField(max_length=30)
 
 class QuizOrder(models.Model):
+    person_id = models.CharField(max_length=30)
     random_index = models.CharField(max_length=20)
     id_1 = models.CharField(max_length=20)
     id_2 = models.CharField(max_length=20)
@@ -44,3 +48,6 @@ class QuizOrder(models.Model):
     # id_13 = models.CharField(max_length=20)
     # id_14 = models.CharField(max_length=20)
     # id_15 = models.CharField(max_length=20)
+
+class Person(models.Model):
+    name = models.CharField(max_length=30)

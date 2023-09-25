@@ -2,17 +2,20 @@ from django.http import HttpResponse
 from django.http import StreamingHttpResponse
 from django.template import loader
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 from django.http import JsonResponse
+from urllib.parse import urlencode
 
-from .models import Question, PlayTime, QuizAnswerTime, Questionnaire, QuizOrder
+from .models import Question, PlayTime, QuizAnswerTime, Questionnaire, QuizOrder, Person
+from .forms import PersonForm
 
 import cv2
 import datetime
 import pytz
 import json
 
+person_id = ""
 
 def index(request):
     latest_question_list = Question.objects.order_by("-pub_date")[:5]
@@ -33,6 +36,27 @@ def results(request, question_id):
 
 def vote(request, question_id):
     return HttpResponse("You're voting on question %s." % question_id)
+
+# 一番最初にアクセスして被験者の識別子を入力するview
+def save_name(request):
+    if request.method == 'POST':
+        form = PersonForm(request.POST)
+        if form.is_valid():
+            form.save()  # フォームのデータをデータベースに保存
+            name = form.cleaned_data['name']
+            print("person_id(save_name): " + name)
+
+            redirect_url = redirect("quiz_movie", person_id=name)
+            parameters = urlencode({"person_id": name})
+            url = f"{redirect_url['Location']}?{parameters}"
+            return redirect(url)
+
+            # return render(request, 'quiz/quiz_movie.html', {"person_name": name})  # 保存が成功した場合、リダイレクト
+            return redirect('quiz_movie', person_id=name)
+    else:
+        form = PersonForm()
+
+    return render(request, 'quiz/save_name.html', {'form': form})
 
 # ストリーミング画像・映像を表示するview
 class WebCameraView(View):
@@ -105,11 +129,12 @@ def stop_recording(request):
         # キャプチャと動画が正しく初期化されていない場合の処理
         return HttpResponse("Recording not started.", status=400)
 
-def quiz_movie_view(request):
+def quiz_movie_view(request, person_id):
     if request.method == "POST":
         print("POSTリクエスト")
         data = json.loads(request.body.decode('utf-8'))  # JSONデータを解析
         action = data.get('action')
+        person_id = data.get('person_id')
 
         if action == 'play':
             # POSTリクエストからボタンが押された時刻を取得
@@ -118,7 +143,7 @@ def quiz_movie_view(request):
             jst_now = datetime.datetime.now(jst)
             timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
             # ボタンが押された時刻をデータベースに保存
-            PlayTime.objects.create(play_time=timestamp)
+            PlayTime.objects.create(person_id=person_id, play_time=timestamp)
             print("save play movie time")
 
             quizIndex = data.get('quizIndex')
@@ -132,7 +157,7 @@ def quiz_movie_view(request):
             jst = pytz.timezone('Asia/Tokyo')
             jst_now = datetime.datetime.now(jst)
             timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
-            QuizAnswerTime.objects.create(answer=answer, time=timestamp)
+            QuizAnswerTime.objects.create(person_id=person_id, answer=answer, time=timestamp)
             print("save quiz answer and time")
 
             # JSONレスポンスを返す（Ajaxリクエストに対応）
@@ -149,6 +174,7 @@ def quiz_movie_view(request):
             timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
             # ボタンが押された時刻をデータベースに保存
             Questionnaire.objects.create(
+                person_id=person_id,
                 q1 = q1,
                 q2_que = q2_que,
                 q2_ans = q2_ans,
@@ -169,6 +195,7 @@ def quiz_movie_view(request):
                 random_index += str(index) + ", "
 
             QuizOrder.objects.create(
+                person_id=person_id,
                 random_index = random_index,
                 id_1 = movie_ids[0],
                 id_2 = movie_ids[1],
@@ -180,9 +207,15 @@ def quiz_movie_view(request):
             return JsonResponse({"message": "Success"})
 
     print("first access quiz_movie.html")
+    person_id = request.GET.get('person_id', '')
+    print("person_id: " + person_id)
     template = loader.get_template("quiz/quiz_movie.html")
     context = {
-        "text": "text",
-        "isPlaying": False
+        "text": person_id,
+        "isPlaying": False,
+        "person_id": person_id,
     }
+    param1 = request.GET.get("person_id")
+    # return HttpResponse(f"POST: {person_id} <br>GET: {param1}")
     return HttpResponse(template.render(context, request))
+    return HttpResponse("You're looking at question %s." % person_id)
