@@ -181,14 +181,7 @@
     <script>
         var player;
 
-        var quiz_movie_ids = [
-            'DFttkTzOFL8',
-            'Sn6pIAkn50c',
-            'wLl6b3JaAvU',
-            '4t8JCicyYfc', 
-            'qPHSalN8k0I',
-            'Ns8-e-5Ll6c',
-        ];
+        var quiz_movie_ids;
         var quizIndex = 0;
 
         const questionnaireTime = 5000; // (ms)
@@ -198,6 +191,68 @@
             // player オブジェクトを生成
             console.log("YouTube APIが初期化されました。")
             createNewPlayer(true);
+        }
+
+        // ランダムな順番にした動画IDを生成
+        function makeQuizMovieIDs() {
+            const quiz_movie = [
+                'DFttkTzOFL8',
+                'Sn6pIAkn50c',
+                'wLl6b3JaAvU',
+                '4t8JCicyYfc', 
+                'qPHSalN8k0I',
+                'Ns8-e-5Ll6c',
+            ];
+
+            var quiz_movie_ids = [];
+            var randoms = [];
+            const min = 0;
+            const max = quiz_movie.length - 1;
+
+            for(i = min; i <= max; i++){
+                while(true){
+                    var tmp = randomInt(min, max);
+                    if(!randoms.includes(tmp)){
+                        randoms.push(tmp);
+                        break;
+                    }
+                }
+            }
+            console.log("randoms: " + randoms);
+
+            for (i = 0; i < randoms.length; i++) {
+                quiz_movie_ids[i] = quiz_movie[randoms[i]];
+            }
+
+            // POSTリクエストを送信して動画の順番データデータをサーバーに送信
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "{% url 'quiz_movie' %}", true);
+            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");  // JSONデータを送信することを指定
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    // レスポンスの処理（任意）
+                    console.log("サーバーレスポンス: " + xhr.responseText);
+                }
+                // フォームをリセット
+                var textForm = document.getElementById("answer");
+                textForm.value = '';
+            };
+
+            var context = { 
+                action: 'quiz_order', 
+                randoms: randoms,
+                movie_ids: quiz_movie_ids, 
+            };
+            var data = JSON.stringify(context);  // JSONデータとしてアクションと回答を送信
+            xhr.send(data);
+
+            return quiz_movie_ids;
+        }
+
+        function randomInt(min, max){
+            return Math.floor( Math.random() * (max - min + 1)) + min;
         }
 
         // 動画再生が終了したときに id=player の div 要素を削除する関数
@@ -221,6 +276,12 @@
                 // 現在のプレーヤーが存在する場合、削除します
                 player.destroy();
                 console.log("destroy player")
+            }
+
+            // 動画のIDリストを生成
+            if (firstPlay) {
+                quiz_movie_ids = makeQuizMovieIDs();
+                console.log("quiz_movie_ids: " + quiz_movie_ids);
             }
 
             console.log("videoID: " + quizIndex)

@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.views import View
 from django.http import JsonResponse
 
-from .models import Question, PlayTime, QuizAnswerTime, Questionnaire
+from .models import Question, PlayTime, QuizAnswerTime, Questionnaire, QuizOrder
 
 import cv2
 import datetime
@@ -157,7 +157,26 @@ def quiz_movie_view(request):
                 time = timestamp
             )
             print("アンケート回答をデータベースに保存しました")
+            return JsonResponse({"message": "Success"})
+        
+        elif action == 'quiz_order':
+            randoms = data.get('randoms')
+            movie_ids = data.get('movie_ids')
+            random_index = ""
 
+            for index in randoms:
+                print("index: " + str(index))
+                random_index += str(index) + ", "
+
+            QuizOrder.objects.create(
+                random_index = random_index,
+                id_1 = movie_ids[0],
+                id_2 = movie_ids[1],
+                id_3 = movie_ids[2],
+                id_4 = movie_ids[3],
+                id_5 = movie_ids[4],
+                id_6 = movie_ids[5],
+            )
             return JsonResponse({"message": "Success"})
 
     print("first access quiz_movie.html")
