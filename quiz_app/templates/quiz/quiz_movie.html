@@ -175,13 +175,7 @@
             <label for="q4_four">
                 <input type="radio" name="q4" id="q4_four" value="four"> 4
             </label>
-    
-            <!-- 送信ボタン -->
-            <!-- <button type="submit">アンケートを送信</button> -->
         </form>
-    </div>
-    <div id="nextButtonContainer" style="display: none;">
-        <button type="button" id="nextButton" onclick="nextQuiz()">次の問題へ</button>
     </div>
 
     <script>
@@ -248,12 +242,6 @@
                             event.target.playVideo(); // 自動再生
                         } else {
                             console.log("プレーヤーの準備が完了しました。")
-
-                            // 再生ボタンを表示
-                            // var playButton = document.getElementById("playButton");
-                            // if (playButton) {
-                            //     playButton.style.display = "block";
-                            // }
                         }
                     },
                     'onStateChange': function(event) {
@@ -292,38 +280,11 @@
                                 // 次の動画を再生
                                 playNextVideo('play');
                             }, questionnaireTime);
-
-
-                            // 次の問題へのボタンを表示
-                            // var nextButtonContainer = document.getElementById("nextButtonContainer");
-                            // if (nextButtonContainer) {
-                            //     nextButtonContainer.style.display = "block";
-                            // }
                         }
                     }
                 }
             });
-        }
-
-        // 次の問題へのボタンを押したときに呼ばれる関数
-        function nextQuiz() {
-            // if (quizIndex < quiz_movie_ids.length) {
-            //     // quizIndex++
-            //     // 次の問題へのボタンを非表示
-            //     var nextButtonContainer = document.getElementById("nextButtonContainer");
-            //     if (nextButtonContainer) {
-            //         nextButtonContainer.style.display = "none";
-            //     }
-
-            //     // 再生ボタンを表示
-            //     var playButton = document.getElementById("playButton");
-            //     if (playButton) {
-            //         playButton.style.display = "block";
-            //     }
-            // }
-        }
-
-        
+        }        
 
         // 動画を再生する関数
         function playVideo(action) {
@@ -366,9 +327,7 @@
                         if(player) {
                             console.log("playVideo")
                             player.playVideo();
-                        }
-
-                        
+                        }         
                     }
                 }
             };
@@ -445,7 +404,7 @@
             // アンケートを非表示
             var questionnaire = document.getElementById("questionnaire");
             questionnaire.style.display = "none";
-            
+
             console.log("アンケートを送信完了");
         }
 
