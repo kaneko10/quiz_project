@@ -45,6 +45,7 @@
 
 <body>
     <h1>{{text}}</h1>
+    <!-- webカメラ -->
     <div id="webcamera_container">
         <div id="image_area">
             <img src="/quiz/video_feed/" width="810" height="540"/>
@@ -53,18 +54,15 @@
         <a id="download_link" style="display: none;" download="video.mp4">動画をダウンロード</a>
     </div>
 
+    <!-- クイズ動画再生エリア -->
     <div id="playerContainer" style="display: none;">
         <!-- <div id="player"></div> -->
     </div>
     <form method="post" action="{% url 'quiz_movie' %}" id="playVideoForm">
         {% csrf_token %}
-        <button type="button" id="playButton" style="display: none;" onclick="playVideo('play')">再生</button>
+        <!-- 1つ目の動画再生ボタン -->
+        <button type="button" id="playButton" style="display: block;" onclick="playVideo('play', true)">再生</button>
     </form>
-    <!-- <button id="playButton" onclick="playVideo()">再生</button> -->
-    <div id="endMessage" style="display: none;">アンケートに答えてください</div>
-    <div id="nextButtonContainer" style="display: none;">
-        <button type="button" id="nextButton" onclick="nextQuiz()">次の問題へ</button>
-    </div>
 
     <!-- クイズの解答フォーム -->
     <div id="quizForm">
@@ -73,6 +71,110 @@
             <label for="answer">回答：</label>
             <input type="text" id="answer" name="answer">
             <button type="button" id="submitButton" onclick="sendAnswer('answer')">送信</button>
+        </form>
+    </div>
+
+    <!-- アンケートフォーム -->
+    <div id="questionnaire" style="display: none;">
+        <p>アンケートに答えてください</p>
+        <!-- <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdJagml4y_YcnofXxFxwgn8mGsZ7I3jRXAo4j65MlSKR_uP6w/viewform?embedded=true" width="640" height="653" frameborder="0" marginheight="0" marginwidth="0">読み込んでいます…</iframe> -->
+        <form method="post" action="{% url 'quiz_movie' %}">
+            <!-- 質問1 -->
+            <h3>質問1：question1に対する感想</h3>
+            <label for="q1_delight">
+                <input type="radio" name="q1" id="q1_delight" value="delight"> Delight
+            </label>
+            <label for="q1_boredom">
+                <input type="radio" name="q1" id="q1_boredom" value="boredom"> Boredom
+            </label>
+            <label for="q1_confused">
+                <input type="radio" name="q1" id="q1_confused" value="confused"> Confused
+            </label>
+            <label for="q1_frustration">
+                <input type="radio" name="q1" id="q1_frustration" value="frustration"> Frustration
+            </label>
+            <label for="q1_concentration">
+                <input type="radio" name="q1" id="q1_concentration" value="concentration"> Concentration
+            </label>
+            <label for="q1_neutral">
+                <input type="radio" name="q1" id="q1_neutral" value="neutral"> Neutral
+            </label>
+    
+            <!-- 質問2 -->
+            <h3>質問2：Question1の難易度</h3>
+            <label for="q2_seen_difficulty">
+                問題を見たとき：
+                <label for="q2_que_very_easy">
+                    <input type="radio" name="q2_que" id="q2_que_very_easy" value="very_easy"> 非常に簡単
+                </label>
+                <label for="q2_que_easy">
+                    <input type="radio" name="q2_que" id="q2_que_easy" value="easy"> 簡単
+                </label>
+                <label for="q2_que_normal">
+                    <input type="radio" name="q2_que" id="q2_que_normal" value="normal"> ふつう
+                </label>
+                <label for="q2_que_hard">
+                    <input type="radio" name="q2_que" id="q2_que_hard" value="hard"> 難しい
+                </label>
+                <label for="q2_que_very_hard">
+                    <input type="radio" name="q2_que" id="q2_que_very_hard" value="very_hard"> 非常に難しい
+                </label>
+            </label>
+            <label for="q2_seen_difficulty">
+                <p></p>
+                答えを見たとき：
+                <label for="q2_ans_very_easy">
+                    <input type="radio" name="q2_ans" id="q2_ans_very_easy" value="very_easy"> 非常に簡単
+                </label>
+                <label for="q2_ans_easy">
+                    <input type="radio" name="q2_ans" id="q2_ans_easy" value="easy"> 簡単
+                </label>
+                <label for="q2_ans_normal">
+                    <input type="radio" name="q2_ans" id="q2_ans_normal" value="normal"> ふつう
+                </label>
+                <label for="q2_ans_hard">
+                    <input type="radio" name="q2_ans" id="q2_ans_hard" value="hard"> 難しい
+                </label>
+                <label for="q2_ans_very_hard">
+                    <input type="radio" name="q2_ans" id="q2_ans_very_hard" value="very_hard"> 非常に難しい
+                </label>
+            </label>
+    
+            <!-- 質問3 -->
+            <h3>質問3：ヒントは役だったか？</h3>
+            <label for="q3_helpful">
+                <input type="radio" name="q3" id="q3_helpful" value="helpful"> 強くそう思う
+            </label>
+            <label for="q3_somewhat_helpful">
+                <input type="radio" name="q3" id="q3_somewhat_helpful" value="somewhat_helpful"> そう思う
+            </label>
+            <label for="q3_neutral">
+                <input type="radio" name="q3" id="q3_neutral" value="neutral"> どちらとも言えない
+            </label>
+            <label for="q3_not_helpful">
+                <input type="radio" name="q3" id="q3_not_helpful" value="not_helpful"> そう思わない
+            </label>
+            <label for="q3_not_at_all_helpful">
+                <input type="radio" name="q3" id="q3_not_at_all_helpful" value="not_at_all_helpful"> まったくそう思わない
+            </label>
+    
+            <!-- 質問4 -->
+            <h3>質問4：クイズ開始時を0として現在の疲労度を選択してください。</h3>
+            <label for="q4_zero">
+                <input type="radio" name="q4" id="q4_zero" value="zero"> 0
+            </label>
+            <label for="q4_one">
+                <input type="radio" name="q4" id="q4_one" value="one"> 1
+            </label>
+            <label for="q4_two">
+                <input type="radio" name="q4" id="q4_two" value="two"> 2
+            </label>
+            <label for="q4_three">
+                <input type="radio" name="q4" id="q4_three" value="three"> 3
+            </label>
+            <label for="q4_four">
+                <input type="radio" name="q4" id="q4_four" value="four"> 4
+            </label>
         </form>
     </div>
 
@@ -89,11 +191,13 @@
         ];
         var quizIndex = 0;
 
+        const questionnaireTime = 5000; // (ms)
+
         // YouTube APIがロードされたときに実行されるコールバック関数
         function onYouTubeIframeAPIReady() {
             // player オブジェクトを生成
             console.log("YouTube APIが初期化されました。")
-            createNewPlayer(false);
+            createNewPlayer(true);
         }
 
         // 動画再生が終了したときに id=player の div 要素を削除する関数
@@ -106,7 +210,8 @@
         }
 
         // 新しいプレーヤーを生成する関数
-        function createNewPlayer(clickPlay) {
+        // firstPlay -> true : 1回目の再生
+        function createNewPlayer(firstPlay) {
             var playerContainer = document.getElementById("playerContainer");
             var playerDiv = document.createElement("div");
             playerDiv.id = "player";
@@ -133,17 +238,10 @@
                 events: {
                     'onReady': function(event) {
                         // event.target.playVideo();  // 動画を自動再生
-                        if (clickPlay) {
+                        if (!firstPlay) {
                             event.target.playVideo(); // 自動再生
                         } else {
-                            // ページ初期表示時は非表示
                             console.log("プレーヤーの準備が完了しました。")
-
-                            // 再生ボタンを表示
-                            var playButton = document.getElementById("playButton");
-                            if (playButton) {
-                                playButton.style.display = "block";
-                            }
                         }
                     },
                     'onStateChange': function(event) {
@@ -153,55 +251,45 @@
                             event.target.playVideo();
                         }
                         if (event.data === YT.PlayerState.ENDED) {
-                            // 動画再生が終了したときにテキストを表示
-                            var endMessage = document.getElementById("endMessage");
-                            if (endMessage) {
-                                endMessage.style.display = "block";
-                            }
-                            // 動画再生が終了したときに新しいタブで指定リンクを開く
-                            window.open('https://docs.google.com/forms/d/e/1FAIpQLSdnFFQIqY782gk1XMCYFhWKdOMsMFPaYdxABGaFscjp2FaZyg/viewform?usp=sf_link', '_blank');
-
+                            console.log("動画の再生が終了しました");
                             // 動画を非表示
                             removePlayer(); // id=player の div 要素を削除
-
                             var playerContainer = document.getElementById("playerContainer");
                             if (playerContainer) {
                                 playerContainer.style.display = "none";
                             }
 
-                            // 次の問題へのボタンを表示
-                            var nextButtonContainer = document.getElementById("nextButtonContainer");
-                            if (nextButtonContainer) {
-                                nextButtonContainer.style.display = "block";
+                            // アンケートを表示
+                            resetRadioButtons();
+                            var questionnaire = document.getElementById("questionnaire");
+                            if (questionnaire) {
+                                questionnaire.style.display = "block";
                             }
+                            // 動画再生が終了したときに新しいタブで指定リンクを開く
+                            // window.open('https://docs.google.com/forms/d/e/1FAIpQLSdnFFQIqY782gk1XMCYFhWKdOMsMFPaYdxABGaFscjp2FaZyg/viewform?usp=sf_link', '_blank');
+
+                            setTimeout(function() {
+                                console.log(`${questionnaireTime}秒経過しました`);
+                                // アンケートを送信
+                                submitForm('questionnaire');
+                                // 次の動画を再生
+                                playNextVideo('play');
+                            }, questionnaireTime);
                         }
                     }
                 }
             });
-        }
-
-        // 次の問題へのボタンを押したときに呼ばれる関数
-        function nextQuiz() {
-            if (quizIndex < quiz_movie_ids.length) {
-                // quizIndex++
-                // 次の問題へのボタンを非表示
-                var nextButtonContainer = document.getElementById("nextButtonContainer");
-                if (nextButtonContainer) {
-                    nextButtonContainer.style.display = "none";
-                }
-
-                // 再生ボタンを表示
-                var playButton = document.getElementById("playButton");
-                if (playButton) {
-                    playButton.style.display = "block";
-                }
-            }
-        }
-
-        
+        }        
 
         // 動画を再生する関数
-        function playVideo(action) {
+        function playVideo(action, firstPlay) {
+            if (firstPlay) {
+                // 再生ボタンを非表示（本当は最初の1回目だけでいい）
+                var playButton = document.getElementById("playButton");
+                if (playButton) {
+                    playButton.style.display = "none";
+                }
+            }
             console.log("quizIndex playVideo: " + quizIndex)
             if (quizIndex != 0) {
                 if (player) {
@@ -210,7 +298,7 @@
                 if(player == null) {
                     console.log("player is null")
                     // player オブジェクトが存在しない場合、新たに生成
-                    createNewPlayer(true);
+                    createNewPlayer(false);
                     console.log("createNewPlayer playVideo")
                 }
             }
@@ -230,25 +318,31 @@
 
                     // ボタンが押されたら動画を表示して再生
                     var playerContainer = document.getElementById("playerContainer");
-                    var playButton = document.getElementById("playButton");
-                    if (playerContainer && playButton) {
+                    // var playButton = document.getElementById("playButton");
+                    if (playerContainer) {
                         playerContainer.style.display = "block";
                         console.log("make movie playVideo")
-                        playButton.style.display = "none";
+                        // playButton.style.display = "none";
                         console.log("player: ")
                         console.log(player)
 
                         if(player) {
                             console.log("playVideo")
                             player.playVideo();
-                        }
-
-                        
+                        }         
                     }
                 }
             };
             var data = JSON.stringify({ action: action, quizIndex: quizIndex });  // JSONデータとして識別子を送信
             xhr.send(data);
+        }
+
+        function playNextVideo(action) {
+            if (quizIndex < quiz_movie_ids.length) {
+                console.log("次の動画を再生");
+                playVideo('play', false);
+            }
+            console.log("次の動画を再生完了");
         }
 
         function sendAnswer(action) {
@@ -295,6 +389,106 @@
                 .catch(error => {
                     console.error("録画停止エラー:", error);
                 });
+        }
+
+        // フォーム送信
+        function submitForm(action) {
+            console.log("アンケートを送信");
+            // アンケートの回答を取得
+            var context = {
+                action: action,
+                q1: getRadioButtonValue("q1"),
+                q2_que: getRadioButtonValue("q2_que"),
+                q2_ans: getRadioButtonValue("q2_ans"),
+                q3: getRadioButtonValue("q3"),
+                q4: getRadioButtonValue("q4"),
+            };
+
+            // POSTリクエストを送信してデータをサーバーに送信
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "{% url 'quiz_movie' %}", true);
+            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");  // JSONデータを送信することを指定
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    // レスポンスの処理（任意）
+                    console.log("サーバーレスポンス: " + xhr.responseText);
+                }
+                // フォームをリセット
+                var textForm = document.getElementById("answer");
+                textForm.value = '';
+            };
+
+            var data = JSON.stringify(context);  // JSONデータとしてアクションと回答を送信
+            xhr.send(data);
+
+            // アンケートを非表示
+            var questionnaire = document.getElementById("questionnaire");
+            questionnaire.style.display = "none";
+
+            console.log("アンケートを送信完了");
+        }
+
+        function getRadioButtonValue(name) {
+            var radioButtons = document.querySelectorAll(`input[name=${name}]`);
+            var selectedValue;
+
+            for (var i = 0; i < radioButtons.length; i++) {
+                if (radioButtons[i].checked) {
+                    selectedValue = radioButtons[i].value;
+                    break;
+                }
+            }
+            console.log("選択されたラジオボタンの値: " + selectedValue);
+
+            if (selectedValue == undefined) {
+                selectedValue = "undefined";
+            }
+
+            return selectedValue;
+        }
+
+        function resetRadioButtons() {
+            // Q1
+            resetRadioButtonCheck("q1_delight");
+            resetRadioButtonCheck("q1_boredom");
+            resetRadioButtonCheck("q1_confused");
+            resetRadioButtonCheck("q1_frustration");
+            resetRadioButtonCheck("q1_concentration");
+            resetRadioButtonCheck("q1_neutral");
+
+            // Q2-1
+            resetRadioButtonCheck("q2_que_very_easy");
+            resetRadioButtonCheck("q2_que_easy");
+            resetRadioButtonCheck("q2_que_normal");
+            resetRadioButtonCheck("q2_que_hard");
+            resetRadioButtonCheck("q2_que_very_hard");
+            // Q2-2
+            resetRadioButtonCheck("q2_ans_very_easy");
+            resetRadioButtonCheck("q2_ans_easy");
+            resetRadioButtonCheck("q2_ans_normal");
+            resetRadioButtonCheck("q2_ans_hard");
+            resetRadioButtonCheck("q2_ans_very_hard");
+    
+            // Q3
+            resetRadioButtonCheck("q3_helpful");
+            resetRadioButtonCheck("q3_somewhat_helpful");
+            resetRadioButtonCheck("q3_neutral");
+            resetRadioButtonCheck("q3_not_helpful");
+            resetRadioButtonCheck("q3_not_at_all_helpful");
+
+            // Q4
+            resetRadioButtonCheck("q4_zero");
+            resetRadioButtonCheck("q4_one");
+            resetRadioButtonCheck("q4_two");
+            resetRadioButtonCheck("q4_three");
+            resetRadioButtonCheck("q4_four");
+        }
+
+        function resetRadioButtonCheck(id) {
+            const radioButton = document.getElementById(id);
+            radioButton.checked = false;
         }
 
     </script>

@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.views import View
 from django.http import JsonResponse
 
-from .models import Question, PlayTime, QuizAnswerTime
+from .models import Question, PlayTime, QuizAnswerTime, Questionnaire
 
 import cv2
 import datetime
@@ -136,6 +136,28 @@ def quiz_movie_view(request):
             print("save quiz answer and time")
 
             # JSONレスポンスを返す（Ajaxリクエストに対応）
+            return JsonResponse({"message": "Success"})
+        elif action == 'questionnaire':
+            q1 = data.get('q1')
+            q2_que = data.get('q2_que')
+            q2_ans = data.get('q2_ans')
+            q3 = data.get('q3')
+            q4 = data.get('q4')
+            # 日本時間のタイムゾーンを取得
+            jst = pytz.timezone('Asia/Tokyo')
+            jst_now = datetime.datetime.now(jst)
+            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
+            # ボタンが押された時刻をデータベースに保存
+            Questionnaire.objects.create(
+                q1 = q1,
+                q2_que = q2_que,
+                q2_ans = q2_ans,
+                q3 = q3,
+                q4 = q4,
+                time = timestamp
+            )
+            print("アンケート回答をデータベースに保存しました")
+
             return JsonResponse({"message": "Success"})
 
     print("first access quiz_movie.html")
