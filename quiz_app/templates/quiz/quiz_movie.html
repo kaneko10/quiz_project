@@ -61,7 +61,7 @@
     <form method="post" action="{% url 'quiz_movie' %}" id="playVideoForm">
         {% csrf_token %}
         <!-- 1つ目の動画再生ボタン -->
-        <button type="button" id="playButton" style="display: none;" onclick="playVideo('play')">再生</button>
+        <button type="button" id="playButton" style="display: block;" onclick="playVideo('play')">再生</button>
     </form>
 
     <!-- クイズの解答フォーム -->
@@ -75,7 +75,7 @@
     </div>
 
     <!-- アンケートフォーム -->
-    <div id="endMessage" style="display: none;">
+    <div id="questionnaire" style="display: none;">
         <p>アンケートに答えてください</p>
         <!-- <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdJagml4y_YcnofXxFxwgn8mGsZ7I3jRXAo4j65MlSKR_uP6w/viewform?embedded=true" width="640" height="653" frameborder="0" marginheight="0" marginwidth="0">読み込んでいます…</iframe> -->
         <form method="post" action="{% url 'quiz_movie' %}">
@@ -197,11 +197,13 @@
         ];
         var quizIndex = 0;
 
+        const questionnaireTime = 5000; // (ms)
+
         // YouTube APIがロードされたときに実行されるコールバック関数
         function onYouTubeIframeAPIReady() {
             // player オブジェクトを生成
             console.log("YouTube APIが初期化されました。")
-            createNewPlayer(false);
+            createNewPlayer(true);
         }
 
         // 動画再生が終了したときに id=player の div 要素を削除する関数
@@ -214,7 +216,8 @@
         }
 
         // 新しいプレーヤーを生成する関数
-        function createNewPlayer(clickPlay) {
+        // firstPlay -> true : 1回目の再生
+        function createNewPlayer(firstPlay) {
             var playerContainer = document.getElementById("playerContainer");
             var playerDiv = document.createElement("div");
             playerDiv.id = "player";
@@ -241,17 +244,16 @@
                 events: {
                     'onReady': function(event) {
                         // event.target.playVideo();  // 動画を自動再生
-                        if (clickPlay) {
+                        if (!firstPlay) {
                             event.target.playVideo(); // 自動再生
                         } else {
-                            // ページ初期表示時は非表示
                             console.log("プレーヤーの準備が完了しました。")
 
                             // 再生ボタンを表示
-                            var playButton = document.getElementById("playButton");
-                            if (playButton) {
-                                playButton.style.display = "block";
-                            }
+                            // var playButton = document.getElementById("playButton");
+                            // if (playButton) {
+                            //     playButton.style.display = "block";
+                            // }
                         }
                     },
                     'onStateChange': function(event) {
@@ -262,33 +264,41 @@
                         }
                         if (event.data === YT.PlayerState.ENDED) {
                             console.log("動画の再生が終了しました");
-                            // 動画再生が終了したときにテキストを表示
-                            var endMessage = document.getElementById("endMessage");
-                            if (endMessage) {
-                                endMessage.style.display = "block";
+                            // 再生ボタンを非表示（本当は最初の1回目だけでいい）
+                            var playButton = document.getElementById("playButton");
+                            if (playButton) {
+                                playButton.style.display = "none";
                             }
-                            // 動画再生が終了したときに新しいタブで指定リンクを開く
-                            // window.open('https://docs.google.com/forms/d/e/1FAIpQLSdnFFQIqY782gk1XMCYFhWKdOMsMFPaYdxABGaFscjp2FaZyg/viewform?usp=sf_link', '_blank');
 
-                            setTimeout(function() {
-                                // アンケートを送信
-                                submitForm();
-                                console.log("5秒経過しました");
-                                // document.getElementById('text').value = '5秒経過しました。';
-                            }, 5000);
                             // 動画を非表示
                             removePlayer(); // id=player の div 要素を削除
-
                             var playerContainer = document.getElementById("playerContainer");
                             if (playerContainer) {
                                 playerContainer.style.display = "none";
                             }
 
-                            // 次の問題へのボタンを表示
-                            var nextButtonContainer = document.getElementById("nextButtonContainer");
-                            if (nextButtonContainer) {
-                                nextButtonContainer.style.display = "block";
+                            // アンケートを表示
+                            var questionnaire = document.getElementById("questionnaire");
+                            if (questionnaire) {
+                                questionnaire.style.display = "block";
                             }
+                            // 動画再生が終了したときに新しいタブで指定リンクを開く
+                            // window.open('https://docs.google.com/forms/d/e/1FAIpQLSdnFFQIqY782gk1XMCYFhWKdOMsMFPaYdxABGaFscjp2FaZyg/viewform?usp=sf_link', '_blank');
+
+                            setTimeout(function() {
+                                console.log(`${questionnaireTime}秒経過しました`);
+                                // アンケートを送信
+                                submitForm();
+                                // 次の動画を再生
+                                playNextVideo('play');
+                            }, questionnaireTime);
+
+
+                            // 次の問題へのボタンを表示
+                            // var nextButtonContainer = document.getElementById("nextButtonContainer");
+                            // if (nextButtonContainer) {
+                            //     nextButtonContainer.style.display = "block";
+                            // }
                         }
                     }
                 }
@@ -297,20 +307,20 @@
 
         // 次の問題へのボタンを押したときに呼ばれる関数
         function nextQuiz() {
-            if (quizIndex < quiz_movie_ids.length) {
-                // quizIndex++
-                // 次の問題へのボタンを非表示
-                var nextButtonContainer = document.getElementById("nextButtonContainer");
-                if (nextButtonContainer) {
-                    nextButtonContainer.style.display = "none";
-                }
+            // if (quizIndex < quiz_movie_ids.length) {
+            //     // quizIndex++
+            //     // 次の問題へのボタンを非表示
+            //     var nextButtonContainer = document.getElementById("nextButtonContainer");
+            //     if (nextButtonContainer) {
+            //         nextButtonContainer.style.display = "none";
+            //     }
 
-                // 再生ボタンを表示
-                var playButton = document.getElementById("playButton");
-                if (playButton) {
-                    playButton.style.display = "block";
-                }
-            }
+            //     // 再生ボタンを表示
+            //     var playButton = document.getElementById("playButton");
+            //     if (playButton) {
+            //         playButton.style.display = "block";
+            //     }
+            // }
         }
 
         
@@ -325,7 +335,7 @@
                 if(player == null) {
                     console.log("player is null")
                     // player オブジェクトが存在しない場合、新たに生成
-                    createNewPlayer(true);
+                    createNewPlayer(false);
                     console.log("createNewPlayer playVideo")
                 }
             }
@@ -345,11 +355,11 @@
 
                     // ボタンが押されたら動画を表示して再生
                     var playerContainer = document.getElementById("playerContainer");
-                    var playButton = document.getElementById("playButton");
-                    if (playerContainer && playButton) {
+                    // var playButton = document.getElementById("playButton");
+                    if (playerContainer) {
                         playerContainer.style.display = "block";
                         console.log("make movie playVideo")
-                        playButton.style.display = "none";
+                        // playButton.style.display = "none";
                         console.log("player: ")
                         console.log(player)
 
@@ -364,6 +374,14 @@
             };
             var data = JSON.stringify({ action: action, quizIndex: quizIndex });  // JSONデータとして識別子を送信
             xhr.send(data);
+        }
+
+        function playNextVideo(action) {
+            if (quizIndex < quiz_movie_ids.length) {
+                console.log("次の動画を再生");
+                playVideo('play');
+            }
+            console.log("次の動画を再生完了");
         }
 
         function sendAnswer(action) {
@@ -414,11 +432,21 @@
 
         // フォーム送信
         function submitForm() {
+            console.log("アンケートを送信");
+            // アンケートの回答を取得
             getRadioButtonValue("q1");
             getRadioButtonValue("q2_que");
             getRadioButtonValue("q2_ans");
             getRadioButtonValue("q3");
             getRadioButtonValue("q4");
+
+            // データベースに保存
+
+            // アンケートを非表示
+            var questionnaire = document.getElementById("questionnaire");
+            questionnaire.style.display = "none";
+            
+            console.log("アンケートを送信完了");
         }
 
         function getRadioButtonValue(name) {
