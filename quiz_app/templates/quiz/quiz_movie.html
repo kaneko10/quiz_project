@@ -40,6 +40,20 @@
             justify-content: center;
             text-align: center;
         }
+
+        .progress-container {
+            width: 100%;
+            background-color: #f0f0f0;
+        }
+
+        .progress-bar {
+            width: 0;
+            height: 30px;
+            background-color: #007bff;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+        }
     </style>
 </head>
 
@@ -77,6 +91,10 @@
 
     <!-- アンケートフォーム -->
     <div id="questionnaire" style="display: none;">
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar">0%</div>
+        </div>
+
         <p>アンケートに答えてください</p>
         <!-- <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdJagml4y_YcnofXxFxwgn8mGsZ7I3jRXAo4j65MlSKR_uP6w/viewform?embedded=true" width="640" height="653" frameborder="0" marginheight="0" marginwidth="0">読み込んでいます…</iframe> -->
         <form method="post" action="{% url 'quiz_movie' person_id=person_id %}">
@@ -186,7 +204,7 @@
         var quizIndex = 0;
         var person_id = "";
 
-        const questionnaireTime = 5000; // (ms)
+        const questionnaireTime = 10000; // (ms)
 
         // YouTube APIがロードされたときに実行されるコールバック関数
         function onYouTubeIframeAPIReady() {
@@ -342,6 +360,21 @@
                             if (questionnaire) {
                                 questionnaire.style.display = "block";
                             }
+
+                            // アンケートのプログレスバーを表示
+                            var durationInSeconds = questionnaireTime / 1000; // 秒数を変数で指定
+                            var progress = 0; // 現在の進捗（0%から100%）
+                            var progressBar = document.getElementById("progress-bar");
+
+                            var interval = setInterval(function() {
+                                progress += 1;
+                                progressBar.style.width = (progress / durationInSeconds * 100) + "%";
+                                progressBar.textContent = Math.round((progress / durationInSeconds) * 100) + "%";
+
+                                if (progress >= durationInSeconds) {
+                                    clearInterval(interval); // タイマーを停止
+                                }
+                            }, 1000); // 1秒ごとに更新
                             // 動画再生が終了したときに新しいタブで指定リンクを開く
                             // window.open('https://docs.google.com/forms/d/e/1FAIpQLSdnFFQIqY782gk1XMCYFhWKdOMsMFPaYdxABGaFscjp2FaZyg/viewform?usp=sf_link', '_blank');
 
@@ -523,6 +556,12 @@
 
             var data = JSON.stringify(context);  // JSONデータとしてアクションと回答を送信
             xhr.send(data);
+
+            // プログレスバーをリセット
+            var progressBar = document.getElementById("progress-bar");
+            progress = 0; // 進捗をリセット
+            progressBar.style.width = "0%"; // プログレスバーの幅を初期化
+            progressBar.textContent = "0%";
 
             // アンケートを非表示
             var questionnaire = document.getElementById("questionnaire");
