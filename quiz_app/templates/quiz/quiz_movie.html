@@ -266,6 +266,7 @@
                             }
 
                             // アンケートを表示
+                            resetRadioButtons();
                             var questionnaire = document.getElementById("questionnaire");
                             if (questionnaire) {
                                 questionnaire.style.display = "block";
@@ -421,6 +422,48 @@
             console.log("選択されたラジオボタンの値: " + selectedValue);
 
             return selectedValue;
+        }
+
+        function resetRadioButtons() {
+            // Q1
+            resetRadioButtonCheck("q1_delight");
+            resetRadioButtonCheck("q1_boredom");
+            resetRadioButtonCheck("q1_confused");
+            resetRadioButtonCheck("q1_frustration");
+            resetRadioButtonCheck("q1_concentration");
+            resetRadioButtonCheck("q1_neutral");
+
+            // Q2-1
+            resetRadioButtonCheck("q2_que_very_easy");
+            resetRadioButtonCheck("q2_que_easy");
+            resetRadioButtonCheck("q2_que_normal");
+            resetRadioButtonCheck("q2_que_hard");
+            resetRadioButtonCheck("q2_que_very_hard");
+            // Q2-2
+            resetRadioButtonCheck("q2_ans_very_easy");
+            resetRadioButtonCheck("q2_ans_easy");
+            resetRadioButtonCheck("q2_ans_normal");
+            resetRadioButtonCheck("q2_ans_hard");
+            resetRadioButtonCheck("q2_ans_very_hard");
+    
+            // Q3
+            resetRadioButtonCheck("q3_helpful");
+            resetRadioButtonCheck("q3_somewhat_helpful");
+            resetRadioButtonCheck("q3_neutral");
+            resetRadioButtonCheck("q3_not_helpful");
+            resetRadioButtonCheck("q3_not_at_all_helpful");
+
+            // Q4
+            resetRadioButtonCheck("q4_zero");
+            resetRadioButtonCheck("q4_one");
+            resetRadioButtonCheck("q4_two");
+            resetRadioButtonCheck("q4_three");
+            resetRadioButtonCheck("q4_four");
+        }
+
+        function resetRadioButtonCheck(id) {
+            const radioButton = document.getElementById(id);
+            radioButton.checked = false;
         }
 
     </script>
