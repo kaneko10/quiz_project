@@ -12,9 +12,10 @@ urlpatterns = [
     # ex: /polls/5/vote/
     path("<int:question_id>/vote/", views.vote, name="vote"),
     path('video_feed/', views.video_feed_view, name="video_feed"),
-    path('quiz_movie/', views.quiz_movie_view, name="quiz_movie"),
+    path('quiz_movie/<str:person_id>/', views.quiz_movie_view, name="quiz_movie"),
     path('webcamera/', views.WebCameraView.as_view(), name="webcamera"),
     # 録画停止用の URL パターン
     path('stop_recording/', views.stop_recording, name='stop_recording'),
+    path('save_name/', views.save_name, name='save_name'),
 ]
 urlpatterns += staticfiles_urlpatterns()

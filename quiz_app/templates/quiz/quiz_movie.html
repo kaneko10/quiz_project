@@ -58,7 +58,7 @@
     <div id="playerContainer" style="display: none;">
         <!-- <div id="player"></div> -->
     </div>
-    <form method="post" action="{% url 'quiz_movie' %}" id="playVideoForm">
+    <form method="post" action="{% url 'quiz_movie' person_id=person_id %}" id="playVideoForm">
         {% csrf_token %}
         <!-- 1つ目の動画再生ボタン -->
         <button type="button" id="playButton" style="display: block;" onclick="playVideo('play', true)">再生</button>
@@ -67,7 +67,7 @@
     <!-- クイズの解答フォーム -->
     <div id="quizForm">
         <h2>クイズに回答する</h2>
-        <form method="post" action="{% url 'quiz_movie' %}">
+        <form method="post" action="{% url 'quiz_movie' person_id=person_id %}">
             <label for="answer">回答：</label>
             <input type="text" id="answer" name="answer">
             <button type="button" id="submitButton" onclick="sendAnswer('answer')">送信</button>
@@ -78,7 +78,7 @@
     <div id="questionnaire" style="display: none;">
         <p>アンケートに答えてください</p>
         <!-- <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdJagml4y_YcnofXxFxwgn8mGsZ7I3jRXAo4j65MlSKR_uP6w/viewform?embedded=true" width="640" height="653" frameborder="0" marginheight="0" marginwidth="0">読み込んでいます…</iframe> -->
-        <form method="post" action="{% url 'quiz_movie' %}">
+        <form method="post" action="{% url 'quiz_movie' person_id=person_id %}">
             <!-- 質問1 -->
             <h3>質問1：question1に対する感想</h3>
             <label for="q1_delight">
@@ -183,6 +183,7 @@
 
         var quiz_movie_ids;
         var quizIndex = 0;
+        var person_id = "";
 
         const questionnaireTime = 5000; // (ms)
 
@@ -190,6 +191,19 @@
         function onYouTubeIframeAPIReady() {
             // player オブジェクトを生成
             console.log("YouTube APIが初期化されました。")
+
+            // 現在のURLを取得
+            var currentURL = window.location.href;
+
+            // 正規表現を使用してperson_idの値を抽出
+            var regex = /person_id=([^&]+)/;
+            var match = currentURL.match(regex);
+
+            // person_idの値を取得
+            var personId = match && match[1];
+            person_id = personId;
+            console.log("person_idの値は: " + person_id);
+
             createNewPlayer(true);
         }
 
@@ -226,7 +240,7 @@
 
             // POSTリクエストを送信して動画の順番データデータをサーバーに送信
             var xhr = new XMLHttpRequest();
-            xhr.open("POST", "{% url 'quiz_movie' %}", true);
+            xhr.open("POST", "{% url 'quiz_movie' person_id=person_id %}", true);
             xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");  // JSONデータを送信することを指定
 
@@ -244,6 +258,7 @@
                 action: 'quiz_order', 
                 randoms: randoms,
                 movie_ids: quiz_movie_ids, 
+                person_id: person_id,
             };
             var data = JSON.stringify(context);  // JSONデータとしてアクションと回答を送信
             xhr.send(data);
@@ -366,7 +381,7 @@
 
             // POSTリクエストを送信してボタンが押された時刻をデータベースに保存
             var xhr = new XMLHttpRequest();
-            xhr.open("POST", "{% url 'quiz_movie' %}", true);
+            xhr.open("POST", "{% url 'quiz_movie' person_id=person_id %}", true);
             xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");  // JSONデータを送信することを指定
 
@@ -394,7 +409,7 @@
                     }
                 }
             };
-            var data = JSON.stringify({ action: action, quizIndex: quizIndex });  // JSONデータとして識別子を送信
+            var data = JSON.stringify({ action: action, quizIndex: quizIndex, person_id: person_id, });  // JSONデータとして識別子を送信
             xhr.send(data);
         }
 
@@ -411,7 +426,7 @@
             var answer = document.getElementById("answer").value;
             // POSTリクエストを送信してデータをサーバーに送信
             var xhr = new XMLHttpRequest();
-            xhr.open("POST", "{% url 'quiz_movie' %}", true);
+            xhr.open("POST", "{% url 'quiz_movie'  person_id=person_id %}", true);
             xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");  // JSONデータを送信することを指定
 
@@ -425,7 +440,7 @@
                 textForm.value = '';
             };
 
-            var data = JSON.stringify({ action: action, answer: answer });  // JSONデータとしてアクションと回答を送信
+            var data = JSON.stringify({ action: action, answer: answer, person_id: person_id });  // JSONデータとしてアクションと回答を送信
             xhr.send(data);
         }
 
@@ -463,11 +478,12 @@
                 q2_ans: getRadioButtonValue("q2_ans"),
                 q3: getRadioButtonValue("q3"),
                 q4: getRadioButtonValue("q4"),
+                person_id: person_id,
             };
 
             // POSTリクエストを送信してデータをサーバーに送信
             var xhr = new XMLHttpRequest();
-            xhr.open("POST", "{% url 'quiz_movie' %}", true);
+            xhr.open("POST", "{% url 'quiz_movie' person_id=person_id %}", true);
             xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");  // JSONデータを送信することを指定
 
