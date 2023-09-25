@@ -91,58 +91,6 @@
 
         // YouTube APIがロードされたときに実行されるコールバック関数
         function onYouTubeIframeAPIReady() {
-            // console.log("videoID: " + quizIndex)
-            // videoId = quiz_movie_ids[quizIndex]
-            // player = new YT.Player('player', {
-            //     videoId: videoId,  // 埋め込むYouTube動画のIDを指定
-            //     playerVars: {
-            //         // 'controls': 0,  // コントロールを非表示にする
-            //         'disablekb': 1,  // キーボード操作を無効にする
-            //         'showinfo': 0,   // タイトルとアップロード者情報を非表示にする
-            //         'rel': 0,        // 関連動画を非表示にする
-            //         'autoplay': 0,   // 自動再生を有効にする
-            //         'playsinline': 1  // iOSデバイスでインライン再生を有効にする
-            //     },
-            //     events: {
-            //         'onReady': function(event) {
-            //             // event.target.playVideo();  // 動画を自動再生
-            //             // ページ初期表示時は非表示
-            //             console.log("delete movie onYouTubeIframeAPIReady")
-            //             var playerContainer = document.getElementById("playerContainer");
-            //             if (playerContainer) {
-            //                 playerContainer.style.display = "none";
-            //             }
-            //         },
-            //         'onStateChange': function(event) {
-            //             if (event.data === YT.PlayerState.PAUSED) {
-            //                 // 動画が一時停止されたときに再度再生
-            //                 event.target.playVideo();
-            //             }
-            //             if (event.data === YT.PlayerState.ENDED) {
-            //                 // 動画再生が終了したときにテキストを表示
-            //                 var endMessage = document.getElementById("endMessage");
-            //                 if (endMessage) {
-            //                     endMessage.style.display = "block";
-            //                 }
-            //                 // 動画再生が終了したときに新しいタブで指定リンクを開く
-            //                 window.open('https://www.library.metro.tokyo.lg.jp/', '_blank');
-
-            //                 // 動画を非表示
-            //                 var playerContainer = document.getElementById("playerContainer");
-            //                 if (playerContainer) {
-            //                     playerContainer.style.display = "none";
-            //                 }
-
-            //                 // 次の問題へのボタンを表示
-            //                 var nextButtonContainer = document.getElementById("nextButtonContainer");
-            //                 if (nextButtonContainer) {
-            //                     nextButtonContainer.style.display = "block";
-            //                 }
-            //             }
-            //         }
-            //     }
-            // });
-
             // player オブジェクトを生成
             console.log("YouTube APIが初期化されました。")
             createNewPlayer(false);
@@ -175,7 +123,7 @@
             player = new YT.Player('player', {
                 videoId: videoId,  // 埋め込むYouTube動画のIDを指定
                 playerVars: {
-                    'controls': 0,  // コントロールを非表示にする
+                    // 'controls': 0,  // コントロールを非表示にする
                     'disablekb': 1,  // キーボード操作を無効にする
                     'showinfo': 0,   // タイトルとアップロード者情報を非表示にする
                     'rel': 0,        // 関連動画を非表示にする
@@ -188,14 +136,8 @@
                         if (clickPlay) {
                             event.target.playVideo(); // 自動再生
                         } else {
-                        // ページ初期表示時は非表示
-                        // if (!clickPlay) {
+                            // ページ初期表示時は非表示
                             console.log("プレーヤーの準備が完了しました。")
-                            // console.log("delete movie createNewPlayer")
-                            // var playerContainer = document.getElementById("playerContainer");
-                            // if (playerContainer) {
-                            //     playerContainer.style.display = "none";
-                            // }
 
                             // 再生ボタンを表示
                             var playButton = document.getElementById("playButton");
@@ -272,11 +214,7 @@
                     console.log("createNewPlayer playVideo")
                 }
             }
-            // if (!player) {
-            //     // player オブジェクトが存在しない場合、新たに生成
-            //     createNewPlayer();
-            //     console.log("createNewPlayer playVideo")
-            // }
+
             // POSTリクエストを送信してボタンが押された時刻をデータベースに保存
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "{% url 'quiz_movie' %}", true);
