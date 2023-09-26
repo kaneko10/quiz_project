@@ -77,8 +77,8 @@
         <button type="button" id="playButton" style="display: block;" onclick="playVideo('play', true)">再生</button>
     </form>
 
-    <!-- クイズの解答フォーム -->
-    <div id="quizForm">
+    <!-- クイズの回答フォーム -->
+    <div id="quizForm" style="display: none;">
         <h2>クイズに回答する</h2>
         <form method="post" action="{% url 'quiz_movie' person_id=person_id %}">
             <label for="answer">回答：</label>
@@ -374,6 +374,12 @@
                                 playerContainer.style.display = "none";
                             }
 
+                            // 回答フォームを非表示
+                            var quizForm = document.getElementById("quizForm");
+                            if (quizForm) {
+                                quizForm.style.display = "none";
+                            }
+
                             // アンケートを表示
                             resetRadioButtons();
                             var questionnaire = document.getElementById("questionnaire");
@@ -452,7 +458,13 @@
                     quizIndex = responseData.quizIndex;
                     console.log("Received quizIndex: " + quizIndex);
 
-                    // ボタンが押されたら動画を表示して再生
+                    // 回答フォームを表示
+                    var quizForm = document.getElementById("quizForm");
+                    if (quizForm) {
+                        quizForm.style.display = "block";
+                    }
+
+                    // 動画を表示して再生
                     var playerContainer = document.getElementById("playerContainer");
                     // var playButton = document.getElementById("playButton");
                     if (playerContainer) {
