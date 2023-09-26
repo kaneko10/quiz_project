@@ -73,8 +73,10 @@
     </div>
     <form method="post" action="{% url 'quiz_movie' person_id=person_id %}" id="playVideoForm">
         {% csrf_token %}
+        <!-- 例題の動画再生ボタン -->
+        <button type="button" id="exPlayButton" style="display: block;" onclick="playVideo('play', true, true)">例題</button>
         <!-- 1つ目の動画再生ボタン -->
-        <button type="button" id="playButton" style="display: block;" onclick="playVideo('play', true)">再生</button>
+        <button type="button" id="playButton" style="display: none;" onclick="playVideo('play', false, true)">開始</button>
     </form>
 
     <!-- クイズの回答フォーム -->
@@ -221,11 +223,14 @@
             person_id = personId;
             console.log("person_idの値は: " + person_id);
 
-            createNewPlayer(true);
+            createNewPlayer(true, true);
         }
 
         // ランダムな順番にした動画IDを生成
         function makeQuizMovieIDs() {
+            // 例題
+            const quiz_movie_ex = 'JinLnLlAdew' // 仮置き（蚊）
+
             // 謎解き
             const quiz_movie_mystery = [
                 'ekbPqltDYMQ',  // アーモンド
@@ -250,6 +255,8 @@
             ];
 
             var quiz_movie_ids = [];
+
+            quiz_movie_ids.push(quiz_movie_ex);
 
             const randoms_mystery = makeRandomArray(0, quiz_movie_mystery.length - 1);
             for (i = 0; i < randoms_mystery.length; i++) {
@@ -277,11 +284,17 @@
                 textForm.value = '';
             };
 
+            // 動画のIDリストから例題のIDを除いたリストを生成
+            console.log("削除前： " + quiz_movie_ids);
+            var copy_movie_ids = JSON.parse(JSON.stringify(quiz_movie_ids));
+            copy_movie_ids.shift();
+            console.log("削除後： " + copy_movie_ids);
+
             var context = { 
                 action: 'quiz_order', 
                 randoms_mystery: randoms_mystery,
                 randoms_riddle: randoms_riddle,
-                movie_ids: quiz_movie_ids, 
+                movie_ids: copy_movie_ids, 
                 person_id: person_id,
             };
             var data = JSON.stringify(context);  // JSONデータとしてアクションと回答を送信
@@ -319,8 +332,9 @@
         }
 
         // 新しいプレーヤーを生成する関数
-        // firstPlay -> true : 1回目の再生
-        function createNewPlayer(firstPlay) {
+        // exPlay -> true：例題動画の再生
+        // firstPlay -> true : 例題または本番の1回目の再生
+        function createNewPlayer(exPlay, firstPlay) {
             var playerContainer = document.getElementById("playerContainer");
             var playerDiv = document.createElement("div");
             playerDiv.id = "player";
@@ -332,8 +346,8 @@
                 console.log("destroy player")
             }
 
-            // 動画のIDリストを生成
-            if (firstPlay) {
+            // 動画のIDリストを生成（例題の問題の時）
+            if (exPlay) {
                 quiz_movie_ids = makeQuizMovieIDs();
                 console.log("quiz_movie_ids: " + quiz_movie_ids);
             }
@@ -418,15 +432,25 @@
         }        
 
         // 動画を再生する関数
-        function playVideo(action, firstPlay) {
-            if (firstPlay) {
+        function playVideo(action, exPlay, firstPlay) {
+            // 例題動画の再生
+            if (exPlay) {
                 // webカメラの映像を非表示
                 var webCamera = document.getElementById("webcameraContainer");
                 if (webCamera) {
                     webCamera.style.display = "none";
                 }
 
-                // 再生ボタンを非表示（本当は最初の1回目だけでいい）
+                // 例題ボタンを非表示
+                var exPlayButton = document.getElementById("exPlayButton");
+                if (exPlayButton) {
+                    exPlayButton.style.display = "none";
+                }
+            }
+
+            // 本番の動画1回目の再生
+            if (firstPlay) {
+                // 再生ボタンを非表示
                 var playButton = document.getElementById("playButton");
                 if (playButton) {
                     playButton.style.display = "none";
@@ -440,7 +464,11 @@
                 if(player == null) {
                     console.log("player is null")
                     // player オブジェクトが存在しない場合、新たに生成
-                    createNewPlayer(false);
+                    if (exPlay) {
+                        createNewPlayer(false, true);
+                    } else {
+                        createNewPlayer(false, false);
+                    }
                     console.log("createNewPlayer playVideo")
                 }
             }
@@ -486,7 +514,16 @@
         }
 
         function playNextVideo(action) {
-            if (quizIndex < quiz_movie_ids.length) {
+            if (quizIndex == 1) {
+                // 例題の次の動画
+                // 再生ボタンを表示
+                // 再生ボタンを非表示
+                var playButton = document.getElementById("playButton");
+                if (playButton) {
+                    playButton.style.display = "block";
+                }
+
+            } else if (quizIndex < quiz_movie_ids.length) {
                 console.log("次の動画を再生");
                 playVideo('play', false);
             } else {
