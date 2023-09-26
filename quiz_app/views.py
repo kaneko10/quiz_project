@@ -186,23 +186,39 @@ def quiz_movie_view(request, person_id):
             return JsonResponse({"message": "Success"})
         
         elif action == 'quiz_order':
-            randoms = data.get('randoms')
+            randoms_mystery = data.get('randoms_mystery')
+            randoms_riddle = data.get('randoms_riddle')
             movie_ids = data.get('movie_ids')
-            random_index = ""
+            random_index_mystery  = ""
+            random_index_riddle  = ""
 
-            for index in randoms:
+            for index in randoms_mystery:
                 print("index: " + str(index))
-                random_index += str(index) + ", "
+                random_index_mystery += str(index) + ", "
+
+            for index in randoms_riddle:
+                print("index: " + str(index))
+                random_index_riddle += str(index) + ", "
 
             QuizOrder.objects.create(
                 person_id=person_id,
-                random_index = random_index,
+                random_index_mystery = random_index_mystery,
+                random_index_riddle = random_index_riddle,
                 id_1 = movie_ids[0],
                 id_2 = movie_ids[1],
                 id_3 = movie_ids[2],
                 id_4 = movie_ids[3],
                 id_5 = movie_ids[4],
                 id_6 = movie_ids[5],
+                id_7 = movie_ids[6],
+                id_8 = movie_ids[7],
+                id_9 = movie_ids[8],
+                id_10 = movie_ids[9],
+                id_11 = movie_ids[10],
+                id_12 = movie_ids[11],
+                id_13 = movie_ids[12],
+                id_14 = movie_ids[13],
+                id_15 = movie_ids[14],
             )
             return JsonResponse({"message": "Success"})
 

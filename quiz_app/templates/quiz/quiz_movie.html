@@ -97,7 +97,7 @@
         <!-- <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdJagml4y_YcnofXxFxwgn8mGsZ7I3jRXAo4j65MlSKR_uP6w/viewform?embedded=true" width="640" height="653" frameborder="0" marginheight="0" marginwidth="0">読み込んでいます…</iframe> -->
         <form method="post" action="{% url 'quiz_movie' person_id=person_id %}">
             <!-- 質問1 -->
-            <h3>質問1：question1に対する感想</h3>
+            <h3>質問1：感想</h3>
             <label for="q1_delight">
                 <input type="radio" name="q1" id="q1_delight" value="delight"> Delight
             </label>
@@ -118,7 +118,7 @@
             </label>
     
             <!-- 質問2 -->
-            <h3>質問2：Question1の難易度</h3>
+            <h3>質問2：難易度</h3>
             <label for="q2_seen_difficulty">
                 問題を見たとき：
                 <label for="q2_que_very_easy">
@@ -226,33 +226,39 @@
 
         // ランダムな順番にした動画IDを生成
         function makeQuizMovieIDs() {
-            const quiz_movie = [
-                'DFttkTzOFL8',
-                'Sn6pIAkn50c',
-                'wLl6b3JaAvU',
-                // '4t8JCicyYfc', 
-                // 'qPHSalN8k0I',
-                // 'Ns8-e-5Ll6c',
+            // 謎解き
+            const quiz_movie_mystery = [
+                'ekbPqltDYMQ',  // アーモンド
+                'yF1QVXk8R3Q',  // いのしし
+                'Xljgsas54CA',  // 赤身
+                'zLm_ILEKJ7A',  // チューイングガム
+                'CMOCBTYa8f0',  // マスカット
+                'wqHQJsGpgV0',  // カッパ
+                'IjdnudDMxnY',  // 太陽系
+            ];
+
+            // なぞなぞ
+            const quiz_movie_riddle = [
+                'JinLnLlAdew',  // 蚊  
+                '57VFZr9y6dA',  // いくら
+                '4TJ4u4K1pws',  // ソフトボール
+                'pGXHxaH9osI',  // 不眠
+                'XamRk58I1Pg',  // 森
+                'p1Aw6_u0wmI',  // 視覚
+                'DiSzWzk0Kq4',  // 119
+                'aUR455d8oek',  // バトル
             ];
 
             var quiz_movie_ids = [];
-            var randoms = [];
-            const min = 0;
-            const max = quiz_movie.length - 1;
 
-            for(i = min; i <= max; i++){
-                while(true){
-                    var tmp = randomInt(min, max);
-                    if(!randoms.includes(tmp)){
-                        randoms.push(tmp);
-                        break;
-                    }
-                }
+            const randoms_mystery = makeRandomArray(0, quiz_movie_mystery.length - 1);
+            for (i = 0; i < randoms_mystery.length; i++) {
+                quiz_movie_ids.push(quiz_movie_mystery[randoms_mystery[i]]);
             }
-            console.log("randoms: " + randoms);
 
-            for (i = 0; i < randoms.length; i++) {
-                quiz_movie_ids[i] = quiz_movie[randoms[i]];
+            const randoms_riddle = makeRandomArray(0, quiz_movie_riddle.length - 1);
+            for (i = 0; i < randoms_riddle.length; i++) {
+                quiz_movie_ids.push(quiz_movie_riddle[randoms_riddle[i]]);
             }
 
             // POSTリクエストを送信して動画の順番データデータをサーバーに送信
@@ -273,7 +279,8 @@
 
             var context = { 
                 action: 'quiz_order', 
-                randoms: randoms,
+                randoms_mystery: randoms_mystery,
+                randoms_riddle: randoms_riddle,
                 movie_ids: quiz_movie_ids, 
                 person_id: person_id,
             };
@@ -281,6 +288,21 @@
             xhr.send(data);
 
             return quiz_movie_ids;
+        }
+
+        function makeRandomArray(min, max) {
+            var randoms = [];
+            for(i = min; i <= max; i++){
+                while(true){
+                    var tmp = randomInt(min, max);
+                    if(!randoms.includes(tmp)){
+                        randoms.push(tmp);
+                        break;
+                    }
+                }
+            }
+            console.log("randoms: " + randoms);
+            return randoms;
         }
 
         function randomInt(min, max){
