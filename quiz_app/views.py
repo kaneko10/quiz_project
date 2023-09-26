@@ -7,7 +7,7 @@ from django.views import View
 from django.http import JsonResponse
 from urllib.parse import urlencode
 
-from .models import Question, PlayTime, QuizAnswerTime, Questionnaire, QuizOrder, Person
+from .models import PlayTime, QuizAnswerTime, Questionnaire, QuizOrder, Person
 from .forms import PersonForm
 
 import cv2
@@ -17,25 +17,25 @@ import json
 
 person_id = ""
 
-def index(request):
-    latest_question_list = Question.objects.order_by("-pub_date")[:5]
-    template = loader.get_template("quiz/index.html")
-    context = {
-        "latest_question_list": latest_question_list,
-    }
-    return HttpResponse(template.render(context, request))
+# def index(request):
+#     latest_question_list = Question.objects.order_by("-pub_date")[:5]
+#     template = loader.get_template("quiz/index.html")
+#     context = {
+#         "latest_question_list": latest_question_list,
+#     }
+#     return HttpResponse(template.render(context, request))
 
-def detail(request, question_id):
-    return HttpResponse("You're looking at question %s." % question_id)
-
-
-def results(request, question_id):
-    response = "You're looking at the results of question %s."
-    return HttpResponse(response % question_id)
+# def detail(request, question_id):
+#     return HttpResponse("You're looking at question %s." % question_id)
 
 
-def vote(request, question_id):
-    return HttpResponse("You're voting on question %s." % question_id)
+# def results(request, question_id):
+#     response = "You're looking at the results of question %s."
+#     return HttpResponse(response % question_id)
+
+
+# def vote(request, question_id):
+#     return HttpResponse("You're voting on question %s." % question_id)
 
 # 一番最初にアクセスして被験者の識別子を入力するview
 def save_name(request):
@@ -52,7 +52,7 @@ def save_name(request):
             return redirect(url)
 
             # return render(request, 'quiz/quiz_movie.html', {"person_name": name})  # 保存が成功した場合、リダイレクト
-            return redirect('quiz_movie', person_id=name)
+            # return redirect('quiz_movie', person_id=name)
     else:
         form = PersonForm()
 
@@ -135,6 +135,7 @@ def quiz_movie_view(request, person_id):
         data = json.loads(request.body.decode('utf-8'))  # JSONデータを解析
         action = data.get('action')
         person_id = data.get('person_id')
+        movie_id = data.get('movie_id')
 
         if action == 'play':
             # POSTリクエストからボタンが押された時刻を取得
@@ -143,7 +144,11 @@ def quiz_movie_view(request, person_id):
             jst_now = datetime.datetime.now(jst)
             timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
             # ボタンが押された時刻をデータベースに保存
-            PlayTime.objects.create(person_id=person_id, play_time=timestamp)
+            PlayTime.objects.create(
+                person_id=person_id, 
+                play_time=timestamp,
+                movie_id=movie_id,
+            )
             print("save play movie time")
 
             quizIndex = data.get('quizIndex')
@@ -154,15 +159,22 @@ def quiz_movie_view(request, person_id):
             return JsonResponse({"message": "Success", "quizIndex": quizIndex})
         elif action == 'answer':
             answer = data.get('answer')
+            movie_id = data.get('movie_id')
             jst = pytz.timezone('Asia/Tokyo')
             jst_now = datetime.datetime.now(jst)
             timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
-            QuizAnswerTime.objects.create(person_id=person_id, answer=answer, time=timestamp)
+            QuizAnswerTime.objects.create(
+                person_id=person_id, 
+                movie_id=movie_id,
+                answer=answer, 
+                time=timestamp
+            )
             print("save quiz answer and time")
 
             # JSONレスポンスを返す（Ajaxリクエストに対応）
             return JsonResponse({"message": "Success"})
         elif action == 'questionnaire':
+            movie_id = data.get('movie_id')
             q1 = data.get('q1')
             q2_que = data.get('q2_que')
             q2_ans = data.get('q2_ans')
@@ -175,6 +187,7 @@ def quiz_movie_view(request, person_id):
             # ボタンが押された時刻をデータベースに保存
             Questionnaire.objects.create(
                 person_id=person_id,
+                movie_id=movie_id,
                 q1 = q1,
                 q2_que = q2_que,
                 q2_ans = q2_ans,
@@ -200,8 +213,13 @@ def quiz_movie_view(request, person_id):
                 print("index: " + str(index))
                 random_index_riddle += str(index) + ", "
 
+            jst = pytz.timezone('Asia/Tokyo')
+            jst_now = datetime.datetime.now(jst)
+            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
+
             QuizOrder.objects.create(
                 person_id=person_id,
+                time = timestamp,
                 random_index_mystery = random_index_mystery,
                 random_index_riddle = random_index_riddle,
                 id_1 = movie_ids[0],
@@ -244,13 +262,18 @@ def make_expression_view(request, person_id):
         person_id = data.get('person_id')
 
         if action == 'play':
+            movie_id = data.get('movie_id')
             # POSTリクエストからボタンが押された時刻を取得
             # 日本時間のタイムゾーンを取得
             jst = pytz.timezone('Asia/Tokyo')
             jst_now = datetime.datetime.now(jst)
             timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
             # ボタンが押された時刻をデータベースに保存
-            PlayTime.objects.create(person_id=person_id, play_time=timestamp)
+            PlayTime.objects.create(
+                person_id=person_id, 
+                movie_id=movie_id,
+                play_time=timestamp
+            )
             print("save play movie time")
 
             quizIndex = data.get('quizIndex')

@@ -1,28 +1,31 @@
 from django.db import models
 
 # Create your models here.
-class Question(models.Model):
-    question_text = models.CharField(max_length=200)
-    pub_date = models.DateTimeField("date published")
+# class Question(models.Model):
+#     question_text = models.CharField(max_length=200)
+#     pub_date = models.DateTimeField("date published")
 
 
-class Choice(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    choice_text = models.CharField(max_length=200)
-    votes = models.IntegerField(default=0)
+# class Choice(models.Model):
+#     question = models.ForeignKey(Question, on_delete=models.CASCADE)
+#     choice_text = models.CharField(max_length=200)
+#     votes = models.IntegerField(default=0)
 
 class PlayTime(models.Model):
     person_id = models.CharField(max_length=30)
+    movie_id = models.CharField(max_length=30)
     play_time = models.CharField(max_length=30)
 
 class QuizAnswerTime(models.Model):
     person_id = models.CharField(max_length=30)
+    movie_id = models.CharField(max_length=30)
     answer = models.CharField(max_length=50)
     time = models.CharField(max_length=30)
 
 # アンケート
 class Questionnaire(models.Model):
     person_id = models.CharField(max_length=30)
+    movie_id = models.CharField(max_length=30)
     q1 = models.CharField(max_length=30)
     q2_que = models.CharField(max_length=30)
     q2_ans = models.CharField(max_length=30)
@@ -32,6 +35,7 @@ class Questionnaire(models.Model):
 
 class QuizOrder(models.Model):
     person_id = models.CharField(max_length=30)
+    time = models.CharField(max_length=30)
     random_index_mystery = models.CharField(max_length=20)
     random_index_riddle = models.CharField(max_length=20)
     id_1 = models.CharField(max_length=20)

@@ -202,6 +202,7 @@
 
         var quiz_movie_ids;
         var quizIndex = 0;
+        var currentMovieID = "";
         var person_id = "";
 
         const questionnaireTime = 10000; // (ms)
@@ -353,9 +354,9 @@
             }
 
             console.log("videoID: " + quizIndex)
-            videoId = quiz_movie_ids[quizIndex]
+            currentMovieID = quiz_movie_ids[quizIndex]
             player = new YT.Player('player', {
-                videoId: videoId,  // 埋め込むYouTube動画のIDを指定
+                videoId: currentMovieID,  // 埋め込むYouTube動画のIDを指定
                 playerVars: {
                     // 'controls': 0,  // コントロールを非表示にする
                     'disablekb': 1,  // キーボード操作を無効にする
@@ -509,7 +510,13 @@
                     }
                 }
             };
-            var data = JSON.stringify({ action: action, quizIndex: quizIndex, person_id: person_id, });  // JSONデータとして識別子を送信
+            var context = { 
+                action: action, 
+                quizIndex: quizIndex,
+                person_id: person_id,
+                movie_id: currentMovieID,
+            };
+            var data = JSON.stringify(context);  // JSONデータとして識別子を送信
             xhr.send(data);
         }
 
@@ -567,7 +574,14 @@
                 textForm.value = '';
             };
 
-            var data = JSON.stringify({ action: action, answer: answer, person_id: person_id });  // JSONデータとしてアクションと回答を送信
+            context = {
+                action: action,
+                answer: answer,
+                person_id: person_id,
+                movie_id: currentMovieID,
+            }
+
+            var data = JSON.stringify(context);  // JSONデータとしてアクションと回答を送信
             xhr.send(data);
         }
 
@@ -583,6 +597,7 @@
                 q3: getRadioButtonValue("q3"),
                 q4: getRadioButtonValue("q4"),
                 person_id: person_id,
+                movie_id: currentMovieID,
             };
 
             // POSTリクエストを送信してデータをサーバーに送信
