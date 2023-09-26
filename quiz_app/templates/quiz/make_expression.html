@@ -67,6 +67,7 @@
         var quiz_movie_ids = [
             "mUclq_zlD8s"
         ]
+        var currentMovieID = "";
 
         // YouTube APIがロードされたときに実行されるコールバック関数
         function onYouTubeIframeAPIReady() {
@@ -111,9 +112,9 @@
                 console.log("destroy player")
             }
 
-            videoId = quiz_movie_ids[0]
+            currentMovieID = quiz_movie_ids[0]
             player = new YT.Player('player', {
-                videoId: videoId,  // 埋め込むYouTube動画のIDを指定
+                videoId: currentMovieID,  // 埋め込むYouTube動画のIDを指定
                 playerVars: {
                     // 'controls': 0,  // コントロールを非表示にする
                     'disablekb': 1,  // キーボード操作を無効にする
@@ -227,7 +228,14 @@
                     }
                 }
             };
-            var data = JSON.stringify({ action: action, quizIndex: quizIndex, person_id: person_id, });  // JSONデータとして識別子を送信
+            
+            context = {
+                action: action, 
+                quizIndex: quizIndex, 
+                person_id: person_id,
+                movie_id: currentMovieID,
+            }
+            var data = JSON.stringify(context);  // JSONデータとして識別子を送信
             xhr.send(data);
         }
 

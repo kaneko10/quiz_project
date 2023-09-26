@@ -126,8 +126,8 @@ def quiz_movie_view(request, person_id):
             # ボタンが押された時刻をデータベースに保存
             PlayTime.objects.create(
                 person_id=person_id, 
-                play_time=timestamp,
                 movie_id=movie_id,
+                play_time=timestamp,
             )
             print("save play movie time")
 
@@ -250,7 +250,7 @@ def make_expression_view(request, person_id):
             timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
             # ボタンが押された時刻をデータベースに保存
             PlayTime.objects.create(
-                person_id=person_id, 
+                person_id=person_id,
                 movie_id=movie_id,
                 play_time=timestamp
             )
