@@ -2,8 +2,6 @@ from django.contrib import admin
 
 from .models import PlayTime, QuizAnswerTime, Questionnaire, QuizOrder, Person
 
-
-# admin.site.register(Question)
 admin.site.register(PlayTime)
 admin.site.register(QuizAnswerTime)
 admin.site.register(Questionnaire)
