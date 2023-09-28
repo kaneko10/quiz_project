@@ -60,12 +60,6 @@
 <body>
     <h1>{{text}}</h1>
     <!-- webカメラ -->
-    <div id="webcameraContainer">
-        <div id="image_area">
-            <img src="/quiz/video_feed/" width="810" height="540"/>
-        </div>
-        <!-- <a href="/quiz/stop_recording/" download="video.mp4" id="downloadLink">動画をダウンロード</a> -->
-    </div>
 
     <!-- クイズ動画再生エリア -->
     <div id="playerContainer" style="display: none;">
@@ -78,6 +72,14 @@
         <!-- 1つ目の動画再生ボタン -->
         <button type="button" id="playButton" style="display: none;" onclick="playVideo('play', false, true)">開始</button>
     </form>
+
+    <!-- webカメラ -->
+    <div id="webcameraContainer">
+        <div id="image_area">
+            <img src="/quiz/video_feed/" width="810" height="540"/>
+        </div>
+        <!-- <a href="/quiz/stop_recording/" download="video.mp4" id="downloadLink">動画をダウンロード</a> -->
+    </div>
 
     <!-- クイズの回答フォーム -->
     <div id="quizForm" style="display: none;">
@@ -452,10 +454,10 @@
             // 例題動画の再生
             if (exPlay) {
                 // webカメラの映像を非表示
-                var webCamera = document.getElementById("webcameraContainer");
-                if (webCamera) {
-                    webCamera.style.display = "none";
-                }
+                // var webCamera = document.getElementById("webcameraContainer");
+                // if (webCamera) {
+                //     webCamera.style.display = "none";
+                // }
 
                 // 例題ボタンを非表示
                 var exPlayButton = document.getElementById("exPlayButton");
