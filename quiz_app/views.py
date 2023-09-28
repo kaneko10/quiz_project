@@ -69,7 +69,7 @@ def generate_frame():
         # 現在の時刻を取得
         jst = pytz.timezone('Asia/Tokyo')
         jst_now = datetime.datetime.now(jst)
-        timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
+        timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
         
         # タイムスタンプをフレーム上にオーバーレイ
         cv2.putText(frame, timestamp, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
@@ -122,7 +122,7 @@ def quiz_movie_view(request, person_id):
             # 日本時間のタイムゾーンを取得
             jst = pytz.timezone('Asia/Tokyo')
             jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
+            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
             # ボタンが押された時刻をデータベースに保存
             PlayTime.objects.create(
                 person_id=person_id, 
@@ -142,7 +142,7 @@ def quiz_movie_view(request, person_id):
             movie_id = data.get('movie_id')
             jst = pytz.timezone('Asia/Tokyo')
             jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
+            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
             QuizAnswerTime.objects.create(
                 person_id=person_id, 
                 movie_id=movie_id,
@@ -163,7 +163,7 @@ def quiz_movie_view(request, person_id):
             # 日本時間のタイムゾーンを取得
             jst = pytz.timezone('Asia/Tokyo')
             jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
+            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
             # ボタンが押された時刻をデータベースに保存
             Questionnaire.objects.create(
                 person_id=person_id,
@@ -195,7 +195,7 @@ def quiz_movie_view(request, person_id):
 
             jst = pytz.timezone('Asia/Tokyo')
             jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
+            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
 
             QuizOrder.objects.create(
                 person_id=person_id,
@@ -247,7 +247,7 @@ def make_expression_view(request, person_id):
             # 日本時間のタイムゾーンを取得
             jst = pytz.timezone('Asia/Tokyo')
             jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
+            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
             # ボタンが押された時刻をデータベースに保存
             PlayTime.objects.create(
                 person_id=person_id,
