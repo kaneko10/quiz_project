@@ -223,7 +223,7 @@
             // person_idの値を取得
             var personId = match && match[1];
             person_id = personId;
-            console.log("person_idの値は: " + person_id);
+            // console.log("person_idの値は: " + person_id);
 
             createNewPlayer(true, true);
         }
@@ -294,10 +294,10 @@
             };
 
             // 動画のIDリストから例題のIDを除いたリストを生成
-            console.log("削除前： " + quiz_movie_ids);
+            // console.log("削除前： " + quiz_movie_ids);
             var copy_movie_ids = JSON.parse(JSON.stringify(quiz_movie_ids));
             copy_movie_ids.shift();
-            console.log("削除後： " + copy_movie_ids);
+            // console.log("削除後： " + copy_movie_ids);
 
             var context = { 
                 action: 'quiz_order', 
@@ -352,7 +352,7 @@
             if (player) {
                 // 現在のプレーヤーが存在する場合、削除します
                 player.destroy();
-                console.log("destroy player")
+                // console.log("destroy player")
             }
 
             // 動画のIDリストを生成（例題の問題の時）
@@ -361,7 +361,7 @@
                 console.log("quiz_movie_ids: " + quiz_movie_ids);
             }
 
-            console.log("videoID: " + quizIndex)
+            // console.log("videoID: " + quizIndex)
             currentMovieID = quiz_movie_ids[quizIndex]
             player = new YT.Player('player', {
                 videoId: currentMovieID,  // 埋め込むYouTube動画のIDを指定
@@ -383,7 +383,7 @@
                         }
                     },
                     'onStateChange': function(event) {
-                        console.log("onStateChange createNewPlayer")
+                        // console.log("onStateChange createNewPlayer")
                         if (event.data === YT.PlayerState.PAUSED) {
                             // 動画が一時停止されたときに再度再生
                             event.target.playVideo();
@@ -472,20 +472,20 @@
                     playButton.style.display = "none";
                 }
             }
-            console.log("quizIndex playVideo: " + quizIndex)
+            // console.log("quizIndex playVideo: " + quizIndex)
             if (quizIndex != 0) {
                 if (player) {
                     player = null
                 }
                 if(player == null) {
-                    console.log("player is null")
+                    // console.log("player is null")
                     // player オブジェクトが存在しない場合、新たに生成
                     if (exPlay) {
                         createNewPlayer(false, true);
                     } else {
                         createNewPlayer(false, false);
                     }
-                    console.log("createNewPlayer playVideo")
+                    // console.log("createNewPlayer playVideo")
                 }
             }
 
@@ -500,7 +500,7 @@
                     // quizIndexの値をインクリメント
                     var responseData = JSON.parse(xhr.responseText);
                     quizIndex = responseData.quizIndex;
-                    console.log("Received quizIndex: " + quizIndex);
+                    // console.log("Received quizIndex: " + quizIndex);
 
                     // 回答フォームを表示
                     var quizForm = document.getElementById("quizForm");
@@ -513,13 +513,13 @@
                     // var playButton = document.getElementById("playButton");
                     if (playerContainer) {
                         playerContainer.style.display = "block";
-                        console.log("make movie playVideo")
+                        // console.log("make movie playVideo")
                         // playButton.style.display = "none";
-                        console.log("player: ")
-                        console.log(player)
+                        // console.log("player: ")
+                        // console.log(player)
 
                         if(player) {
-                            console.log("playVideo")
+                            // console.log("playVideo")
                             player.playVideo();
                         }         
                     }
@@ -655,7 +655,7 @@
                     break;
                 }
             }
-            console.log("選択されたラジオボタンの値: " + selectedValue);
+            // console.log("選択されたラジオボタンの値: " + selectedValue);
 
             if (selectedValue == undefined) {
                 selectedValue = "undefined";
