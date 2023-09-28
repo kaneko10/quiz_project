@@ -206,6 +206,7 @@
         var person_id = "";
 
         const questionnaireTime = 10000; // (ms)
+        const breakTime = 5000  // 問題間の休憩時間
 
         // YouTube APIがロードされたときに実行されるコールバック関数
         function onYouTubeIframeAPIReady() {
@@ -230,29 +231,36 @@
         // ランダムな順番にした動画IDを生成
         function makeQuizMovieIDs() {
             // 例題
-            const quiz_movie_ex = 'JinLnLlAdew' // 仮置き（蚊）
+            // const quiz_movie_ex = 'JinLnLlAdew' // 仮置き（蚊）
+            const quiz_movie_ex = '4t8JCicyYfc' // 仮置き（クイズノック）
 
             // 謎解き
             const quiz_movie_mystery = [
-                'ekbPqltDYMQ',  // アーモンド
-                'yF1QVXk8R3Q',  // いのしし
-                'Xljgsas54CA',  // 赤身
-                'zLm_ILEKJ7A',  // チューイングガム
-                'CMOCBTYa8f0',  // マスカット
-                'wqHQJsGpgV0',  // カッパ
-                'IjdnudDMxnY',  // 太陽系
+                // 'ekbPqltDYMQ',  // アーモンド
+                // 'yF1QVXk8R3Q',  // いのしし
+                // 'Xljgsas54CA',  // 赤身
+                // 'zLm_ILEKJ7A',  // チューイングガム
+                // 'CMOCBTYa8f0',  // マスカット
+                // 'wqHQJsGpgV0',  // カッパ
+                // 'IjdnudDMxnY',  // 太陽系
+                '4t8JCicyYfc',  // クイズノック
+                'qPHSalN8k0I',  // クイズノック
+                'Ns8-e-5Ll6c',  // クイズノック
             ];
 
             // なぞなぞ
             const quiz_movie_riddle = [
-                'JinLnLlAdew',  // 蚊  
-                '57VFZr9y6dA',  // いくら
-                '4TJ4u4K1pws',  // ソフトボール
-                'pGXHxaH9osI',  // 不眠
-                'XamRk58I1Pg',  // 森
-                'p1Aw6_u0wmI',  // 視覚
-                'DiSzWzk0Kq4',  // 119
-                'aUR455d8oek',  // バトル
+                // 'JinLnLlAdew',  // 蚊  
+                // '57VFZr9y6dA',  // いくら
+                // '4TJ4u4K1pws',  // ソフトボール
+                // 'pGXHxaH9osI',  // 不眠
+                // 'XamRk58I1Pg',  // 森
+                // 'p1Aw6_u0wmI',  // 視覚
+                // 'DiSzWzk0Kq4',  // 119
+                // 'aUR455d8oek',  // バトル
+                '4t8JCicyYfc',  // クイズノック
+                'qPHSalN8k0I',  // クイズノック
+                'Ns8-e-5Ll6c',  // クイズノック
             ];
 
             var quiz_movie_ids = [];
@@ -420,12 +428,19 @@
                             // window.open('https://docs.google.com/forms/d/e/1FAIpQLSdnFFQIqY782gk1XMCYFhWKdOMsMFPaYdxABGaFscjp2FaZyg/viewform?usp=sf_link', '_blank');
 
                             setTimeout(function() {
-                                console.log(`${questionnaireTime}秒経過しました`);
+                                console.log(`アンケート：${questionnaireTime / 1000}秒経過しました`);
                                 // アンケートを送信
                                 submitForm('questionnaire');
+                                // // 次の動画を再生
+                                // playNextVideo('play');
+                                console.log("アンケートを送信完了");
+                            }, questionnaireTime);
+
+                            setTimeout(function() {
+                                console.log(`休憩：${breakTime / 1000}秒経過しました`);
                                 // 次の動画を再生
                                 playNextVideo('play');
-                            }, questionnaireTime);
+                            }, breakTime + questionnaireTime);
                         }
                     }
                 }
@@ -552,7 +567,7 @@
                     webcameraContainer.appendChild(downloadLink);
                 }
             }
-            console.log("次の動画を再生完了");
+            // console.log("次の動画を再生完了");
         }
 
         function sendAnswer(action) {
@@ -628,8 +643,6 @@
             // アンケートを非表示
             var questionnaire = document.getElementById("questionnaire");
             questionnaire.style.display = "none";
-
-            console.log("アンケートを送信完了");
         }
 
         function getRadioButtonValue(name) {
