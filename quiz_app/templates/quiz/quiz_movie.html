@@ -210,6 +210,8 @@
         const questionnaireTime = 10000; // (ms)
         const breakTime = 5000  // 問題間の休憩時間
 
+        var isPlaying = false;
+
         // YouTube APIがロードされたときに実行されるコールバック関数
         function onYouTubeIframeAPIReady() {
             // player オブジェクトを生成
@@ -392,8 +394,11 @@
                             // 動画クリックするごとに毎回実行される
                             console.log("動画の再生を開始：PLAYING");
 
-                            // 動画の再生時刻の保存をサーバーに要求
-                            orderSaveDate('play')
+                            if (!isPlaying) {
+                                // 動画の再生時刻の保存をサーバーに要求
+                                orderSaveDate('play')
+                                isPlaying = true;
+                            }
 
                         } else if (event.data === YT.PlayerState.PAUSED) {
                             // 動画が一時停止されたときに再度再生
@@ -402,7 +407,8 @@
                             console.log("動画の再生が終了しました");
 
                             // 動画の再生終了時刻の保存をサーバーに要求
-                            
+                            orderSaveDate('ended')
+                            isPlaying = false;
 
                             // 動画を非表示
                             removePlayer(); // id=player の div 要素を削除
@@ -569,10 +575,16 @@
 
             xhr.onload = function() {
                 if (xhr.status === 200) {
-                    // quizIndexの値をインクリメント（action == 'play')
-                    var responseData = JSON.parse(xhr.responseText);
-                    quizIndex = responseData.quizIndex;
-                    // console.log("Received quizIndex: " + quizIndex);
+                    if (action == 'play') {
+                        console.log("再生開始時刻の保存が成功しました");
+                    } else if(action == 'ended') {
+                        console.log("再生終了時刻の保存が成功しました");
+
+                        // quizIndexの値をインクリメント
+                        var responseData = JSON.parse(xhr.responseText);
+                        quizIndex = responseData.quizIndex;
+                        // console.log("Received quizIndex: " + quizIndex);
+                    }
                 }
             };
             var context = { 
