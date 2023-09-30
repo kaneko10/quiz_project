@@ -5,6 +5,11 @@ class PlayTime(models.Model):
     movie_id = models.CharField(max_length=30)
     play_time = models.CharField(max_length=30)
 
+class EndedTime(models.Model):
+    person_id = models.CharField(max_length=30)
+    movie_id = models.CharField(max_length=30)
+    ended_time = models.CharField(max_length=30)
+
 class QuizAnswerTime(models.Model):
     person_id = models.CharField(max_length=30)
     movie_id = models.CharField(max_length=30)

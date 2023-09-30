@@ -7,7 +7,7 @@ from django.views import View
 from django.http import JsonResponse
 from urllib.parse import urlencode
 
-from .models import PlayTime, QuizAnswerTime, Questionnaire, QuizOrder, Person
+from .models import PlayTime, QuizAnswerTime, Questionnaire, QuizOrder, Person, EndedTime
 from .forms import PersonForm
 
 import cv2
@@ -69,7 +69,7 @@ def generate_frame():
         # 現在の時刻を取得
         jst = pytz.timezone('Asia/Tokyo')
         jst_now = datetime.datetime.now(jst)
-        timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
+        timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
         
         # タイムスタンプをフレーム上にオーバーレイ
         cv2.putText(frame, timestamp, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
@@ -122,7 +122,7 @@ def quiz_movie_view(request, person_id):
             # 日本時間のタイムゾーンを取得
             jst = pytz.timezone('Asia/Tokyo')
             jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
+            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
             # ボタンが押された時刻をデータベースに保存
             PlayTime.objects.create(
                 person_id=person_id, 
@@ -130,19 +130,15 @@ def quiz_movie_view(request, person_id):
                 play_time=timestamp,
             )
             print("save play movie time")
-
-            quizIndex = data.get('quizIndex')
-            quizIndex += 1
-            print(f"Next Quiz Number {quizIndex}")
             
             # JSONレスポンスを返す（Ajaxリクエストに対応）
-            return JsonResponse({"message": "Success", "quizIndex": quizIndex})
+            return JsonResponse({"message": "Success"})
         elif action == 'answer':
             answer = data.get('answer')
             movie_id = data.get('movie_id')
             jst = pytz.timezone('Asia/Tokyo')
             jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
+            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
             QuizAnswerTime.objects.create(
                 person_id=person_id, 
                 movie_id=movie_id,
@@ -153,6 +149,22 @@ def quiz_movie_view(request, person_id):
 
             # JSONレスポンスを返す（Ajaxリクエストに対応）
             return JsonResponse({"message": "Success"})
+        elif action == 'ended':
+            jst = pytz.timezone('Asia/Tokyo')
+            jst_now = datetime.datetime.now(jst)
+            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
+            # ボタンが押された時刻をデータベースに保存
+            EndedTime.objects.create(
+                person_id=person_id, 
+                movie_id=movie_id,
+                ended_time=timestamp,
+            )
+
+            quizIndex = data.get('quizIndex')
+            quizIndex += 1
+            print(f"Next Quiz Number {quizIndex}")
+            
+            return JsonResponse({"message": "Success", "quizIndex": quizIndex})
         elif action == 'questionnaire':
             movie_id = data.get('movie_id')
             q1 = data.get('q1')
@@ -163,7 +175,7 @@ def quiz_movie_view(request, person_id):
             # 日本時間のタイムゾーンを取得
             jst = pytz.timezone('Asia/Tokyo')
             jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
+            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
             # ボタンが押された時刻をデータベースに保存
             Questionnaire.objects.create(
                 person_id=person_id,
@@ -195,7 +207,7 @@ def quiz_movie_view(request, person_id):
 
             jst = pytz.timezone('Asia/Tokyo')
             jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
+            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
 
             QuizOrder.objects.create(
                 person_id=person_id,
@@ -247,7 +259,7 @@ def make_expression_view(request, person_id):
             # 日本時間のタイムゾーンを取得
             jst = pytz.timezone('Asia/Tokyo')
             jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S")
+            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
             # ボタンが押された時刻をデータベースに保存
             PlayTime.objects.create(
                 person_id=person_id,
