@@ -97,9 +97,9 @@
     <form method="post" action="{% url 'quiz_movie' person_id=person_id %}" id="playVideoForm">
         {% csrf_token %}
         <!-- 例題の動画再生ボタン -->
-        <button type="button" id="exPlayButton" style="display: block;" onclick="playVideo('play', true, true)">例題</button>
+        <button type="button" id="exPlayButton" style="display: block;" onclick="playingVideo('play', true, true)">例題</button>
         <!-- 1つ目の動画再生ボタン -->
-        <button type="button" id="playButton" style="display: none;" onclick="playVideo('play', false, true)">開始</button>
+        <button type="button" id="playButton" style="display: none;" onclick="playingVideo('play', false, true)">開始</button>
     </form>
 
     <!-- webカメラ -->
@@ -619,7 +619,7 @@
         }        
 
         // 動画を再生する関数
-        function playVideo(action, exPlay, firstPlay) {
+        function playingVideo(action, exPlay, firstPlay) {
             // 例題動画の再生
             if (exPlay) {
                 // webカメラの映像を非表示
@@ -695,7 +695,7 @@
 
             } else if (quizIndex < quiz_movie_ids.length) {
                 console.log("次の動画を再生");
-                playVideo('play', false);
+                playingVideo('play', false, false);
             } else {
                 // webカメラの映像を表示
                 var webCamera = document.getElementById("webcameraContainer");
