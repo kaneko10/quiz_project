@@ -541,9 +541,6 @@
                             }
 
                         } else if (event.data === YT.PlayerState.PAUSED) {
-                            // 動画が一時停止されたときに再度再生
-                            // event.target.playVideo();
-
                             if (isFirstPaused) {
                                 setTimeout(function() {
                                     event.target.playVideo();
@@ -552,6 +549,9 @@
                                     console.log("再生時刻(PAUSED): " + timestamp);
                                 }, 1000);
                                 isFirstPaused = false;
+                            } else {
+                                // 動画が一時停止されたときに再度再生
+                                event.target.playVideo();
                             }
                         } else if (event.data === YT.PlayerState.ENDED) {
                             console.log("動画の再生が終了しました");
