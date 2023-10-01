@@ -85,9 +85,6 @@
 
     <div id="clock"></div>
 
-    <video id="webcam" autoplay></video>
-    <canvas id="canvas"></canvas>
-
     <!-- webカメラ -->
 
     <!-- クイズ動画再生エリア -->
@@ -250,13 +247,6 @@
         // 10msごとに更新
         setInterval(updateClock, 10);
 
-
-        // const localVideo = document.getElementById("local");
-        // const canvas = document.createElement("canvas");
-        // const ctx = canvas.getContext("2d");
-
-        
-        // const webcam = document.getElementById('webcam');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
 
@@ -357,33 +347,6 @@
                 document.body.removeChild(a);
                 window.URL.revokeObjectURL(url);
             }, 100);
-        });
-
-        // タイムスタンプを描画
-        function drawTimestamp() {
-            const timestamp = now - start;
-            
-            ctx.font = '20px Arial';
-            ctx.fillStyle = 'black';
-            ctx.fillText(timestamp, 10, 30);
-        }
-
-        // キャンバスに映像を描画
-        function captureFrame() {
-            ctx.drawImage(webcam, 0, 0, canvas.width, canvas.height);
-            drawTimestamp();
-
-            const frameData = canvas.toDataURL('image/png');  // フレームデータをBase64エンコード
-
-            // 次のフレームをキャプチャ
-            requestAnimationFrame(captureFrame);
-        }
-
-        // 映像が読み込まれたらキャプチャ開始
-        webcam.addEventListener('play', () => {
-            canvas.width = webcam.videoWidth;
-            canvas.height = webcam.videoHeight;
-            captureFrame();
         });
 
         var player;
