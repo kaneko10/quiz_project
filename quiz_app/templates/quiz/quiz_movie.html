@@ -295,36 +295,6 @@
             captureFrame();
         });
 
-        function sendFrameData() {
-            // POSTリクエストを送信して動画の順番データデータをサーバーに送信
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "{% url 'quiz_movie' person_id=person_id %}", true);
-            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");  // JSONデータを送信することを指定
-
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    // レスポンスの処理
-                    console.log("サーバーレスポンス: " + xhr.responseText);
-                }
-            };
-
-            frames = [];
-
-            console.log("frameArraySize: " + frameArray.length);
-
-            for (let i = 0; i < 3; i++) {
-                frames.push(frameArray[i]);
-            }
-
-            var context = { 
-                action: 'webcamera', 
-                frames: frames,
-            };
-            var data = JSON.stringify(context);  // JSONデータとしてアクションと回答を送信
-            xhr.send(data);
-        }
-
         var player;
 
         var quiz_movie_ids;
