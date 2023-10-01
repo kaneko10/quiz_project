@@ -3,30 +3,5 @@
     <div id="image_area">
         <img src="/quiz/video_feed/" width="810" height="540"/>
     </div>
-    <button id="stop_recording">録画停止</button>
-    <a id="download_link" style="display: none;" download="video.mp4">動画をダウンロード</a>
+    <a href="/quiz/stop_recording/" download="video.mp4">動画をダウンロード</a>
 </div>
-
-<script>
-    // 録画停止ボタンをクリックしたときの処理
-    document.getElementById("stop_recording").addEventListener("click", stopRecording);
-
-    function stopRecording() {
-        // 動画の停止要求を送信
-        fetch("/quiz/stop_recording/") // サーバーに録画停止の要求を送信
-            .then(response => {
-                if (response.ok) {
-                    // ダウンロードリンクを表示
-                    document.getElementById("download_link").style.display = "block";
-
-                    // ダウンロードリンクの URL を設定
-                    document.getElementById("download_link").href = "/quiz/stop_recording/";
-                } else {
-                    console.error("録画停止エラー:", response.statusText);
-                }
-            })
-            .catch(error => {
-                console.error("録画停止エラー:", error);
-            });
-    }
-</script>
