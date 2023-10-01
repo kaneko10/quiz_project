@@ -16,18 +16,18 @@
             height: 40vh;
         }
 
-        #webcameraContainer {
+        /* #webcameraContainer {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh; /* ビューポートの高さいっぱいに要素を広げる */
-            text-align: center;
-        }
+            /* text-align: center;
+        } */
 
-        #webcameraContainer > * {
-            margin: 10px; /* 要素間の余白を設定（適宜調整してください） */
-        }
+        /* #webcameraContainer > * { */
+            /* margin: 10px; 要素間の余白を設定（適宜調整してください） */
+        /* } */
 
         #playerContainer {
             display: flex;
@@ -99,13 +99,6 @@
         <button type="button" id="playButton" style="display: none;" onclick="playingVideo('play', false, true)">開始</button>
     </form>
 
-    <!-- webカメラ -->
-    <div id="webcameraContainer">
-        <div id="image_area">
-            <img src="/quiz/video_feed/" width="810" height="540"/>
-        </div>
-        <!-- <a href="/quiz/stop_recording/" download="video.mp4" id="downloadLink">動画をダウンロード</a> -->
-    </div>
 
     <!-- クイズの回答フォーム -->
     <div id="quizForm" style="display: none;">
@@ -647,7 +640,7 @@
         function playingVideo(action, exPlay, firstPlay) {
             // 例題動画の再生
             if (exPlay) {
-                // webカメラの映像を非表示
+                // webカメラの映像を非表示（バックエンド）
                 // var webCamera = document.getElementById("webcameraContainer");
                 // if (webCamera) {
                 //     webCamera.style.display = "none";
@@ -717,23 +710,23 @@
                 console.log("次の動画を再生");
                 playingVideo('play', false, false);
             } else {
-                // webカメラの映像を表示
-                var webCamera = document.getElementById("webcameraContainer");
-                if (webCamera) {
-                    webCamera.style.display = "block";
-                }
+                // webカメラの映像を表示（バックエンド）
+                // var webCamera = document.getElementById("webcameraContainer");
+                // if (webCamera) {
+                //     webCamera.style.display = "block";
+                // }
 
-                // ダウンロードリンクを作成
-                var downloadLink = document.createElement("a");
-                downloadLink.href = "/quiz/stop_recording/";
-                downloadLink.download = "video.mp4";
-                downloadLink.textContent = "動画をダウンロード";
+                // ダウンロードリンクを作成（バックエンド）
+                // var downloadLink = document.createElement("a");
+                // downloadLink.href = "/quiz/stop_recording/";
+                // downloadLink.download = "video.mp4";
+                // downloadLink.textContent = "動画をダウンロード";
 
-                var webcameraContainer = document.getElementById("webcameraContainer");
+                // var webcameraContainer = document.getElementById("webcameraContainer");
 
-                if (webcameraContainer) {
-                    webcameraContainer.appendChild(downloadLink);
-                }
+                // if (webcameraContainer) {
+                //     webcameraContainer.appendChild(downloadLink);
+                // }
             }
             // console.log("次の動画を再生完了");
         }
