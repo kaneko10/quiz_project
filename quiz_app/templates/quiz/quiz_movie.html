@@ -247,9 +247,6 @@
         // 10msごとに更新
         setInterval(updateClock, 10);
 
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-
         const localVideo = document.getElementById("local");
         const recordedVideo = document.getElementById("recorded");
         const startBtn = document.getElementById("start");
@@ -316,7 +313,7 @@
 
         recordBtn.addEventListener("click", () => {
             if (recordBtn.textContent === "録画開始") {
-                startRecording();
+                                startRecording();
             } else {
                 stopRecording();
                 recordBtn.textContent = "録画開始";
