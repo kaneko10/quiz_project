@@ -233,17 +233,6 @@
         var now;
 
         function updateClock() {
-            // const now = new Date();
-            // const hours = now.getHours().toString().padStart(2, '0');
-            // const minutes = now.getMinutes().toString().padStart(2, '0');
-            // const seconds = now.getSeconds().toString().padStart(2, '0');
-            // const milliseconds = now.getMilliseconds().toString().padStart(3, '0');
-
-            // const timeString = `${hours}:${minutes}:${seconds}.${milliseconds}`;
-            
-            // const clockElement = document.getElementById('clock');
-            // clockElement.textContent = timeString;
-
             now = (new Date()).getTime();
             const passed = now - start;
 
@@ -280,14 +269,6 @@
 
         // タイムスタンプを描画
         function drawTimestamp() {
-            // const now = new Date();
-            // const hours = now.getHours().toString().padStart(2, '0');
-            // const minutes = now.getMinutes().toString().padStart(2, '0');
-            // const seconds = now.getSeconds().toString().padStart(2, '0');
-            // const milliseconds = now.getMilliseconds().toString().padStart(3, '0');
-            
-            // const timestamp = `${hours}:${minutes}:${seconds}.${milliseconds}`;
-
             const timestamp = now - start;
             
             ctx.font = '20px Arial';
@@ -665,7 +646,7 @@
                     playButton.style.display = "none";
                 }
             }
-            // console.log("quizIndex playVideo: " + quizIndex)
+
             if (quizIndex != 0) {
                 if (player) {
                     player = null
@@ -678,7 +659,6 @@
                     } else {
                         createNewPlayer(false, false);
                     }
-                    // console.log("createNewPlayer playVideo")
                 }
             }
 
@@ -693,10 +673,6 @@
             // var playButton = document.getElementById("playButton");
             if (playerContainer) {
                 playerContainer.style.display = "block";
-                // console.log("make movie playVideo")
-                // playButton.style.display = "none";
-                // console.log("player: ")
-                // console.log(player)
 
                 if(player) {
                     // console.log("playVideo")
