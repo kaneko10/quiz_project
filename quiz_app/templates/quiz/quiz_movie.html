@@ -351,10 +351,11 @@
         var currentMovieID = "";
         var person_id = "";
 
-        const questionnaireTime = 10000; // (ms)
-        const breakTime = 5000  // 問題間の休憩時間
+        const questionnaireTime = 3000; // (ms)
+        const breakTime = 3000  // 問題間の休憩時間
 
         var isPlaying = false;
+        var isFirstPaused = true;
 
         // YouTube APIがロードされたときに実行されるコールバック関数
         function onYouTubeIframeAPIReady() {
@@ -379,36 +380,36 @@
         // ランダムな順番にした動画IDを生成
         function makeQuizMovieIDs() {
             // 例題
-            // const quiz_movie_ex = 'JinLnLlAdew' // 仮置き（蚊）
-            const quiz_movie_ex = '4t8JCicyYfc' // 仮置き（クイズノック）
+            const quiz_movie_ex = 'ubgKp0MoNHE' // 仮置き（蚊）
+            // const quiz_movie_ex = '4t8JCicyYfc' // 仮置き（クイズノック）
 
             // 謎解き
             const quiz_movie_mystery = [
-                // 'ekbPqltDYMQ',  // アーモンド
-                // 'yF1QVXk8R3Q',  // いのしし
-                // 'Xljgsas54CA',  // 赤身
-                // 'zLm_ILEKJ7A',  // チューイングガム
-                // 'CMOCBTYa8f0',  // マスカット
-                // 'wqHQJsGpgV0',  // カッパ
-                // 'IjdnudDMxnY',  // 太陽系
-                '4t8JCicyYfc',  // クイズノック
-                'qPHSalN8k0I',  // クイズノック
-                'Ns8-e-5Ll6c',  // クイズノック
+                'JzfDo389ZaY',  // アーモンド
+                'W1yGj2dwItQ',  // 赤身
+                'BoBzFke_Cbw',  // いのしし
+                // 'zLm_ILEKJ7A',  // チューイングガム　まだ
+                // 'CMOCBTYa8f0',  // マスカット　まだ
+                // 'wqHQJsGpgV0',  // カッパ　まだ
+                // 'IjdnudDMxnY',  // 太陽系　まだ
+                // '4t8JCicyYfc',  // クイズノック
+                // 'qPHSalN8k0I',  // クイズノック
+                // 'Ns8-e-5Ll6c',  // クイズノック
             ];
 
             // なぞなぞ
             const quiz_movie_riddle = [
-                // 'JinLnLlAdew',  // 蚊  
-                // '57VFZr9y6dA',  // いくら
-                // '4TJ4u4K1pws',  // ソフトボール
-                // 'pGXHxaH9osI',  // 不眠
-                // 'XamRk58I1Pg',  // 森
-                // 'p1Aw6_u0wmI',  // 視覚
-                // 'DiSzWzk0Kq4',  // 119
-                // 'aUR455d8oek',  // バトル
-                '4t8JCicyYfc',  // クイズノック
-                'qPHSalN8k0I',  // クイズノック
-                'Ns8-e-5Ll6c',  // クイズノック
+                'ubgKp0MoNHE',  // 蚊  
+                'SMykdWzApTg',  // いくら
+                'Av8mrPXsWkY',  // ソフトボール
+                'zjphDXhTUI8',  // 不眠
+                'Bk66yWgQACk',  // 森
+                'ga6PY-7y0VE',  // 視覚
+                '5eWLkYdCpYc',  // 119
+                // 'aUR455d8oek',  // バトル　まだ
+                // '4t8JCicyYfc',  // クイズノック
+                // 'qPHSalN8k0I',  // クイズノック
+                // 'Ns8-e-5Ll6c',  // クイズノック
             ];
 
             var quiz_movie_ids = [];
@@ -533,14 +534,24 @@
                         }
                     },
                     'onStateChange': function(event) {
-                        // console.log("onStateChange createNewPlayer")
                         if (event.data == YT.PlayerState.PLAYING) {
+                            // PLAYINGだと、本当の再生開始時刻より若干遅い
+                            const timestamp = now - start;
+                            console.log("再生時刻: " + timestamp);
+
+                            if (isFirstPaused) {
+                                var interval = setInterval(function() {
+                                    const currentTime = event.target.getCurrentTime();
+                                    if (currentTime >= 1) {
+                                        event.target.pauseVideo();
+                                        clearInterval(interval); // タイマーを停止
+                                        console.log(`現在の再生時間: ${currentTime}秒`);
+                                    }
+                                }, 5); // 5msごとに更新
+                            }
+
                             // 動画クリックするごとに毎回実行される
                             console.log("動画の再生を開始：PLAYING");
-
-                            const timestamp = now - start;
-
-                            console.log("再生時刻: " + timestamp);
 
                             if (!isPlaying) {
                                 // 動画の再生時刻の保存をサーバーに要求
@@ -550,7 +561,17 @@
 
                         } else if (event.data === YT.PlayerState.PAUSED) {
                             // 動画が一時停止されたときに再度再生
-                            event.target.playVideo();
+                            // event.target.playVideo();
+
+                            if (isFirstPaused) {
+                                setTimeout(function() {
+                                    event.target.playVideo();
+                                    // ここの再生時刻の方が真の値に近い、けどまだ若干遅い
+                                    const timestamp = now - start;
+                                    console.log("再生時刻(PAUSED): " + timestamp);
+                                }, 1000);
+                                isFirstPaused = false;
+                            }
                         } else if (event.data === YT.PlayerState.ENDED) {
                             console.log("動画の再生が終了しました");
 
@@ -560,6 +581,7 @@
                             // 動画の再生終了時刻の保存をサーバーに要求
                             orderSaveDate('ended', timestamp)
                             isPlaying = false;
+                            isFirstPaused = true;
 
                             // 動画を非表示
                             removePlayer(); // id=player の div 要素を削除
