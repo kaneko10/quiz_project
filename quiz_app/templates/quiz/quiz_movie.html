@@ -8,6 +8,14 @@
     <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 
     <style>
+        #webcam {
+            height: 40vh;
+        }
+
+        #canvas {
+            height: 40vh;
+        }
+
         #webcameraContainer {
             display: flex;
             flex-direction: column;
@@ -26,7 +34,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 50vh; /* ビューポートの高さいっぱいに要素を広げる */
+            height: 40vh; /* ビューポートの高さいっぱいに要素を広げる */
             text-align: center;
         }
 
@@ -65,30 +73,20 @@
 <body>
     <h1>{{text}}</h1>
 
-    <video id="local" playsinline autoplay muted></video>
-    <video id="recorded" playsinline loop></video>
+    <!-- <video id="local" playsinline autoplay muted></video>
+    <video id="recorded" playsinline loop></video> -->
 
-    <div>
+    <!-- <div>
       <button id="start">映像を取得する</button>
       <button id="record" disabled>録画開始</button>
       <button id="play" disabled>再生</button>
       <button id="download" disabled>ダウンロード</button>
-    </div>
+    </div> -->
 
-    <!-- <video id="webcam" autoplay></video> -->
+    <div id="clock"></div>
+
+    <video id="webcam" autoplay></video>
     <canvas id="canvas"></canvas>
-
-    <!-- <button type="button" onclick="sendFrameData()">映像送信</button> -->
-    <!-- <button type="button" onclick="downloadZip()">zipダウンロード</button> -->
-    <!-- <a href="#" id="downloadLink">zipダウンロード</a>s -->
-
-
-    <!-- <video id="videoElement" autoplay playsinline></video>
-    <canvas id="canvas" style="display: none;"></canvas>
-    <button id="startRecording">録画開始</button>
-    <button id="stopRecording">録画停止</button>
-    <a id="downloadLink" style="display: none;">ダウンロード</a> -->
-
 
     <!-- webカメラ -->
 
@@ -231,374 +229,120 @@
     </div>
 
     <script>
-        const localVideo = document.getElementById("local");
-const canvas = document.createElement("canvas");
-const ctx = canvas.getContext("2d");
-const recordedVideo = document.getElementById("recorded");
-const startBtn = document.getElementById("start");
-const recordBtn = document.getElementById("record");
-const playBtn = document.getElementById("play");
-const downloadBtn = document.getElementById("download");
-let mediaRecorder;
-let recordedBlobs;
+        const start = (new Date()).getTime();
+        var now;
 
-function getLocalMediaStream(mediaStream) {
-  recordBtn.disabled = false;
-  const localStream = mediaStream;
-  localVideo.srcObject = mediaStream;
-  window.stream = mediaStream;
-}
+        function updateClock() {
+            // const now = new Date();
+            // const hours = now.getHours().toString().padStart(2, '0');
+            // const minutes = now.getMinutes().toString().padStart(2, '0');
+            // const seconds = now.getSeconds().toString().padStart(2, '0');
+            // const milliseconds = now.getMilliseconds().toString().padStart(3, '0');
 
-function handleLocalMediaStreamError(error) {
-  console.log(`navigator.getUserMedia error: ${error}`);
-}
-
-function handleDataAvailable(event) {
-  if (event.data && event.data.size > 0) {
-    recordedBlobs.push(event.data);
-  }
-}
-
-function startRecording() {
-  recordedBlobs = [];
-  const options = { mimeType: "video/webm;codecs=vp9" };
-
-  try {
-    mediaRecorder = new MediaRecorder(window.stream, options);
-  } catch (error) {
-    console.log(`Exception while creating MediaRecorder: ${error}`);
-    return;
-  }
-
-  console.log("Created MediaRecorder", mediaRecorder);
-  recordBtn.textContent = "録画停止";
-  playBtn.disabled = true;
-  downloadBtn.disabled = true;
-
-  mediaRecorder.onstop = event => {
-    console.log("Recorder stopped: ", event);
-  };
-
-  mediaRecorder.ondataavailable = handleDataAvailable;
-  mediaRecorder.start(10);
-  console.log("MediaRecorder started", mediaRecorder);
-}
-
-function stopRecording() {
-  mediaRecorder.stop();
-  console.log("Recorded media.");
-}
-
-function drawTimestamp() {
-  const now = new Date();
-  const hours = now.getHours().toString().padStart(2, "0");
-  const minutes = now.getMinutes().toString().padStart(2, "0");
-  const seconds = now.getSeconds().toString().padStart(2, "0");
-  const milliseconds = now.getMilliseconds().toString().padStart(3, "0");
-
-  const timestamp = `${hours}:${minutes}:${seconds}.${milliseconds}`;
-
-  ctx.font = "20px Arial";
-  ctx.fillStyle = "white";
-  ctx.fillText(timestamp, 10, 30);
-}
-
-function captureFrame() {
-  ctx.drawImage(localVideo, 0, 0, canvas.width, canvas.height);
-  drawTimestamp();
-
-  const frameData = canvas.toDataURL("image/png"); // フレームデータをBase64エンコード
-  recordedBlobs.push(new Blob([frameData], { type: "image/png" }));
-
-  requestAnimationFrame(captureFrame);
-}
-
-startBtn.addEventListener("click", () => {
-  const constraints = {
-    video: {
-      width: 1280,
-      height: 720
-    }
-  };
-
-  navigator.mediaDevices
-    .getUserMedia(constraints)
-    .then(mediaStream => {
-      getLocalMediaStream(mediaStream);
-      canvas.width = localVideo.videoWidth;
-      canvas.height = localVideo.videoHeight;
-      captureFrame();
-    })
-    .catch(handleLocalMediaStreamError);
-});
-
-recordBtn.addEventListener("click", () => {
-  if (recordBtn.textContent === "録画開始") {
-    startRecording();
-  } else {
-    stopRecording();
-    recordBtn.textContent = "録画開始";
-    playBtn.disabled = false;
-    downloadBtn.disabled = false;
-  }
-});
-
-playBtn.addEventListener("click", () => {
-  const superBuffer = new Blob(recordedBlobs, { type: "video/webm" });
-  recordedVideo.src = null;
-  recordedVideo.srcObject = null;
-  recordedVideo.src = window.URL.createObjectURL(superBuffer);
-  recordedVideo.controls = true;
-  recordedVideo.play();
-});
-
-downloadBtn.addEventListener("click", () => {
-  const blob = new Blob(recordedBlobs, { type: "video/webm" });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.style.display = "none";
-  a.href = url;
-  a.download = "rec.mp4";
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => {
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-  }, 100);
-});
-
-        // ページ読み込み時に実行
-// document.addEventListener("DOMContentLoaded", () => {
-//   const videoElement = document.getElementById("videoElement");
-//   const canvas = document.getElementById("canvas");
-//   const startRecordingButton = document.getElementById("startRecording");
-//   const stopRecordingButton = document.getElementById("stopRecording");
-//   const downloadLink = document.getElementById("downloadLink");
-//   const mediaStreamConstraints = { video: true };
-
-//   let mediaRecorder;
-//   let recordedChunks = [];
-//   let isRecording = false;
-
-//   // カメラのストリームを取得してビデオ要素にセット
-//   navigator.mediaDevices
-//     .getUserMedia(mediaStreamConstraints)
-//     .then((stream) => {
-//       videoElement.srcObject = stream;
-//     })
-//     .catch((error) => {
-//       console.error("カメラへのアクセスが拒否されました:", error);
-//     });
-
-//   // カメラの映像をキャンバスに描画し、タイムスタンプを追加
-//   function captureFrame() {
-//     const ctx = canvas.getContext("2d");
-//     canvas.width = videoElement.videoWidth;
-//     canvas.height = videoElement.videoHeight;
-//     ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-
-//     const timestamp = new Date().getTime(); // タイムスタンプを取得
-//     ctx.fillText(timestamp.toString(), 10, 20); // タイムスタンプを描画
-//   }
-
-//   // 録画開始ボタンのクリック時の処理
-//   startRecordingButton.addEventListener("click", () => {
-//     console.log("録画開始");
-//     mediaRecorder = new MediaRecorder(videoElement.srcObject);
-//     mediaRecorder.ondataavailable = handleDataAvailable;
-//     mediaRecorder.start();
-//     isRecording = true;
-//   });
-
-//   // 録画停止ボタンのクリック時の処理
-//   stopRecordingButton.addEventListener("click", () => {
-//     console.log("録画停止");
-//     if (isRecording) {
-//       mediaRecorder.stop();
-//       isRecording = false;
-//     }
-//   });
-
-//   // メディアデータが利用可能な場合の処理
-//   function handleDataAvailable(event) {
-//     if (event.data.size > 0) {
-//       recordedChunks.push(event.data);
-//     }
-//   }
-
-  // ダウンロードリンクの設定
-//   mediaRecorder.onstop = () => {
-//     const blob = new Blob(recordedChunks, { type: "video/webm" });
-//     const url = URL.createObjectURL(blob);
-//     downloadLink.href = url;
-//     downloadLink.download = "recorded_video.webm";
-//     downloadLink.style.display = "block";
-//   };
-
-  // タイムスタンプを含むフレームをキャプチャし、録画データに追加
-//   mediaRecorder.ondataavailable = (e) => {
-//     if (e.data.size > 0) {
-//       recordedChunks.push(e.data);
-//       captureFrame(); // タイムスタンプを含むフレームをキャプチャ
-//     }
-//   };
-// });
-
-        // const webcam = document.getElementById('webcam');
-        // const canvas = document.getElementById('canvas');
-        // const ctx = canvas.getContext('2d');
-        // const frameArray = [];
-
-        // // html2canvasライブラリをインポート
-        // // const html2canvas = require('html2canvas');
-        // // const JSZip = require('jszip');
-
-        // // 新しいZipファイルを作成
-        // // const zip = new JSZip();
-
-        // // ウェブカメラから映像をキャプチャ
-        // navigator.mediaDevices.getUserMedia({ video: true })
-        //     .then(stream => {
-        //         webcam.srcObject = stream;
-        //     })
-        //     .catch(error => {
-        //         console.error('Error accessing webcam:', error);
-        //     });
-
-        // // タイムスタンプを描画
-        // function drawTimestamp() {
-        //     const now = new Date();
-        //     const hours = now.getHours().toString().padStart(2, '0');
-        //     const minutes = now.getMinutes().toString().padStart(2, '0');
-        //     const seconds = now.getSeconds().toString().padStart(2, '0');
-        //     const milliseconds = now.getMilliseconds().toString().padStart(3, '0');
+            // const timeString = `${hours}:${minutes}:${seconds}.${milliseconds}`;
             
-        //     const timestamp = `${hours}:${minutes}:${seconds}.${milliseconds}`;
+            // const clockElement = document.getElementById('clock');
+            // clockElement.textContent = timeString;
+
+            now = (new Date()).getTime();
+            const passed = now - start;
+
+
+            const clockElement = document.getElementById('clock');
+            clockElement.textContent = passed;
+        }
+
+        // 初回表示
+        updateClock();
+
+        // 10msごとに更新
+        setInterval(updateClock, 10);
+
+
+        // const localVideo = document.getElementById("local");
+        // const canvas = document.createElement("canvas");
+        // const ctx = canvas.getContext("2d");
+
+        
+        const webcam = document.getElementById('webcam');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const frameArray = [];
+
+        // ウェブカメラから映像をキャプチャ
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                webcam.srcObject = stream;
+            })
+            .catch(error => {
+                console.error('Error accessing webcam:', error);
+            });
+
+        // タイムスタンプを描画
+        function drawTimestamp() {
+            // const now = new Date();
+            // const hours = now.getHours().toString().padStart(2, '0');
+            // const minutes = now.getMinutes().toString().padStart(2, '0');
+            // const seconds = now.getSeconds().toString().padStart(2, '0');
+            // const milliseconds = now.getMilliseconds().toString().padStart(3, '0');
             
-        //     ctx.font = '20px Arial';
-        //     ctx.fillStyle = 'white';
-        //     ctx.fillText(timestamp, 10, 30);
-        // }
+            // const timestamp = `${hours}:${minutes}:${seconds}.${milliseconds}`;
 
-        // // キャンバスに映像を描画
-        // function captureFrame() {
-        //     ctx.drawImage(webcam, 0, 0, canvas.width, canvas.height);
-        //     drawTimestamp();
+            const timestamp = now - start;
+            
+            ctx.font = '20px Arial';
+            ctx.fillStyle = 'black';
+            ctx.fillText(timestamp, 10, 30);
+        }
 
-        //     const frameData = canvas.toDataURL('image/png');  // フレームデータをBase64エンコード
-        //     frameArray.push(frameData);  // フレームデータを配列に格納
+        // キャンバスに映像を描画
+        function captureFrame() {
+            ctx.drawImage(webcam, 0, 0, canvas.width, canvas.height);
+            drawTimestamp();
 
-        //     // 次のフレームをキャプチャ
-        //     requestAnimationFrame(captureFrame);
-        // }
+            const frameData = canvas.toDataURL('image/png');  // フレームデータをBase64エンコード
+            frameArray.push(frameData);  // フレームデータを配列に格納
 
-        // // 映像が読み込まれたらキャプチャ開始
-        // webcam.addEventListener('play', () => {
-        //     canvas.width = webcam.videoWidth;
-        //     canvas.height = webcam.videoHeight;
-        //     captureFrame();
-        // });
+            // 次のフレームをキャプチャ
+            requestAnimationFrame(captureFrame);
+        }
 
-        // function sendFrameData() {
-        //     // POSTリクエストを送信して動画の順番データデータをサーバーに送信
-        //     var xhr = new XMLHttpRequest();
-        //     xhr.open("POST", "{% url 'quiz_movie' person_id=person_id %}", true);
-        //     xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-        //     xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");  // JSONデータを送信することを指定
+        // 映像が読み込まれたらキャプチャ開始
+        webcam.addEventListener('play', () => {
+            canvas.width = webcam.videoWidth;
+            canvas.height = webcam.videoHeight;
+            captureFrame();
+        });
 
-        //     xhr.onload = function () {
-        //         if (xhr.status === 200) {
-        //             // レスポンスの処理
-        //             console.log("サーバーレスポンス: " + xhr.responseText);
-        //         }
-        //     };
+        function sendFrameData() {
+            // POSTリクエストを送信して動画の順番データデータをサーバーに送信
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "{% url 'quiz_movie' person_id=person_id %}", true);
+            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");  // JSONデータを送信することを指定
 
-        //     frames = [];
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    // レスポンスの処理
+                    console.log("サーバーレスポンス: " + xhr.responseText);
+                }
+            };
 
-        //     console.log("frameArraySize: " + frameArray.length);
+            frames = [];
 
-        //     for (let i = 0; i < 3; i++) {
-        //         frames.push(frameArray[i]);
-        //     }
+            console.log("frameArraySize: " + frameArray.length);
 
-        //     var context = { 
-        //         action: 'webcamera', 
-        //         frames: frames,
-        //     };
-        //     var data = JSON.stringify(context);  // JSONデータとしてアクションと回答を送信
-        //     xhr.send(data);
-        // }
+            for (let i = 0; i < 3; i++) {
+                frames.push(frameArray[i]);
+            }
 
-        // // ダウンロードボタンがクリックされたとき
-        // // const downloadButton = document.getElementById('downloadButton');
-        // // downloadButton.addEventListener('click', () => {
-        // //     // Zipファイルに各フレームの画像を追加
-        // //     for (let i = 0; i < frameArray.length; i++) {
-        // //         zip.file(`frame_${i}.png`, frameArray[i].split(',')[1], { base64: true });
-        // //     }
-
-        // //     // Zipファイルを生成
-        // //     zip.generateAsync({ type: 'blob' }).then(function (content) {
-        // //         // ダウンロードリンクを作成
-        // //         const a = document.createElement('a');
-        // //         a.href = URL.createObjectURL(content);
-        // //         a.download = 'frames.zip';
-
-        // //         // ダウンロードリンクをクリックしてzipファイルをダウンロード
-        // //         a.style.display = 'none';
-        // //         document.body.appendChild(a);
-        // //         a.click();
-        // //         document.body.removeChild(a);
-        // //     });
-        // // });
-
-        // document.getElementById('downloadLink').addEventListener('click', function() {
-        //     console.log("zipダウンロード");
-        //     // Zipファイルを生成
-        //     const zip = new JSZip();
-
-        //     // Zipファイルに各フレームの画像を追加
-        //     for (let i = 0; i < frameArray.length; i++) {
-        //         console.log(`add frame_${i}.png`);
-        //         zip.file(`frame_${i}.png`, frameArray[i].split(',')[1], { base64: true });
-        //     }
-
-        //     // Zipファイルを生成し、ダウンロードする
-        //     zip.generateAsync({ type: 'blob' }).then(function (content) {
-        //         const a = document.createElement('a');
-        //         a.href = URL.createObjectURL(content);
-        //         a.download = 'frames.zip';
-
-        //         // 作成したリンクを DOM に追加してクリックイベントをトリガー
-        //         document.body.appendChild(a);
-        //         a.click();
-        //         document.body.removeChild(a);
-        //     });
-        // });
-
-        // function downloadZip() {
-        //     console.log("zipダウンロード");
-        //     const zip = new JSZip();
-        //      // Zipファイルに各フレームの画像を追加
-        //      for (let i = 0; i < frameArray.length; i++) {
-        //         console.log(`add frame_${i}.png`);
-        //         zip.file(`frame_${i}.png`, frameArray[i].split(',')[1], { base64: true });
-        //     }
-
-        //     // Zipファイルを生成
-        //     zip.generateAsync({ type: 'blob' }).then(function (content) {
-        //         // ダウンロードリンクを作成
-        //         const a = document.createElement('a');
-        //         a.href = URL.createObjectURL(content);
-        //         a.download = 'frames.zip';
-
-        //         // ダウンロードリンクをクリックしてzipファイルをダウンロード
-        //         a.style.display = 'none';
-        //         document.body.appendChild(a);
-        //         a.click();
-        //         document.body.removeChild(a);
-        //     });
-        // }
+            var context = { 
+                action: 'webcamera', 
+                frames: frames,
+            };
+            var data = JSON.stringify(context);  // JSONデータとしてアクションと回答を送信
+            xhr.send(data);
+        }
 
         var player;
 
@@ -794,9 +538,13 @@ downloadBtn.addEventListener("click", () => {
                             // 動画クリックするごとに毎回実行される
                             console.log("動画の再生を開始：PLAYING");
 
+                            const timestamp = now - start;
+
+                            console.log("再生時刻: " + timestamp);
+
                             if (!isPlaying) {
                                 // 動画の再生時刻の保存をサーバーに要求
-                                orderSaveDate('play')
+                                orderSaveDate('play', timestamp)
                                 isPlaying = true;
                             }
 
@@ -806,8 +554,11 @@ downloadBtn.addEventListener("click", () => {
                         } else if (event.data === YT.PlayerState.ENDED) {
                             console.log("動画の再生が終了しました");
 
+                            const timestamp = now - start;
+                            console.log("終了時刻： " + timestamp);
+
                             // 動画の再生終了時刻の保存をサーバーに要求
-                            orderSaveDate('ended')
+                            orderSaveDate('ended', timestamp)
                             isPlaying = false;
 
                             // 動画を非表示
@@ -967,7 +718,7 @@ downloadBtn.addEventListener("click", () => {
             // console.log("次の動画を再生完了");
         }
 
-        function orderSaveDate(action) {
+        function orderSaveDate(action, timeString) {
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "{% url 'quiz_movie' person_id=person_id %}", true);
             xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
