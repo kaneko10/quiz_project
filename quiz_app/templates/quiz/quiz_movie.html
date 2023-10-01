@@ -229,7 +229,7 @@
         const supportedCodecs = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus");
         console.log("Is VP9 supported:", supportedCodecs);
 
-        const start = (new Date()).getTime();
+        var start = (new Date()).getTime();
         var now;
 
         function updateClock() {
@@ -295,7 +295,8 @@
             };
 
             mediaRecorder.ondataavailable = handleDataAvailable;
-            mediaRecorder.start(10);
+            mediaRecorder.start(5);
+            start = (new Date()).getTime();
             console.log("MediaRecorder started", mediaRecorder);
         }
 
@@ -313,7 +314,7 @@
 
         recordBtn.addEventListener("click", () => {
             if (recordBtn.textContent === "録画開始") {
-                                startRecording();
+                startRecording();
             } else {
                 stopRecording();
                 recordBtn.textContent = "録画開始";
