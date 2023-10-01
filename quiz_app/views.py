@@ -14,6 +14,9 @@ import cv2
 import datetime
 import pytz
 import json
+import numpy as np
+import base64
+from io import BytesIO
 
 person_id = ""
 
@@ -230,6 +233,26 @@ def quiz_movie_view(request, person_id):
                 id_14 = movie_ids[13],
                 id_15 = movie_ids[14],
             )
+            return JsonResponse({"message": "Success"})
+        elif action == 'webcamera':
+            frame_array = data.get('frames')
+            # 動画ファイルの設定
+            output_file = 'output_video.mp4'
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+            fps = 30
+            width, height = 640, 480
+            out = cv2.VideoWriter(output_file, fourcc, fps, (width, height))
+
+            # フレームデータを画像フレームに変換して動画に追加
+            for frame_data in frame_array:
+                frame_data = base64.b64decode(frame_data.split(",")[1])
+                image = cv2.imdecode(np.frombuffer(frame_data, np.uint8), -1)
+                print("out.write(image)")
+                out.write(image)
+
+            # 動画ファイルをクローズ
+            out.release()
+
             return JsonResponse({"message": "Success"})
 
     print("first access quiz_movie.html")
