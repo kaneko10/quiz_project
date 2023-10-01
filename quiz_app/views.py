@@ -40,11 +40,6 @@ def save_name(request):
         form = PersonForm()
 
     return render(request, 'quiz/save_name.html', {'form': form})
-
-# ストリーミング画像・映像を表示するview
-class WebCameraView(View):
-    def get(self, request):
-        return render(request, 'quiz/webcamera.html', {})
     
 def quiz_movie_view(request, person_id):
     if request.method == "POST":
