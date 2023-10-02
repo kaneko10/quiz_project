@@ -266,9 +266,6 @@
             }
 
             console.log("Created MediaRecorder", mediaRecorder);
-            // recordBtn.textContent = "録画停止";
-            // playBtn.disabled = true;
-            // downloadBtn.disabled = true;
 
             mediaRecorder.onstop = event => {
                 console.log("Recorder stopped: ", event);
@@ -298,14 +295,6 @@
             startRecording();
             recordBtn.style.display = "none";
             videoOFFBtn.style.display = "block";
-            // if (recordBtn.textContent === "録画開始") {
-            //     startRecording();
-            // } else {
-            //     stopRecording();
-            //     recordBtn.textContent = "録画開始";
-            //     playBtn.disabled = false;
-            //     downloadBtn.disabled = false;
-            // }
         });
 
         videoOFFBtn.addEventListener("click", () => {
@@ -323,15 +312,6 @@
             stopRecording();
             stopBtn.style.display = "none";
             downloadBtn.style.display = "block";
-
-            // if (recordBtn.textContent === "録画開始") {
-            //     startRecording();
-            // } else {
-            //     stopRecording();
-            //     recordBtn.textContent = "録画開始";
-            //     playBtn.disabled = false;
-            //     downloadBtn.disabled = false;
-            // }
         });
 
         downloadBtn.addEventListener("click", () => {
@@ -653,12 +633,6 @@
         function playingVideo(action, exPlay, firstPlay) {
             // 例題動画の再生
             if (exPlay) {
-                // webカメラの映像を非表示（バックエンド）
-                // var webCamera = document.getElementById("webcameraContainer");
-                // if (webCamera) {
-                //     webCamera.style.display = "none";
-                // }
-
                 // 例題ボタンを非表示
                 var exPlayButton = document.getElementById("exPlayButton");
                 if (exPlayButton) {
@@ -728,27 +702,7 @@
                 // webカメラの映像を表示
                 localVideo.style.display = "block";
                 stopBtn.style.display = "block";
-
-
-                // webカメラの映像を表示（バックエンド）
-                // var webCamera = document.getElementById("webcameraContainer");
-                // if (webCamera) {
-                //     webCamera.style.display = "block";
-                // }
-
-                // ダウンロードリンクを作成（バックエンド）
-                // var downloadLink = document.createElement("a");
-                // downloadLink.href = "/quiz/stop_recording/";
-                // downloadLink.download = "video.mp4";
-                // downloadLink.textContent = "動画をダウンロード";
-
-                // var webcameraContainer = document.getElementById("webcameraContainer");
-
-                // if (webcameraContainer) {
-                //     webcameraContainer.appendChild(downloadLink);
-                // }
             }
-            // console.log("次の動画を再生完了");
         }
 
         function orderSaveDate(action, timestamp) {
