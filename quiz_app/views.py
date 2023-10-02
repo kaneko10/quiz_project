@@ -1,22 +1,16 @@
 from django.http import HttpResponse
-from django.http import StreamingHttpResponse
 from django.template import loader
 
 from django.shortcuts import render, redirect
-from django.views import View
 from django.http import JsonResponse
 from urllib.parse import urlencode
 
 from .models import PlayTime, QuizAnswerTime, Questionnaire, QuizOrder, Person, EndedTime
 from .forms import PersonForm
 
-import cv2
-import datetime
-import pytz
+import datetime # 実験1が修正できたら削除予定
+import pytz # 実験1が修正できたら削除予定
 import json
-import numpy as np
-import base64
-from io import BytesIO
 
 person_id = ""
 
