@@ -2,18 +2,18 @@
 <html>
 <head>
     <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+
     <style>
-        #webcameraContainer {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh; /* ビューポートの高さいっぱいに要素を広げる */
-            text-align: center;
+        #webcam {
+            height: 40vh;
         }
 
-        #webcameraContainer > * {
-            margin: 10px; /* 要素間の余白を設定（適宜調整してください） */
+        #canvas {
+            height: 40vh;
         }
 
         #playerContainer {
@@ -21,7 +21,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 50vh; /* ビューポートの高さいっぱいに要素を広げる */
+            height: 40vh; /* ビューポートの高さいっぱいに要素を広げる */
             text-align: center;
         }
 
@@ -59,7 +59,19 @@
 
 <body>
     <h1>{{text}}</h1>
-    <!-- webカメラ -->
+
+    <video id="local" playsinline autoplay muted></video>
+
+    <div>
+      <button id="cameraON">カメラオン</button>
+      <button id="record" style="display: none;">録画開始</button>
+      <button id="videoOFF" style="display: none;">ビデオオフ</button>
+      <button id="stop" style="display: none;">録画停止</button>
+      <button id="play" style="display: none;">再生</button>
+      <button id="download" style="display: none;">ダウンロード</button>
+    </div>
+
+    <div id="clock"></div>
 
     <!-- クイズ動画再生エリア -->
     <div id="playerContainer" style="display: none;">
@@ -68,18 +80,11 @@
     <form method="post" action="{% url 'quiz_movie' person_id=person_id %}" id="playVideoForm">
         {% csrf_token %}
         <!-- 例題の動画再生ボタン -->
-        <button type="button" id="exPlayButton" style="display: block;" onclick="playVideo('play', true, true)">例題</button>
+        <button type="button" id="exPlayButton" style="display: none;" onclick="playingVideo('play', true, true)">例題</button>
         <!-- 1つ目の動画再生ボタン -->
-        <button type="button" id="playButton" style="display: none;" onclick="playVideo('play', false, true)">開始</button>
+        <button type="button" id="playButton" style="display: none;" onclick="playingVideo('play', false, true)">開始</button>
     </form>
 
-    <!-- webカメラ -->
-    <div id="webcameraContainer">
-        <div id="image_area">
-            <img src="/quiz/video_feed/" width="810" height="540"/>
-        </div>
-        <!-- <a href="/quiz/stop_recording/" download="video.mp4" id="downloadLink">動画をダウンロード</a> -->
-    </div>
 
     <!-- クイズの回答フォーム -->
     <div id="quizForm" style="display: none;">
@@ -200,6 +205,130 @@
     </div>
 
     <script>
+        const supportedCodecs = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus");
+        console.log("Is VP9 supported:", supportedCodecs);
+
+        var start = (new Date()).getTime();
+        var now;
+
+        function updateClock() {
+            now = (new Date()).getTime();
+            const passed = now - start;
+
+
+            const clockElement = document.getElementById('clock');
+            clockElement.textContent = passed;
+        }
+
+        // 初回表示
+        updateClock();
+
+        // 10msごとに更新
+        setInterval(updateClock, 10);
+
+        const localVideo = document.getElementById("local");
+        const cameraONBtn = document.getElementById("cameraON");
+        const recordBtn = document.getElementById("record");
+        const videoOFFBtn = document.getElementById("videoOFF");
+        const stopBtn = document.getElementById("stop");
+        const playBtn = document.getElementById("play");
+        const downloadBtn = document.getElementById("download");
+        let mediaRecorder;
+        let recordedBlobs;
+
+        function getLocalMediaStream(mediaStream) {
+            recordBtn.style.display = "block";
+            const localStream = mediaStream;
+            localVideo.srcObject = mediaStream;
+            window.stream = mediaStream;
+        }
+
+        function handleLocalMediaStreamError(error) {
+            console.log(`navigator.getUserMedia error: ${error}`);
+        }
+
+        function handleDataAvailable(event) {
+            if (event.data && event.data.size > 0) {
+                recordedBlobs.push(event.data);
+            }
+        }
+
+        function startRecording() {
+            recordedBlobs = [];
+            // const options = { mimeType: "video/webm;codecs=vp9" };
+
+            try {
+                // mediaRecorder = new MediaRecorder(window.stream, options);
+                mediaRecorder = new MediaRecorder(window.stream);
+            } catch (error) {
+                console.log(`Exception while creating MediaRecorder: ${error}`);
+                return;
+            }
+
+            console.log("Created MediaRecorder", mediaRecorder);
+
+            mediaRecorder.onstop = event => {
+                console.log("Recorder stopped: ", event);
+            };
+
+            mediaRecorder.ondataavailable = handleDataAvailable;
+            mediaRecorder.start(5);
+            start = (new Date()).getTime();
+            console.log("MediaRecorder started", mediaRecorder);
+        }
+
+        function stopRecording() {
+            mediaRecorder.stop();
+            console.log("Recorded media.");
+        }
+
+        cameraONBtn.addEventListener("click", () => {
+            navigator.mediaDevices
+                .getUserMedia({ video: true })
+                .then(getLocalMediaStream)
+                .catch(handleLocalMediaStreamError);
+
+            cameraONBtn.style.display = "none";
+        });
+
+        recordBtn.addEventListener("click", () => {
+            startRecording();
+            recordBtn.style.display = "none";
+            videoOFFBtn.style.display = "block";
+        });
+
+        videoOFFBtn.addEventListener("click", () => {
+            videoOFFBtn.style.display = "none";
+            localVideo.style.display = "none";
+
+            // 例題ボタンを表示
+            var exPlayButton = document.getElementById("exPlayButton");
+            if (exPlayButton) {
+                exPlayButton.style.display = "block";
+            }
+        });
+
+        stopBtn.addEventListener("click", () => {
+            stopRecording();
+            stopBtn.style.display = "none";
+            downloadBtn.style.display = "block";
+        });
+
+        downloadBtn.addEventListener("click", () => {
+            const blob = new Blob(recordedBlobs, { type: "video/webm" });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.style.display = "none";
+            a.href = url;
+            a.download = "rec.webm";
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }, 100);
+        });
+
         var player;
 
         var quiz_movie_ids;
@@ -207,10 +336,11 @@
         var currentMovieID = "";
         var person_id = "";
 
-        const questionnaireTime = 10000; // (ms)
-        const breakTime = 5000  // 問題間の休憩時間
+        const questionnaireTime = 3000; // (ms)
+        const breakTime = 3000  // 問題間の休憩時間
 
         var isPlaying = false;
+        var isFirstPaused = true;
 
         // YouTube APIがロードされたときに実行されるコールバック関数
         function onYouTubeIframeAPIReady() {
@@ -235,36 +365,36 @@
         // ランダムな順番にした動画IDを生成
         function makeQuizMovieIDs() {
             // 例題
-            // const quiz_movie_ex = 'JinLnLlAdew' // 仮置き（蚊）
-            const quiz_movie_ex = '4t8JCicyYfc' // 仮置き（クイズノック）
+            const quiz_movie_ex = 'IsTm-LsudI0'
+            // const quiz_movie_ex = '4t8JCicyYfc' // 仮置き（クイズノック）
 
             // 謎解き
             const quiz_movie_mystery = [
-                // 'ekbPqltDYMQ',  // アーモンド
-                // 'yF1QVXk8R3Q',  // いのしし
-                // 'Xljgsas54CA',  // 赤身
-                // 'zLm_ILEKJ7A',  // チューイングガム
-                // 'CMOCBTYa8f0',  // マスカット
-                // 'wqHQJsGpgV0',  // カッパ
-                // 'IjdnudDMxnY',  // 太陽系
-                '4t8JCicyYfc',  // クイズノック
-                'qPHSalN8k0I',  // クイズノック
-                'Ns8-e-5Ll6c',  // クイズノック
+                'dFxEED-qX2I',  // アーモンド
+                'PTX-tsGAj4Q',  // 赤身
+                '3joBYp4EbRc',  // いのしし
+                // 'zLm_ILEKJ7A',  // チューイングガム　まだ
+                // 'CMOCBTYa8f0',  // マスカット　まだ
+                // 'wqHQJsGpgV0',  // カッパ　まだ
+                // 'IjdnudDMxnY',  // 太陽系　まだ
+                // '4t8JCicyYfc',  // クイズノック
+                // 'qPHSalN8k0I',  // クイズノック
+                // 'Ns8-e-5Ll6c',  // クイズノック
             ];
 
             // なぞなぞ
             const quiz_movie_riddle = [
-                // 'JinLnLlAdew',  // 蚊  
-                // '57VFZr9y6dA',  // いくら
-                // '4TJ4u4K1pws',  // ソフトボール
-                // 'pGXHxaH9osI',  // 不眠
-                // 'XamRk58I1Pg',  // 森
-                // 'p1Aw6_u0wmI',  // 視覚
-                // 'DiSzWzk0Kq4',  // 119
-                // 'aUR455d8oek',  // バトル
-                '4t8JCicyYfc',  // クイズノック
-                'qPHSalN8k0I',  // クイズノック
-                'Ns8-e-5Ll6c',  // クイズノック
+                'tp8JXhzyBrY',  // 蚊  
+                'oCtt6YqAnhk',  // いくら
+                'zyVWcC53lNc',  // ソフトボール
+                // 'zjphDXhTUI8',  // 不眠
+                // 'Bk66yWgQACk',  // 森
+                // 'ga6PY-7y0VE',  // 視覚
+                // '5eWLkYdCpYc',  // 119
+                // 'aUR455d8oek',  // バトル　まだ
+                // '4t8JCicyYfc',  // クイズノック
+                // 'qPHSalN8k0I',  // クイズノック
+                // 'Ns8-e-5Ll6c',  // クイズノック
             ];
 
             var quiz_movie_ids = [];
@@ -303,12 +433,15 @@
             copy_movie_ids.shift();
             // console.log("削除後： " + copy_movie_ids);
 
+            const timestamp = now - start;
+
             var context = { 
                 action: 'quiz_order', 
                 randoms_mystery: randoms_mystery,
                 randoms_riddle: randoms_riddle,
                 movie_ids: copy_movie_ids, 
                 person_id: person_id,
+                timestamp: timestamp,
             };
             var data = JSON.stringify(context);  // JSONデータとしてアクションと回答を送信
             xhr.send(data);
@@ -389,26 +522,54 @@
                         }
                     },
                     'onStateChange': function(event) {
-                        // console.log("onStateChange createNewPlayer")
                         if (event.data == YT.PlayerState.PLAYING) {
+                            // PLAYINGだと、本当の再生開始時刻より若干遅い
+                            const timestamp = now - start;
+                            console.log("再生時刻: " + timestamp);
+
+                            if (isFirstPaused) {
+                                var interval = setInterval(function() {
+                                    const currentTime = event.target.getCurrentTime();
+                                    if (currentTime >= 1) {
+                                        event.target.pauseVideo();
+                                        clearInterval(interval); // タイマーを停止
+                                        console.log(`現在の再生時間: ${currentTime}秒`);
+                                    }
+                                }, 5); // 5msごとに更新
+                            }
+
                             // 動画クリックするごとに毎回実行される
                             console.log("動画の再生を開始：PLAYING");
 
                             if (!isPlaying) {
                                 // 動画の再生時刻の保存をサーバーに要求
-                                orderSaveDate('play')
+                                orderSaveDate('play', timestamp)
                                 isPlaying = true;
                             }
 
                         } else if (event.data === YT.PlayerState.PAUSED) {
-                            // 動画が一時停止されたときに再度再生
-                            event.target.playVideo();
+                            if (isFirstPaused) {
+                                setTimeout(function() {
+                                    event.target.playVideo();
+                                    // ここの再生時刻の方が真の値に近い、けどまだ若干遅い
+                                    const timestamp = now - start;
+                                    console.log("再生時刻(PAUSED): " + timestamp);
+                                }, 1000);
+                                isFirstPaused = false;
+                            } else {
+                                // 動画が一時停止されたときに再度再生
+                                event.target.playVideo();
+                            }
                         } else if (event.data === YT.PlayerState.ENDED) {
                             console.log("動画の再生が終了しました");
 
+                            const timestamp = now - start;
+                            console.log("終了時刻： " + timestamp);
+
                             // 動画の再生終了時刻の保存をサーバーに要求
-                            orderSaveDate('ended')
+                            orderSaveDate('ended', timestamp)
                             isPlaying = false;
+                            isFirstPaused = true;
 
                             // 動画を非表示
                             removePlayer(); // id=player の div 要素を削除
@@ -450,7 +611,8 @@
                             setTimeout(function() {
                                 console.log(`アンケート：${questionnaireTime / 1000}秒経過しました`);
                                 // アンケートを送信
-                                submitForm('questionnaire');
+                                const timestamp = now - start;
+                                submitForm('questionnaire', timestamp);
                                 // // 次の動画を再生
                                 // playNextVideo('play');
                                 console.log("アンケートを送信完了");
@@ -468,15 +630,9 @@
         }        
 
         // 動画を再生する関数
-        function playVideo(action, exPlay, firstPlay) {
+        function playingVideo(action, exPlay, firstPlay) {
             // 例題動画の再生
             if (exPlay) {
-                // webカメラの映像を非表示
-                // var webCamera = document.getElementById("webcameraContainer");
-                // if (webCamera) {
-                //     webCamera.style.display = "none";
-                // }
-
                 // 例題ボタンを非表示
                 var exPlayButton = document.getElementById("exPlayButton");
                 if (exPlayButton) {
@@ -492,7 +648,7 @@
                     playButton.style.display = "none";
                 }
             }
-            // console.log("quizIndex playVideo: " + quizIndex)
+
             if (quizIndex != 0) {
                 if (player) {
                     player = null
@@ -505,7 +661,6 @@
                     } else {
                         createNewPlayer(false, false);
                     }
-                    // console.log("createNewPlayer playVideo")
                 }
             }
 
@@ -520,10 +675,6 @@
             // var playButton = document.getElementById("playButton");
             if (playerContainer) {
                 playerContainer.style.display = "block";
-                // console.log("make movie playVideo")
-                // playButton.style.display = "none";
-                // console.log("player: ")
-                // console.log(player)
 
                 if(player) {
                     // console.log("playVideo")
@@ -544,30 +695,17 @@
 
             } else if (quizIndex < quiz_movie_ids.length) {
                 console.log("次の動画を再生");
-                playVideo('play', false);
+                playingVideo('play', false, false);
             } else {
+                // 問題が全て終了した場合
+
                 // webカメラの映像を表示
-                var webCamera = document.getElementById("webcameraContainer");
-                if (webCamera) {
-                    webCamera.style.display = "block";
-                }
-
-                // ダウンロードリンクを作成
-                var downloadLink = document.createElement("a");
-                downloadLink.href = "/quiz/stop_recording/";
-                downloadLink.download = "video.mp4";
-                downloadLink.textContent = "動画をダウンロード";
-
-                var webcameraContainer = document.getElementById("webcameraContainer");
-
-                if (webcameraContainer) {
-                    webcameraContainer.appendChild(downloadLink);
-                }
+                localVideo.style.display = "block";
+                stopBtn.style.display = "block";
             }
-            // console.log("次の動画を再生完了");
         }
 
-        function orderSaveDate(action) {
+        function orderSaveDate(action, timestamp) {
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "{% url 'quiz_movie' person_id=person_id %}", true);
             xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
@@ -592,12 +730,15 @@
                 quizIndex: quizIndex,
                 person_id: person_id,
                 movie_id: currentMovieID,
+                timestamp: timestamp,
             };
             var data = JSON.stringify(context);  // JSONデータとして識別子を送信
             xhr.send(data);
         }
 
         function sendAnswer(action) {
+            const timestamp = now - start;
+
             // フォームの内容を取得
             var answer = document.getElementById("answer").value;
             // POSTリクエストを送信してデータをサーバーに送信
@@ -621,6 +762,7 @@
                 answer: answer,
                 person_id: person_id,
                 movie_id: currentMovieID,
+                timestamp: timestamp,
             }
 
             var data = JSON.stringify(context);  // JSONデータとしてアクションと回答を送信
@@ -628,7 +770,7 @@
         }
 
         // フォーム送信
-        function submitForm(action) {
+        function submitForm(action, timestamp) {
             console.log("アンケートを送信");
             // アンケートの回答を取得
             var context = {
@@ -640,6 +782,7 @@
                 q4: getRadioButtonValue("q4"),
                 person_id: person_id,
                 movie_id: currentMovieID,
+                timestamp: timestamp,
             };
 
             // POSTリクエストを送信してデータをサーバーに送信

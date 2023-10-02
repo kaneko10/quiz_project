@@ -14,6 +14,9 @@ import cv2
 import datetime
 import pytz
 import json
+import numpy as np
+import base64
+from io import BytesIO
 
 person_id = ""
 
@@ -37,77 +40,6 @@ def save_name(request):
         form = PersonForm()
 
     return render(request, 'quiz/save_name.html', {'form': form})
-
-# ストリーミング画像・映像を表示するview
-class WebCameraView(View):
-    def get(self, request):
-        return render(request, 'quiz/webcamera.html', {})
-
-# ストリーミング画像を定期的に返却するview
-def video_feed_view(request):
-    return StreamingHttpResponse(generate_frame(), content_type='multipart/x-mixed-replace; boundary=frame')
-
-# フレーム生成・返却する処理
-def generate_frame():
-    global capture, video  # capture と video をグローバル変数として使用
-
-    capture = cv2.VideoCapture(0)  # USBカメラから
-
-    fps = int(capture.get(cv2.CAP_PROP_FPS))                    # カメラのFPSを取得
-    w = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))              # カメラの横幅を取得
-    h = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))             # カメラの縦幅を取得
-    fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')        # 動画保存時のfourcc設定（mp4用）
-    video = cv2.VideoWriter('video.mp4', fourcc, fps, (w, h))  # 動画の仕様（ファイル名、fourcc, FPS, サイズ）
-
-    while True:
-        ret, frame = capture.read()
-        
-        if not ret:
-            print("Failed to read frame.")
-            break
-        
-        # 現在の時刻を取得
-        jst = pytz.timezone('Asia/Tokyo')
-        jst_now = datetime.datetime.now(jst)
-        timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
-        
-        # タイムスタンプをフレーム上にオーバーレイ
-        cv2.putText(frame, timestamp, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        video.write(frame)
-        
-        # フレーム画像バイナリに変換
-        ret, jpeg = cv2.imencode('.jpg', frame)
-        byte_frame = jpeg.tobytes()
-        
-        # フレーム画像のバイナリデータをユーザーに送付する
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + byte_frame + b'\r\n\r\n')
-        
-        # フレーム生成速度を調整するための一時停止
-        # time.sleep(0.1)  # 0.1秒待機
-    capture.release()
-    video.release()
-
-def stop_recording(request):
-    global capture, video  # capture と video をグローバル変数として使用
-
-    if capture and video:
-        # カメラのキャプチャと動画保存を停止
-        capture.release()
-        video.release()
-        capture = None
-        video = None
-
-        # video.mp4 ファイルをダウンロードさせる
-        with open('video.mp4', 'rb') as file:
-            print("ファイルをダウンロード")
-            response = HttpResponse(file.read(), content_type='video/mp4')
-            response['Content-Disposition'] = 'attachment; filename="video.mp4"'
-    
-        return response
-    else:
-        # キャプチャと動画が正しく初期化されていない場合の処理
-        return HttpResponse("Recording not started.", status=400)
     
 def quiz_movie_view(request, person_id):
     if request.method == "POST":
@@ -115,14 +47,10 @@ def quiz_movie_view(request, person_id):
         data = json.loads(request.body.decode('utf-8'))  # JSONデータを解析
         action = data.get('action')
         person_id = data.get('person_id')
-        movie_id = data.get('movie_id')
+        timestamp = data.get('timestamp')
 
         if action == 'play':
-            # POSTリクエストからボタンが押された時刻を取得
-            # 日本時間のタイムゾーンを取得
-            jst = pytz.timezone('Asia/Tokyo')
-            jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
+            movie_id = data.get('movie_id')
             # ボタンが押された時刻をデータベースに保存
             PlayTime.objects.create(
                 person_id=person_id, 
@@ -136,9 +64,6 @@ def quiz_movie_view(request, person_id):
         elif action == 'answer':
             answer = data.get('answer')
             movie_id = data.get('movie_id')
-            jst = pytz.timezone('Asia/Tokyo')
-            jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
             QuizAnswerTime.objects.create(
                 person_id=person_id, 
                 movie_id=movie_id,
@@ -150,9 +75,8 @@ def quiz_movie_view(request, person_id):
             # JSONレスポンスを返す（Ajaxリクエストに対応）
             return JsonResponse({"message": "Success"})
         elif action == 'ended':
-            jst = pytz.timezone('Asia/Tokyo')
-            jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
+            movie_id = data.get('movie_id')
+            timestamp = data.get('timestamp')
             # ボタンが押された時刻をデータベースに保存
             EndedTime.objects.create(
                 person_id=person_id, 
@@ -172,10 +96,6 @@ def quiz_movie_view(request, person_id):
             q2_ans = data.get('q2_ans')
             q3 = data.get('q3')
             q4 = data.get('q4')
-            # 日本時間のタイムゾーンを取得
-            jst = pytz.timezone('Asia/Tokyo')
-            jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
             # ボタンが押された時刻をデータベースに保存
             Questionnaire.objects.create(
                 person_id=person_id,
@@ -204,10 +124,6 @@ def quiz_movie_view(request, person_id):
             for index in randoms_riddle:
                 print("index: " + str(index))
                 random_index_riddle += str(index) + ", "
-
-            jst = pytz.timezone('Asia/Tokyo')
-            jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
 
             QuizOrder.objects.create(
                 person_id=person_id,
