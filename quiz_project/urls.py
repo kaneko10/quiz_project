@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
-    path("quiz/", include("quiz_app.urls")),
+    # path("quiz/", include("quiz_app.urls")),
+    path("", include("quiz_app.urls")),
     path('admin/', admin.site.urls),
 ]
