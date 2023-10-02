@@ -444,12 +444,15 @@
             copy_movie_ids.shift();
             // console.log("削除後： " + copy_movie_ids);
 
+            const timestamp = now - start;
+
             var context = { 
                 action: 'quiz_order', 
                 randoms_mystery: randoms_mystery,
                 randoms_riddle: randoms_riddle,
                 movie_ids: copy_movie_ids, 
                 person_id: person_id,
+                timestamp: timestamp,
             };
             var data = JSON.stringify(context);  // JSONデータとしてアクションと回答を送信
             xhr.send(data);
@@ -619,7 +622,8 @@
                             setTimeout(function() {
                                 console.log(`アンケート：${questionnaireTime / 1000}秒経過しました`);
                                 // アンケートを送信
-                                submitForm('questionnaire');
+                                const timestamp = now - start;
+                                submitForm('questionnaire', timestamp);
                                 // // 次の動画を再生
                                 // playNextVideo('play');
                                 console.log("アンケートを送信完了");
@@ -763,6 +767,8 @@
         }
 
         function sendAnswer(action) {
+            const timestamp = now - start;
+
             // フォームの内容を取得
             var answer = document.getElementById("answer").value;
             // POSTリクエストを送信してデータをサーバーに送信
@@ -786,6 +792,7 @@
                 answer: answer,
                 person_id: person_id,
                 movie_id: currentMovieID,
+                timestamp: timestamp,
             }
 
             var data = JSON.stringify(context);  // JSONデータとしてアクションと回答を送信
@@ -793,7 +800,7 @@
         }
 
         // フォーム送信
-        function submitForm(action) {
+        function submitForm(action, timestamp) {
             console.log("アンケートを送信");
             // アンケートの回答を取得
             var context = {
@@ -805,6 +812,7 @@
                 q4: getRadioButtonValue("q4"),
                 person_id: person_id,
                 movie_id: currentMovieID,
+                timestamp: timestamp,
             };
 
             // POSTリクエストを送信してデータをサーバーに送信

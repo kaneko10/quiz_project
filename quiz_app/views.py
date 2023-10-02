@@ -47,10 +47,10 @@ def quiz_movie_view(request, person_id):
         data = json.loads(request.body.decode('utf-8'))  # JSONデータを解析
         action = data.get('action')
         person_id = data.get('person_id')
-        movie_id = data.get('movie_id')
+        timestamp = data.get('timestamp')
 
         if action == 'play':
-            timestamp = data.get('timestamp')
+            movie_id = data.get('movie_id')
             # ボタンが押された時刻をデータベースに保存
             PlayTime.objects.create(
                 person_id=person_id, 
@@ -64,9 +64,6 @@ def quiz_movie_view(request, person_id):
         elif action == 'answer':
             answer = data.get('answer')
             movie_id = data.get('movie_id')
-            jst = pytz.timezone('Asia/Tokyo')
-            jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
             QuizAnswerTime.objects.create(
                 person_id=person_id, 
                 movie_id=movie_id,
@@ -78,6 +75,7 @@ def quiz_movie_view(request, person_id):
             # JSONレスポンスを返す（Ajaxリクエストに対応）
             return JsonResponse({"message": "Success"})
         elif action == 'ended':
+            movie_id = data.get('movie_id')
             timestamp = data.get('timestamp')
             # ボタンが押された時刻をデータベースに保存
             EndedTime.objects.create(
@@ -98,10 +96,6 @@ def quiz_movie_view(request, person_id):
             q2_ans = data.get('q2_ans')
             q3 = data.get('q3')
             q4 = data.get('q4')
-            # 日本時間のタイムゾーンを取得
-            jst = pytz.timezone('Asia/Tokyo')
-            jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
             # ボタンが押された時刻をデータベースに保存
             Questionnaire.objects.create(
                 person_id=person_id,
@@ -130,10 +124,6 @@ def quiz_movie_view(request, person_id):
             for index in randoms_riddle:
                 print("index: " + str(index))
                 random_index_riddle += str(index) + ", "
-
-            jst = pytz.timezone('Asia/Tokyo')
-            jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
 
             QuizOrder.objects.create(
                 person_id=person_id,
