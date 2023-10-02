@@ -61,7 +61,6 @@
     <h1>{{text}}</h1>
 
     <video id="local" playsinline autoplay muted></video>
-    <video id="recorded" playsinline loop></video>
 
     <div>
       <button id="cameraON">カメラオン</button>
@@ -73,8 +72,6 @@
     </div>
 
     <div id="clock"></div>
-
-    <!-- webカメラ -->
 
     <!-- クイズ動画再生エリア -->
     <div id="playerContainer" style="display: none;">
@@ -230,7 +227,6 @@
         setInterval(updateClock, 10);
 
         const localVideo = document.getElementById("local");
-        const recordedVideo = document.getElementById("recorded");
         const cameraONBtn = document.getElementById("cameraON");
         const recordBtn = document.getElementById("record");
         const videoOFFBtn = document.getElementById("videoOFF");
@@ -336,16 +332,6 @@
             //     playBtn.disabled = false;
             //     downloadBtn.disabled = false;
             // }
-        });
-
-
-        playBtn.addEventListener("click", () => {
-            const superBuffer = new Blob(recordedBlobs, { type: "video/webm" });
-            recordedVideo.src = null;
-            recordedVideo.srcObject = null;
-            recordedVideo.src = window.URL.createObjectURL(superBuffer);
-            recordedVideo.controls = true;
-            recordedVideo.play();
         });
 
         downloadBtn.addEventListener("click", () => {
