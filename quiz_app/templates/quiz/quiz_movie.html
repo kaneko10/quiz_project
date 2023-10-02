@@ -16,19 +16,6 @@
             height: 40vh;
         }
 
-        /* #webcameraContainer {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh; /* ビューポートの高さいっぱいに要素を広げる */
-            /* text-align: center;
-        } */
-
-        /* #webcameraContainer > * { */
-            /* margin: 10px; 要素間の余白を設定（適宜調整してください） */
-        /* } */
-
         #playerContainer {
             display: flex;
             flex-direction: column;
@@ -77,10 +64,12 @@
     <video id="recorded" playsinline loop></video>
 
     <div>
-      <button id="start">映像を取得する</button>
-      <button id="record" disabled>録画開始</button>
-      <button id="play" disabled>再生</button>
-      <button id="download" disabled>ダウンロード</button>
+      <button id="cameraON">カメラオン</button>
+      <button id="record" style="display: none;">録画開始</button>
+      <button id="videoOFF" style="display: none;">ビデオオフ</button>
+      <button id="stop" style="display: none;">録画停止</button>
+      <button id="play" style="display: none;">再生</button>
+      <button id="download" style="display: none;">ダウンロード</button>
     </div>
 
     <div id="clock"></div>
@@ -94,7 +83,7 @@
     <form method="post" action="{% url 'quiz_movie' person_id=person_id %}" id="playVideoForm">
         {% csrf_token %}
         <!-- 例題の動画再生ボタン -->
-        <button type="button" id="exPlayButton" style="display: block;" onclick="playingVideo('play', true, true)">例題</button>
+        <button type="button" id="exPlayButton" style="display: none;" onclick="playingVideo('play', true, true)">例題</button>
         <!-- 1つ目の動画再生ボタン -->
         <button type="button" id="playButton" style="display: none;" onclick="playingVideo('play', false, true)">開始</button>
     </form>
@@ -242,15 +231,17 @@
 
         const localVideo = document.getElementById("local");
         const recordedVideo = document.getElementById("recorded");
-        const startBtn = document.getElementById("start");
+        const cameraONBtn = document.getElementById("cameraON");
         const recordBtn = document.getElementById("record");
+        const videoOFFBtn = document.getElementById("videoOFF");
+        const stopBtn = document.getElementById("stop");
         const playBtn = document.getElementById("play");
         const downloadBtn = document.getElementById("download");
         let mediaRecorder;
         let recordedBlobs;
 
         function getLocalMediaStream(mediaStream) {
-            recordBtn.disabled = false;
+            recordBtn.style.display = "block";
             const localStream = mediaStream;
             localVideo.srcObject = mediaStream;
             window.stream = mediaStream;
@@ -279,9 +270,9 @@
             }
 
             console.log("Created MediaRecorder", mediaRecorder);
-            recordBtn.textContent = "録画停止";
-            playBtn.disabled = true;
-            downloadBtn.disabled = true;
+            // recordBtn.textContent = "録画停止";
+            // playBtn.disabled = true;
+            // downloadBtn.disabled = true;
 
             mediaRecorder.onstop = event => {
                 console.log("Recorder stopped: ", event);
@@ -298,23 +289,55 @@
             console.log("Recorded media.");
         }
 
-        startBtn.addEventListener("click", () => {
+        cameraONBtn.addEventListener("click", () => {
             navigator.mediaDevices
                 .getUserMedia({ video: true })
                 .then(getLocalMediaStream)
                 .catch(handleLocalMediaStreamError);
+
+            cameraONBtn.style.display = "none";
         });
 
         recordBtn.addEventListener("click", () => {
-            if (recordBtn.textContent === "録画開始") {
-                startRecording();
-            } else {
-                stopRecording();
-                recordBtn.textContent = "録画開始";
-                playBtn.disabled = false;
-                downloadBtn.disabled = false;
+            startRecording();
+            recordBtn.style.display = "none";
+            videoOFFBtn.style.display = "block";
+            // if (recordBtn.textContent === "録画開始") {
+            //     startRecording();
+            // } else {
+            //     stopRecording();
+            //     recordBtn.textContent = "録画開始";
+            //     playBtn.disabled = false;
+            //     downloadBtn.disabled = false;
+            // }
+        });
+
+        videoOFFBtn.addEventListener("click", () => {
+            videoOFFBtn.style.display = "none";
+            localVideo.style.display = "none";
+
+            // 例題ボタンを表示
+            var exPlayButton = document.getElementById("exPlayButton");
+            if (exPlayButton) {
+                exPlayButton.style.display = "block";
             }
         });
+
+        stopBtn.addEventListener("click", () => {
+            stopRecording();
+            stopBtn.style.display = "none";
+            downloadBtn.style.display = "block";
+
+            // if (recordBtn.textContent === "録画開始") {
+            //     startRecording();
+            // } else {
+            //     stopRecording();
+            //     recordBtn.textContent = "録画開始";
+            //     playBtn.disabled = false;
+            //     downloadBtn.disabled = false;
+            // }
+        });
+
 
         playBtn.addEventListener("click", () => {
             const superBuffer = new Blob(recordedBlobs, { type: "video/webm" });
@@ -714,6 +737,13 @@
                 console.log("次の動画を再生");
                 playingVideo('play', false, false);
             } else {
+                // 問題が全て終了した場合
+
+                // webカメラの映像を表示
+                localVideo.style.display = "block";
+                stopBtn.style.display = "block";
+
+
                 // webカメラの映像を表示（バックエンド）
                 // var webCamera = document.getElementById("webcameraContainer");
                 // if (webCamera) {
