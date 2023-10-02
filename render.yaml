@@ -14,7 +14,7 @@ services:
     startCommand: 'gunicorn quiz_project.wsgi:application'
     plan: free
     branch: deploy
-    healthCheckPath: /quiz/quiz_movie/
+    healthCheckPath: /
     envVars:
       - key: DATABASE_URL
         fromDatabase:
