@@ -18,8 +18,7 @@ from . import views
 #     path('stop_recording/', views.stop_recording, name='stop_recording'),
 # ]
 urlpatterns = [
-    # path("", views.index, name="index"),
-    path('', views.quiz_movie_view, name="quiz_movie"),
+    path("", views.index, name="index"),
     # ex: /polls/5/
     path("<int:question_id>/", views.detail, name="detail"),
     # ex: /polls/5/results/
