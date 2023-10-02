@@ -11,7 +11,7 @@ services:
     env: python
     region: singapore
     buildCommand: './build.sh'
-    startCommand: 'gunicorn quiz_project.wsgi:application'
+    startCommand: 'gunicorn quiz_project.wsgi --log-file -'
     plan: free
     branch: deploy
     healthCheckPath: /
