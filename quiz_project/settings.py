@@ -30,7 +30,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # DEBUG = True
 DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', 'quiz.onrender.com']
+# ALLOWED_HOSTS = ['127.0.0.1', 'quiz.onrender.com']
+ALLOWED_HOSTS = []
 
 # Application definition
 
