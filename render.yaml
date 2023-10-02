@@ -13,7 +13,7 @@ services:
     buildCommand: './build.sh'
     startCommand: 'gunicorn quiz_project.wsgi:application'
     plan: free
-    branch: main
+    branch: deploy3
     healthCheckPath: /quiz/quiz_movie
     envVars:
       - key: DATABASE_URL
