@@ -1,0 +1,11 @@
+django==4.1.2
+dj-database-url
+dj-static
+python-decouple
+django-environ
+gunicorn
+psycopg2-binary
+whitenoise
+pytz
+opencv-python
+python-dotenv
