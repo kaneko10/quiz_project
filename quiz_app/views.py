@@ -50,11 +50,7 @@ def quiz_movie_view(request, person_id):
         movie_id = data.get('movie_id')
 
         if action == 'play':
-            # POSTリクエストからボタンが押された時刻を取得
-            # 日本時間のタイムゾーンを取得
-            jst = pytz.timezone('Asia/Tokyo')
-            jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
+            timestamp = data.get('timestamp')
             # ボタンが押された時刻をデータベースに保存
             PlayTime.objects.create(
                 person_id=person_id, 
@@ -82,9 +78,7 @@ def quiz_movie_view(request, person_id):
             # JSONレスポンスを返す（Ajaxリクエストに対応）
             return JsonResponse({"message": "Success"})
         elif action == 'ended':
-            jst = pytz.timezone('Asia/Tokyo')
-            jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
+            timestamp = data.get('timestamp')
             # ボタンが押された時刻をデータベースに保存
             EndedTime.objects.create(
                 person_id=person_id, 
