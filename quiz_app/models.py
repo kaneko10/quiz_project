@@ -49,4 +49,6 @@ class QuizOrder(models.Model):
     id_15 = models.CharField(max_length=20)
 
 class Person(models.Model):
+    id_str = models.CharField(max_length=10)
     name = models.CharField(max_length=30)
+    whether_answer = models.BooleanField()

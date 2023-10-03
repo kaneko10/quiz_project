@@ -10,15 +10,62 @@
     <!-- 名前入力フォーム -->
     <div id="nameForm">
         <form method="post" action="{% url 'save_name' %}">
-            {% csrf_token %}
+            <!-- {% csrf_token %} -->
+            <label for="name">id：</label>
+            <input type="text" id="id" name="id">
+            <br> </br>
             <label for="name">名前：</label>
             <input type="text" id="name" name="name">
-            <button type="submit">決定</button>
+            <!-- <button type="submit">決定</button> -->
+            <button type="button" id="personInfo" onclick="sendPersonInfo('personInfo')">決定</button>
         </form>
     </div>
     <script>
+        function sendPersonInfo(action) {
+            // フォームの内容を取得
+            const id = document.getElementById("id").value;
+            const name = document.getElementById("name").value;
+
+            // POSTリクエストを送信してデータをサーバーに送信
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "{% url 'save_name' %}", true);
+            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");  // JSONデータを送信することを指定
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    // レスポンスの処理（任意）
+                    console.log("サーバーレスポンス: " + xhr.responseText);
+                }
+                // フォームをリセット
+                var textForm = document.getElementById("id");
+                textForm.value = '';
+
+                textForm = document.getElementById("name");
+                textForm.value = '';
+            };
+
+            context = {
+                action: action,
+                id: id,
+                name: name,
+            }
+
+            var data = JSON.stringify(context);
+            xhr.send(data);
+        }
+
+        // エンターキーのデフォルト動作を無効にする
+        document.getElementById("id").addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // デフォルトの動作をキャンセル
+            }
+        });
+        document.getElementById("name").addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // デフォルトの動作をキャンセル
+            }
+        });
 
     </script>
 </body>
-</html>
-
