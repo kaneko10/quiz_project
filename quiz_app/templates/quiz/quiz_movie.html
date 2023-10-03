@@ -492,20 +492,6 @@
             playerDiv.id = "player";
             playerContainer.appendChild(playerDiv);
 
-            // if (player) {
-            //     // 現在のプレーヤーが存在する場合、削除します
-            //     player.destroy();
-            //     console.log("destroy player")
-            // }
-
-            // 動画のIDリストを生成（例題の問題の時）
-            // if (exPlay) {
-            //     quiz_movie_ids = makeQuizMovieIDs();
-            //     console.log("quiz_movie_ids: " + quiz_movie_ids);
-            // }
-
-
-
             // console.log("videoID: " + quizIndex)
             currentMovieID = quiz_movie_ids[quizIndex]
             player = new YT.Player('player', {
@@ -611,8 +597,6 @@
                                     clearInterval(interval); // タイマーを停止
                                 }
                             }, 1000); // 1秒ごとに更新
-                            // 動画再生が終了したときに新しいタブで指定リンクを開く
-                            // window.open('https://docs.google.com/forms/d/e/1FAIpQLSdnFFQIqY782gk1XMCYFhWKdOMsMFPaYdxABGaFscjp2FaZyg/viewform?usp=sf_link', '_blank');
 
                             setTimeout(function() {
                                 console.log(`アンケート：${questionnaireTime / 1000}秒経過しました`);
