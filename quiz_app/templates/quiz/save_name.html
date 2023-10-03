@@ -6,66 +6,69 @@
 </head>
 
 <body>
+    {% if name %}
+    <h1>{{ name }}</h1>
+    {% else %}
     <h1>名前入力</h1>
+    {% endif %}
+
     <!-- 名前入力フォーム -->
     <div id="nameForm">
         <form method="post" action="{% url 'save_name' %}">
-            <!-- {% csrf_token %} -->
-            <label for="name">id：</label>
-            <input type="text" id="id" name="id">
-            <br> </br>
-            <label for="name">名前：</label>
-            <input type="text" id="name" name="name">
-            <!-- <button type="submit">決定</button> -->
-            <button type="button" id="personInfo" onclick="sendPersonInfo('personInfo')">決定</button>
+            {% csrf_token %}
+            {% for item in form %}
+            <div class="form-group">
+                <label for="{{item.id_for_label}}" class="form-label">{{item.label}}</label>
+                <div class="form-input">
+                    {{ item }}
+                </div>
+            </div>
+            {% endfor %}
+
+            <button type="submit" name="personInfo" value="personInfo">決定</button>
         </form>
     </div>
+
+    {% if name %}
+    <button type="button" id="startRoulette" onclick="startRoulette()">スタート</button>
+    {% endif %}
+
+    <div id="rouletteContainer" style="display: none;">
+        <p id="randomNumber"></p>
+        <button type="button" id="stopRoulette" onclick="stopRoulette()">ストップ</button>
+    </div>
+
+    <form method="post" action="{% url 'save_name' %}">
+        {% csrf_token %}
+        <button type="sumit" id="next" name="next" value="next">次へ</button>
+    </form>
+
     <script>
-        function sendPersonInfo(action) {
-            // フォームの内容を取得
-            const id = document.getElementById("id").value;
-            const name = document.getElementById("name").value;
+        var interval;
 
-            // POSTリクエストを送信してデータをサーバーに送信
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "{% url 'save_name' %}", true);
-            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");  // JSONデータを送信することを指定
+        function startRoulette() {
+            console.log("ルーレット開始");
 
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    // レスポンスの処理（任意）
-                    console.log("サーバーレスポンス: " + xhr.responseText);
-                }
-                // フォームをリセット
-                var textForm = document.getElementById("id");
-                textForm.value = '';
+            const rouletteContainer = document.getElementById("rouletteContainer");
+            rouletteContainer.style.display = "block";
 
-                textForm = document.getElementById("name");
-                textForm.value = '';
-            };
 
-            context = {
-                action: action,
-                id: id,
-                name: name,
-            }
+            const randomNumberElement = document.getElementById("randomNumber");
 
-            var data = JSON.stringify(context);
-            xhr.send(data);
+            interval = setInterval(function() {
+                const randomNumber = getRandomThreeDigitNumber();
+                randomNumberElement.textContent = randomNumber;
+            }, 100);
         }
 
-        // エンターキーのデフォルト動作を無効にする
-        document.getElementById("id").addEventListener("keypress", function (event) {
-            if (event.key === "Enter") {
-                event.preventDefault(); // デフォルトの動作をキャンセル
-            }
-        });
-        document.getElementById("name").addEventListener("keypress", function (event) {
-            if (event.key === "Enter") {
-                event.preventDefault(); // デフォルトの動作をキャンセル
-            }
-        });
+        function getRandomThreeDigitNumber() {
+            // 100から999までのランダムな整数を生成
+            return Math.floor(Math.random() * 900) + 100;
+        }
+
+        function stopRoulette() {
+            clearInterval(interval); 
+        }
 
     </script>
 </body>

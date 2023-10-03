@@ -5,42 +5,97 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from urllib.parse import urlencode
 
-from .models import PlayTime, QuizAnswerTime, Questionnaire, QuizOrder, Person, EndedTime
-# from .forms import PersonForm
+from .models import PlayTime, QuizAnswerTime, Questionnaire, QuizOrder, Person, EndedTime, WhetherAnswer
+from .forms import PersonForm
 
 import datetime # 実験1が修正できたら削除予定
 import pytz # 実験1が修正できたら削除予定
 import json
 
 person_id = ""
+whether_answer = False
 
 # 一番最初にアクセスして被験者の識別子を入力するview
 def save_name(request):
+    global person_id
+    global whether_answer
+
     if request.method == "POST":
-        data = json.loads(request.body.decode('utf-8'))  # JSONデータを解析
-        action = data.get('action')
+        print("POSTリクエスト")
+        form = PersonForm(request.POST)
+        if form.is_valid():
+            form.save()  # フォームのデータをデータベースに保存
+            name = form.cleaned_data['name']
+            person_id = name
+            print("フォームをデータベースに保存しました")
 
-        if action == 'personInfo':
-            id = data.get('id')
-            name = data.get('name')
-            whether_answer = True
-
-            id_int = int(id)
+            # 回答するかしないか決定
+            id_str = form.cleaned_data['id_str']
+            id_int = int(id_str)
             if id_int % 2 == 1:
                 whether_answer = False
             else:
                 whether_answer = True
 
-
-            # ボタンが押された時刻をデータベースに保存
-            Person.objects.create(
-                id_str=id,
+            WhetherAnswer.objects.create(
                 name=name,
                 whether_answer=whether_answer,
             )
+
+            return render(request, 'quiz/save_name.html', {'form': form, 'name': name, 'is_post_request': True})
+        elif 'next' in request.POST:
+            print("person_id: " + person_id)
+            redirect_url = redirect("quiz_movie", person_id=person_id)
+            parameters = urlencode({"person_id": person_id})
+            url = f"{redirect_url['Location']}?{parameters}"
+            return redirect(url)
+
+        else:
+            print("フォームが空です")
+        
+        # print("request: " + request)
+        # if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        #     print("Ajaxリクエスト")
+        #     data = json.loads(request.body.decode('utf-8'))  # JSONデータを解析
+        #     # action = data.get('action')
+        #     id = data.get('id')
+        #     name = data.get('name')
+        #     whether_answer = True
+
+        #     person_id = name
+
+        #     id_int = int(id)
+        #     if id_int % 2 == 1:
+        #         whether_answer = False
+        #     else:
+        #         whether_answer = True
+
+
+        #     # ボタンが押された時刻をデータベースに保存
+        #     Person.objects.create(
+        #         id_str=id,
+        #         name=name,
+        #         whether_answer=whether_answer,
+        #     )
             
-            # JSONレスポンスを返す（Ajaxリクエストに対応）
-            return JsonResponse({"message": "Success"})
+        #     # JSONレスポンスを返す（Ajaxリクエストに対応）
+        #     return JsonResponse({"message": "Success", "whether_answer": whether_answer})
+            
+        # else:
+        #     print("こっち？？")
+        #     form = PersonForm()
+            # print("通常のPOSTリクエスト")
+            # redirect_url = redirect("quiz_movie", person_id=name)
+            # parameters = urlencode({"person_id": name})
+            # url = f"{redirect_url['Location']}?{parameters}"
+            # return redirect(url)
+
+    elif request.method == 'GET':
+        form = PersonForm()
+        print("GETリクエスト")
+        return render(request, 'quiz/save_name.html', {'form': form})
+
+    # return render(request, 'quiz/save_name.html', {'form': form})
         
     # if request.method == 'POST':
     #     form = PersonForm(request.POST)
@@ -59,8 +114,6 @@ def save_name(request):
     #         # return redirect('quiz_movie', person_id=name)
     # else:
     #     form = PersonForm()
-
-    return render(request, 'quiz/save_name.html')
     
 def quiz_movie_view(request, person_id):
     if request.method == "POST":
@@ -177,6 +230,7 @@ def quiz_movie_view(request, person_id):
         "text": person_id,
         "isPlaying": False,
         "person_id": person_id,
+        "whether_answer": whether_answer
     }
     param1 = request.GET.get("person_id")
     # return HttpResponse(f"POST: {person_id} <br>GET: {param1}")
