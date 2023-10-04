@@ -149,6 +149,9 @@
 
         function stopRecording() {
             mediaRecorder.stop();
+            const timestamp = now - start;
+            console.log("録画停止： " + timestamp);
+            orderSaveData('stopRecord', [timestamp])
             console.log("Recorded media.");
         }
 
@@ -384,6 +387,12 @@
                     timestamp_0s: data[0],
                     timestamp_1s: data[1],
                     current_movie_time: data[2],
+                };
+            } else if (action == "stopRecord") {
+                context = { 
+                    action: action, 
+                    person_id: person_id,
+                    timestamp: data[0],
                 };
             } else {
                 context = { 

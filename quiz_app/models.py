@@ -59,3 +59,7 @@ class WhetherAnswer(models.Model):
     id_str = models.CharField(verbose_name='ID', max_length=10)
     name = models.CharField(max_length=30)
     whether_answer = models.BooleanField()
+
+class StopRecordTime(models.Model):
+    person_id = models.CharField(max_length=30)
+    time = models.CharField(max_length=30, default=None)

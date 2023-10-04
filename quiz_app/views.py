@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from urllib.parse import urlencode
 
-from .models import PlayTime, QuizAnswerTime, Questionnaire, QuizOrder, Person, EndedTime, WhetherAnswer
+from .models import PlayTime, QuizAnswerTime, Questionnaire, QuizOrder, Person, EndedTime, WhetherAnswer, StopRecordTime
 from .forms import PersonForm
 
 import json
@@ -68,6 +68,15 @@ def make_expression_view(request, person_id):
                 person_id=person_id, 
                 movie_id=movie_id,
                 ended_time=timestamp,
+            )
+
+            return JsonResponse({"message": "Success"})
+        elif action == 'stopRecord':
+            timestamp = data.get('timestamp')
+            # ボタンが押された時刻をデータベースに保存
+            StopRecordTime.objects.create(
+                person_id=person_id, 
+                time=timestamp,
             )
 
             return JsonResponse({"message": "Success"})
@@ -242,6 +251,15 @@ def quiz_movie_view(request, person_id):
                 id_14 = movie_ids[13],
                 id_15 = movie_ids[14],
             )
+            return JsonResponse({"message": "Success"})
+        elif action == 'stopRecord':
+            timestamp = data.get('timestamp')
+            # ボタンが押された時刻をデータベースに保存
+            StopRecordTime.objects.create(
+                person_id=person_id, 
+                time=timestamp,
+            )
+
             return JsonResponse({"message": "Success"})
 
     print("first access quiz_movie.html")
