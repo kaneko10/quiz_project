@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    <link rel="icon" type="image/png" href="{% static 'quiz_app/icon/favicon.png' %}">
+</head>
+
+<body>
+    <h1>名前入力</h1>
+    <!-- 名前入力フォーム -->
+    <div id="nameForm">
+        <form method="post" action="{% url 'input_name_expt1' %}">
+            {% csrf_token %}
+            {% for item in form %}
+            <div class="form-group">
+                <label for="{{item.id_for_label}}" class="form-label">{{item.label}}</label>
+                <div class="form-input">
+                    {{ item }}
+                </div>
+            </div>
+            {% endfor %}
+
+            <button type="submit" name="personInfo" value="personInfo">決定</button>
+        </form>
+    </div>
+    <script>
+
+    </script>
+</body>
+</html>
+

@@ -14,7 +14,7 @@
 
     <!-- 名前入力フォーム -->
     <div id="nameForm">
-        <form method="post" action="{% url 'save_name' %}">
+        <form method="post" action="{% url 'input_name_expt2' %}">
             {% csrf_token %}
             {% for item in form %}
             <div class="form-group">
@@ -38,7 +38,7 @@
         <button type="button" id="stopRoulette" onclick="stopRoulette()">ストップ</button>
     </div>
 
-    <form method="post" action="{% url 'save_name' %}">
+    <form method="post" action="{% url 'input_name_expt2' %}">
         {% csrf_token %}
         <button type="sumit" id="next" name="next" value="next">次へ</button>
     </form>

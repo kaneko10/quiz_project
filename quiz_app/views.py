@@ -15,8 +15,8 @@ import json
 person_id = ""
 whether_answer = False
 
-# 一番最初にアクセスして被験者の識別子を入力するview
-def save_name(request):
+# 実験2：なぞなぞと謎解き
+def input_name_expt2(request):
     global person_id
     global whether_answer
 
@@ -48,7 +48,7 @@ def save_name(request):
                 whether_answer=whether_answer,
             )
 
-            return render(request, 'quiz/save_name.html', {'form': form, 'name': name, 'is_post_request': True})
+            return render(request, 'quiz/input_name_expt2.html', {'form': form, 'name': name, 'is_post_request': True})
         elif 'next' in request.POST:
             print("person_id: " + person_id)
             redirect_url = redirect("quiz_movie", person_id=person_id)
@@ -56,70 +56,10 @@ def save_name(request):
             url = f"{redirect_url['Location']}?{parameters}"
             return redirect(url)
 
-        else:
-            print("フォームが空です")
-        
-        # print("request: " + request)
-        # if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        #     print("Ajaxリクエスト")
-        #     data = json.loads(request.body.decode('utf-8'))  # JSONデータを解析
-        #     # action = data.get('action')
-        #     id = data.get('id')
-        #     name = data.get('name')
-        #     whether_answer = True
-
-        #     person_id = name
-
-        #     id_int = int(id)
-        #     if id_int % 2 == 1:
-        #         whether_answer = False
-        #     else:
-        #         whether_answer = True
-
-
-        #     # ボタンが押された時刻をデータベースに保存
-        #     Person.objects.create(
-        #         id_str=id,
-        #         name=name,
-        #         whether_answer=whether_answer,
-        #     )
-            
-        #     # JSONレスポンスを返す（Ajaxリクエストに対応）
-        #     return JsonResponse({"message": "Success", "whether_answer": whether_answer})
-            
-        # else:
-        #     print("こっち？？")
-        #     form = PersonForm()
-            # print("通常のPOSTリクエスト")
-            # redirect_url = redirect("quiz_movie", person_id=name)
-            # parameters = urlencode({"person_id": name})
-            # url = f"{redirect_url['Location']}?{parameters}"
-            # return redirect(url)
-
     elif request.method == 'GET':
         form = PersonForm()
         print("GETリクエスト")
-        return render(request, 'quiz/save_name.html', {'form': form})
-
-    # return render(request, 'quiz/save_name.html', {'form': form})
-        
-    # if request.method == 'POST':
-    #     form = PersonForm(request.POST)
-    #     if form.is_valid():
-    #         form.save()  # フォームのデータをデータベースに保存
-    #         id = form.cleaned_data['id']
-    #         name = form.cleaned_data['name']
-    #         print("person_id(save_name): " + name)
-
-    #         redirect_url = redirect("quiz_movie", person_id=name)
-    #         parameters = urlencode({"person_id": name})
-    #         url = f"{redirect_url['Location']}?{parameters}"
-    #         return redirect(url)
-
-    #         # return render(request, 'quiz/quiz_movie.html', {"person_name": name})  # 保存が成功した場合、リダイレクト
-    #         # return redirect('quiz_movie', person_id=name)
-    # else:
-    #     form = PersonForm()
+        return render(request, 'quiz/input_name_expt2.html', {'form': form})
     
 def quiz_movie_view(request, person_id):
     if request.method == "POST":
@@ -156,7 +96,6 @@ def quiz_movie_view(request, person_id):
             return JsonResponse({"message": "Success"})
         elif action == 'ended':
             movie_id = data.get('movie_id')
-            timestamp = data.get('timestamp')
             # ボタンが押された時刻をデータベースに保存
             EndedTime.objects.create(
                 person_id=person_id, 
@@ -238,25 +177,42 @@ def quiz_movie_view(request, person_id):
         "person_id": person_id,
         "whether_answer": whether_answer
     }
-    param1 = request.GET.get("person_id")
-    # return HttpResponse(f"POST: {person_id} <br>GET: {param1}")
     return HttpResponse(template.render(context, request))
 
+
 # 実験1：表情を作成してもらう実験
+def input_name_expt1(request):
+    global person_id
+
+    if request.method == "POST":
+        print("POSTリクエスト")
+        form = PersonForm(request.POST)
+        if form.is_valid():
+            form.save()  # フォームのデータをデータベースに保存
+            name = form.cleaned_data['name']
+            person_id = name
+            print("フォームをデータベースに保存しました")
+
+            redirect_url = redirect("make_expression", person_id=person_id)
+            parameters = urlencode({"person_id": person_id})
+            url = f"{redirect_url['Location']}?{parameters}"
+            return redirect(url)
+
+    elif request.method == 'GET':
+        form = PersonForm()
+        print("GETリクエスト")
+        return render(request, 'quiz/input_name_expt1.html', {'form': form})
+
 def make_expression_view(request, person_id):
     if request.method == "POST":
         print("POSTリクエスト")
         data = json.loads(request.body.decode('utf-8'))  # JSONデータを解析
         action = data.get('action')
         person_id = data.get('person_id')
+        timestamp = data.get('timestamp')
 
         if action == 'play':
             movie_id = data.get('movie_id')
-            # POSTリクエストからボタンが押された時刻を取得
-            # 日本時間のタイムゾーンを取得
-            jst = pytz.timezone('Asia/Tokyo')
-            jst_now = datetime.datetime.now(jst)
-            timestamp = jst_now.strftime("%Y-%m-%d %H:%M:%S.%f")  # %f はマイクロ秒まで表示
             # ボタンが押された時刻をデータベースに保存
             PlayTime.objects.create(
                 person_id=person_id,
@@ -264,13 +220,18 @@ def make_expression_view(request, person_id):
                 play_time=timestamp
             )
             print("save play movie time")
-
-            quizIndex = data.get('quizIndex')
-            quizIndex += 1
-            print(f"Next Quiz Number {quizIndex}")
             
-            # JSONレスポンスを返す（Ajaxリクエストに対応）
-            return JsonResponse({"message": "Success", "quizIndex": quizIndex})
+            return JsonResponse({"message": "Success"})
+        elif action == 'ended':
+            movie_id = data.get('movie_id')
+            # ボタンが押された時刻をデータベースに保存
+            EndedTime.objects.create(
+                person_id=person_id, 
+                movie_id=movie_id,
+                ended_time=timestamp,
+            )
+
+            return JsonResponse({"message": "Success"})
 
     print("first access make_expression.html")
     person_id = request.GET.get('person_id', '')
@@ -280,21 +241,3 @@ def make_expression_view(request, person_id):
         "person_id": person_id,
     }
     return HttpResponse(template.render(context, request))
-
-# 実験1：一番最初にアクセスして被験者の識別子を入力するview
-def save_name_expt1(request):
-    # if request.method == 'POST':
-    #     form = PersonForm(request.POST)
-    #     if form.is_valid():
-    #         form.save()  # フォームのデータをデータベースに保存
-    #         name = form.cleaned_data['name']
-    #         print("person_id(save_name): " + name)
-
-    #         redirect_url = redirect("make_expression", person_id=name)
-    #         parameters = urlencode({"person_id": name})
-    #         url = f"{redirect_url['Location']}?{parameters}"
-    #         return redirect(url)
-    # else:
-    #     form = PersonForm()
-
-    return render(request, 'quiz/save_name_expt1.html', {'form': form})
