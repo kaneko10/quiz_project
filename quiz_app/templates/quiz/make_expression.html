@@ -74,7 +74,6 @@
         const breakTime = 3000  // 問題間の休憩時間
 
         var isPlaying = false;
-        var isFirstPaused = true;
 
         const supportedCodecs = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus");
         console.log("Is VP9 supported:", supportedCodecs);
@@ -284,16 +283,22 @@
                     'onStateChange': function(event) {
                         if (event.data == YT.PlayerState.PLAYING) {
                             // PLAYINGだと、本当の再生開始時刻より若干遅い
-                            const timestamp = now - start;
-                            console.log("再生時刻: " + timestamp);
+                            const timestamp_0s = now - start;
+                            console.log("再生時刻: " + timestamp_0s);
 
-                            if (isFirstPaused) {
+                            if (!isPlaying) {
                                 var interval = setInterval(function() {
                                     currentTime = event.target.getCurrentTime();
                                     if (currentTime >= 1) {
-                                        event.target.pauseVideo();
+                                        const timestamp_1s = now - start;
+                                        console.log("1秒の時: " + timestamp_1s);
                                         clearInterval(interval); // タイマーを停止
-                                        console.log(`現在の再生時間: ${currentTime.toFixed(10)}秒`);
+                                        const currentTimeFixed = currentTime.toFixed(10);
+                                        console.log(`現在の再生時間: ${currentTimeFixed}秒`);
+
+                                        // 動画の再生時刻の保存をサーバーに要求
+                                        orderSaveData('play', [timestamp_0s, timestamp_1s, currentTimeFixed]);
+                                        isPlaying = true;
                                     }
                                 }, 5); // 5msごとに更新
                             }
@@ -301,34 +306,9 @@
                             // 動画クリックするごとに毎回実行される
                             console.log("動画の再生を開始：PLAYING");
 
-                            if (!isPlaying) {
-                                // 動画の再生時刻の保存をサーバーに要求
-                                orderSaveDate('play', [timestamp])
-                                isPlaying = true;
-                            }
-
                         } else if (event.data === YT.PlayerState.PAUSED) {
-                            if (isFirstPaused) {
-                                setTimeout(function() {
-                                    const timestamp_before = now - start;
-                                    console.log("再生時刻(PAUSED): " + timestamp_before);
-
-                                    event.target.playVideo();
-
-                                    // ここの再生時刻の方が真の値に近い、けどまだ若干遅い
-                                    const timestamp_after = now - start;
-                                    console.log("再生時刻(PAUSED): " + timestamp_after);
-
-                                    const currentTimeFixed = currentTime.toFixed(10);
-
-                                    orderSaveDate('paused', [timestamp_before, timestamp_after, currentTimeFixed]);
-                                    isPlaying = false;
-                                }, 1000);
-                                isFirstPaused = false;
-                            } else {
-                                // 動画が一時停止されたときに再度再生
-                                event.target.playVideo();
-                            }
+                            // 動画が一時停止されたときに再度再生
+                            event.target.playVideo();
                         } else if (event.data === YT.PlayerState.ENDED) {
                             console.log("動画の再生が終了しました");
 
@@ -336,9 +316,8 @@
                             console.log("終了時刻： " + timestamp);
 
                             // 動画の再生終了時刻の保存をサーバーに要求
-                            orderSaveDate('ended', [timestamp])
+                            orderSaveData('ended', [timestamp])
                             isPlaying = false;
-                            isFirstPaused = true;
 
                             // 動画を非表示
                             removePlayer(); // id=player の div 要素を削除
@@ -381,7 +360,7 @@
             stopBtn.style.display = "block";
         }
 
-        function orderSaveDate(action, data) {
+        function orderSaveData(action, data) {
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "{% url 'make_expression' person_id=person_id %}", true);
             xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
@@ -397,14 +376,13 @@
                 }
             };
             var context;
-            if (action == "paused") {
+            if (action == "play") {
                 context = { 
                     action: action, 
-                    quizIndex: quizIndex,
                     person_id: person_id,
                     movie_id: currentMovieID,
-                    timestamp_before: data[0],
-                    timestamp_after: data[1],
+                    timestamp_0s: data[0],
+                    timestamp_1s: data[1],
                     current_movie_time: data[2],
                 };
             } else {

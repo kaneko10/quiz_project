@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from urllib.parse import urlencode
 
-from .models import PlayTime, QuizAnswerTime, Questionnaire, QuizOrder, Person, EndedTime, WhetherAnswer, PausedTime
+from .models import PlayTime, QuizAnswerTime, Questionnaire, QuizOrder, Person, EndedTime, WhetherAnswer
 from .forms import PersonForm
 
 import json
@@ -45,27 +45,15 @@ def make_expression_view(request, person_id):
 
         if action == 'play':
             movie_id = data.get('movie_id')
-            timestamp = data.get('timestamp')
-            # ボタンが押された時刻をデータベースに保存
-            PlayTime.objects.create(
-                person_id=person_id,
-                movie_id=movie_id,
-                play_time=timestamp
-            )
-            print("save play movie time")
-            
-            return JsonResponse({"message": "Success"})
-        elif action == 'paused':
-            movie_id = data.get('movie_id')
-            timestamp_before = data.get('timestamp_before')
-            timestamp_after = data.get('timestamp_after')
+            timestamp_0s = data.get('timestamp_0s')
+            timestamp_1s = data.get('timestamp_1s')
             current_movie_time = data.get('current_movie_time')
             # ボタンが押された時刻をデータベースに保存
-            PausedTime.objects.create(
+            PlayTime.objects.create(
                 person_id=person_id, 
                 movie_id=movie_id,
-                play_time_before=timestamp_before,
-                play_time_after=timestamp_after,
+                play_time_0s=timestamp_0s,
+                play_time_1s=timestamp_1s,
                 current_movie_time=str(current_movie_time),
             )
             print("save play movie time")
@@ -149,28 +137,15 @@ def quiz_movie_view(request, person_id):
 
         if action == 'play':
             movie_id = data.get('movie_id')
-            timestamp = data.get('timestamp')
+            timestamp_0s = data.get('timestamp_0s')
+            timestamp_1s = data.get('timestamp_1s')
+            current_movie_time = data.get('current_movie_time')
             # ボタンが押された時刻をデータベースに保存
             PlayTime.objects.create(
                 person_id=person_id, 
                 movie_id=movie_id,
-                play_time=timestamp,
-            )
-            print("save play movie time")
-            
-            # JSONレスポンスを返す（Ajaxリクエストに対応）
-            return JsonResponse({"message": "Success"})
-        elif action == 'paused':
-            movie_id = data.get('movie_id')
-            timestamp_before = data.get('timestamp_before')
-            timestamp_after = data.get('timestamp_after')
-            current_movie_time = data.get('current_movie_time')
-            # ボタンが押された時刻をデータベースに保存
-            PausedTime.objects.create(
-                person_id=person_id, 
-                movie_id=movie_id,
-                play_time_before=timestamp_before,
-                play_time_after=timestamp_after,
+                play_time_0s=timestamp_0s,
+                play_time_1s=timestamp_1s,
                 current_movie_time=str(current_movie_time),
             )
             print("save play movie time")

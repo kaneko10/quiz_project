@@ -3,13 +3,8 @@ from django.db import models
 class PlayTime(models.Model):
     person_id = models.CharField(max_length=30)
     movie_id = models.CharField(max_length=30)
-    play_time = models.CharField(max_length=30, default=None)
-
-class PausedTime(models.Model):
-    person_id = models.CharField(max_length=30)
-    movie_id = models.CharField(max_length=30)
-    play_time_before = models.CharField(max_length=30, default=None)
-    play_time_after = models.CharField(max_length=30, default=None)
+    play_time_0s = models.CharField(max_length=30, default=None)
+    play_time_1s = models.CharField(max_length=30, default=None)
     current_movie_time = models.CharField(max_length=30, default=None)
 
 class EndedTime(models.Model):
