@@ -179,7 +179,10 @@
             console.log("録画開始ボタンが押されました");
             startRecording();
             recordBtn.style.display = "none";
-            videoOFFBtn.style.display = "block";
+            
+            setTimeout(function() {
+                videoOFFBtn.style.display = "block";
+            }, 3000);
         });
 
         videoOFFBtn.addEventListener("click", () => {
