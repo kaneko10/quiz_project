@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from urllib.parse import urlencode
 
-from .models import PlayTime, QuizAnswerTime, Questionnaire, QuizOrder, Person, EndedTime
+from .models import PlayTime, QuizAnswerTime, Questionnaire, QuizOrder, Person, EndedTime, WhetherAnswer
 from .forms import PersonForm
 
 import datetime # 実験1が修正できたら削除予定
@@ -13,27 +13,113 @@ import pytz # 実験1が修正できたら削除予定
 import json
 
 person_id = ""
+whether_answer = False
 
 # 一番最初にアクセスして被験者の識別子を入力するview
 def save_name(request):
-    if request.method == 'POST':
+    global person_id
+    global whether_answer
+
+    if request.method == "POST":
+        print("POSTリクエスト")
         form = PersonForm(request.POST)
         if form.is_valid():
             form.save()  # フォームのデータをデータベースに保存
             name = form.cleaned_data['name']
-            print("person_id(save_name): " + name)
+            person_id = name
+            print("フォームをデータベースに保存しました")
 
-            redirect_url = redirect("quiz_movie", person_id=name)
-            parameters = urlencode({"person_id": name})
+            # 回答するかしないか決定
+            id_str = form.cleaned_data['id_str']
+            id_int = int(id_str)
+
+            # IDが偶数：回答する
+            # IDが奇数：回答しない
+            if id_int % 2 == 1:
+                print("回答しないグループです")
+                whether_answer = False
+            else:
+                print("回答グループです")
+                whether_answer = True
+
+            WhetherAnswer.objects.create(
+                id_str=id_str,
+                name=name,
+                whether_answer=whether_answer,
+            )
+
+            return render(request, 'quiz/save_name.html', {'form': form, 'name': name, 'is_post_request': True})
+        elif 'next' in request.POST:
+            print("person_id: " + person_id)
+            redirect_url = redirect("quiz_movie", person_id=person_id)
+            parameters = urlencode({"person_id": person_id})
             url = f"{redirect_url['Location']}?{parameters}"
             return redirect(url)
 
-            # return render(request, 'quiz/quiz_movie.html', {"person_name": name})  # 保存が成功した場合、リダイレクト
-            # return redirect('quiz_movie', person_id=name)
-    else:
-        form = PersonForm()
+        else:
+            print("フォームが空です")
+        
+        # print("request: " + request)
+        # if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        #     print("Ajaxリクエスト")
+        #     data = json.loads(request.body.decode('utf-8'))  # JSONデータを解析
+        #     # action = data.get('action')
+        #     id = data.get('id')
+        #     name = data.get('name')
+        #     whether_answer = True
 
-    return render(request, 'quiz/save_name.html', {'form': form})
+        #     person_id = name
+
+        #     id_int = int(id)
+        #     if id_int % 2 == 1:
+        #         whether_answer = False
+        #     else:
+        #         whether_answer = True
+
+
+        #     # ボタンが押された時刻をデータベースに保存
+        #     Person.objects.create(
+        #         id_str=id,
+        #         name=name,
+        #         whether_answer=whether_answer,
+        #     )
+            
+        #     # JSONレスポンスを返す（Ajaxリクエストに対応）
+        #     return JsonResponse({"message": "Success", "whether_answer": whether_answer})
+            
+        # else:
+        #     print("こっち？？")
+        #     form = PersonForm()
+            # print("通常のPOSTリクエスト")
+            # redirect_url = redirect("quiz_movie", person_id=name)
+            # parameters = urlencode({"person_id": name})
+            # url = f"{redirect_url['Location']}?{parameters}"
+            # return redirect(url)
+
+    elif request.method == 'GET':
+        form = PersonForm()
+        print("GETリクエスト")
+        return render(request, 'quiz/save_name.html', {'form': form})
+
+    # return render(request, 'quiz/save_name.html', {'form': form})
+        
+    # if request.method == 'POST':
+    #     form = PersonForm(request.POST)
+    #     if form.is_valid():
+    #         form.save()  # フォームのデータをデータベースに保存
+    #         id = form.cleaned_data['id']
+    #         name = form.cleaned_data['name']
+    #         print("person_id(save_name): " + name)
+
+    #         redirect_url = redirect("quiz_movie", person_id=name)
+    #         parameters = urlencode({"person_id": name})
+    #         url = f"{redirect_url['Location']}?{parameters}"
+    #         return redirect(url)
+
+    #         # return render(request, 'quiz/quiz_movie.html', {"person_name": name})  # 保存が成功した場合、リダイレクト
+    #         # return redirect('quiz_movie', person_id=name)
+    # else:
+    #     form = PersonForm()
     
 def quiz_movie_view(request, person_id):
     if request.method == "POST":
@@ -150,6 +236,7 @@ def quiz_movie_view(request, person_id):
         "text": person_id,
         "isPlaying": False,
         "person_id": person_id,
+        "whether_answer": whether_answer
     }
     param1 = request.GET.get("person_id")
     # return HttpResponse(f"POST: {person_id} <br>GET: {param1}")
@@ -196,18 +283,18 @@ def make_expression_view(request, person_id):
 
 # 実験1：一番最初にアクセスして被験者の識別子を入力するview
 def save_name_expt1(request):
-    if request.method == 'POST':
-        form = PersonForm(request.POST)
-        if form.is_valid():
-            form.save()  # フォームのデータをデータベースに保存
-            name = form.cleaned_data['name']
-            print("person_id(save_name): " + name)
+    # if request.method == 'POST':
+    #     form = PersonForm(request.POST)
+    #     if form.is_valid():
+    #         form.save()  # フォームのデータをデータベースに保存
+    #         name = form.cleaned_data['name']
+    #         print("person_id(save_name): " + name)
 
-            redirect_url = redirect("make_expression", person_id=name)
-            parameters = urlencode({"person_id": name})
-            url = f"{redirect_url['Location']}?{parameters}"
-            return redirect(url)
-    else:
-        form = PersonForm()
+    #         redirect_url = redirect("make_expression", person_id=name)
+    #         parameters = urlencode({"person_id": name})
+    #         url = f"{redirect_url['Location']}?{parameters}"
+    #         return redirect(url)
+    # else:
+    #     form = PersonForm()
 
     return render(request, 'quiz/save_name_expt1.html', {'form': form})

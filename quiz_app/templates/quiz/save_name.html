@@ -6,19 +6,69 @@
 </head>
 
 <body>
+    {% if name %}
+    <h1>{{ name }}</h1>
+    {% else %}
     <h1>名前入力</h1>
+    {% endif %}
+
     <!-- 名前入力フォーム -->
     <div id="nameForm">
         <form method="post" action="{% url 'save_name' %}">
             {% csrf_token %}
-            <label for="name">名前：</label>
-            <input type="text" id="name" name="name">
-            <button type="submit">決定</button>
+            {% for item in form %}
+            <div class="form-group">
+                <label for="{{item.id_for_label}}" class="form-label">{{item.label}}</label>
+                <div class="form-input">
+                    {{ item }}
+                </div>
+            </div>
+            {% endfor %}
+
+            <button type="submit" name="personInfo" value="personInfo">決定</button>
         </form>
     </div>
+
+    {% if name %}
+    <button type="button" id="startRoulette" onclick="startRoulette()">スタート</button>
+    {% endif %}
+
+    <div id="rouletteContainer" style="display: none;">
+        <p id="randomNumber"></p>
+        <button type="button" id="stopRoulette" onclick="stopRoulette()">ストップ</button>
+    </div>
+
+    <form method="post" action="{% url 'save_name' %}">
+        {% csrf_token %}
+        <button type="sumit" id="next" name="next" value="next">次へ</button>
+    </form>
+
     <script>
+        var interval;
+
+        function startRoulette() {
+            console.log("ルーレット開始");
+
+            const rouletteContainer = document.getElementById("rouletteContainer");
+            rouletteContainer.style.display = "block";
+
+
+            const randomNumberElement = document.getElementById("randomNumber");
+
+            interval = setInterval(function() {
+                const randomNumber = getRandomThreeDigitNumber();
+                randomNumberElement.textContent = randomNumber;
+            }, 100);
+        }
+
+        function getRandomThreeDigitNumber() {
+            // 100から999までのランダムな整数を生成
+            return Math.floor(Math.random() * 900) + 100;
+        }
+
+        function stopRoulette() {
+            clearInterval(interval); 
+        }
 
     </script>
 </body>
-</html>
-
