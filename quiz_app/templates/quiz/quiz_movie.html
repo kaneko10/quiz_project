@@ -596,6 +596,13 @@
                         if (firstLoad) {
                             console.log("プレーヤーの準備が完了しました。");
                         } else {
+                            if (quizIndex != 0) {
+                                // 回答フォームを表示
+                                var quizForm = document.getElementById("quizForm");
+                                if (quizForm) {
+                                    quizForm.style.display = "block";
+                                }
+                            }
                             event.target.playVideo(); // 自動再生
                             console.log("動画の再生を開始：onReady");
                         }
@@ -657,47 +664,63 @@
                                 playerContainer.style.display = "none";
                             }
 
-                            // 回答フォームを非表示
-                            var quizForm = document.getElementById("quizForm");
-                            if (quizForm) {
-                                quizForm.style.display = "none";
-                            }
+                            const endedMovieID = quizIndex - 1;
 
-                            // アンケートを表示
-                            resetRadioButtons();
-                            var questionnaire = document.getElementById("questionnaire");
-                            if (questionnaire) {
-                                questionnaire.style.display = "block";
-                            }
+                            if (endedMovieID == 0) {
+                                // 説明動画の場合
+                                setTimeout(function() {
+                                    console.log(`休憩：${breakTime / 1000}秒経過しました`);
+                                    // 次の動画を再生
+                                    playNextVideo();
+                                }, breakTime);
 
-                            // アンケートのプログレスバーを表示
-                            var durationInSeconds = questionnaireTime / 1000; // 秒数を変数で指定
-                            var progress = 0; // 現在の進捗（0%から100%）
-                            var progressBar = document.getElementById("progress-bar");
+                            } else {
+                                // クイズ問題の場合
 
-                            var interval = setInterval(function() {
-                                progress += 1;
-                                progressBar.style.width = (progress / durationInSeconds * 100) + "%";
-                                progressBar.textContent = Math.round((progress / durationInSeconds) * 100) + "%";
-
-                                if (progress >= durationInSeconds) {
-                                    clearInterval(interval); // タイマーを停止
+                                // 回答フォームを非表示
+                                var quizForm = document.getElementById("quizForm");
+                                if (quizForm) {
+                                    quizForm.style.display = "none";
                                 }
-                            }, 1000); // 1秒ごとに更新
 
-                            setTimeout(function() {
-                                console.log(`アンケート：${questionnaireTime / 1000}秒経過しました`);
-                                // アンケートを送信
-                                const timestamp = now - start;
-                                submitForm('questionnaire', timestamp);
-                                console.log("アンケートを送信完了");
-                            }, questionnaireTime);
+                                // アンケートを表示
+                                resetRadioButtons();
+                                var questionnaire = document.getElementById("questionnaire");
+                                if (questionnaire) {
+                                    questionnaire.style.display = "block";
+                                }
 
-                            setTimeout(function() {
-                                console.log(`休憩：${breakTime / 1000}秒経過しました`);
-                                // 次の動画を再生
-                                playNextVideo();
-                            }, breakTime + questionnaireTime);
+                                // アンケートのプログレスバーを表示
+                                var durationInSeconds = questionnaireTime / 1000; // 秒数を変数で指定
+                                var progress = 0; // 現在の進捗（0%から100%）
+                                var progressBar = document.getElementById("progress-bar");
+
+                                var interval = setInterval(function() {
+                                    progress += 1;
+                                    progressBar.style.width = (progress / durationInSeconds * 100) + "%";
+                                    progressBar.textContent = Math.round((progress / durationInSeconds) * 100) + "%";
+
+                                    if (progress >= durationInSeconds) {
+                                        clearInterval(interval); // タイマーを停止
+                                    }
+                                }, 1000); // 1秒ごとに更新
+
+                                setTimeout(function() {
+                                    console.log(`アンケート：${questionnaireTime / 1000}秒経過しました`);
+                                    // アンケートを送信
+                                    const timestamp = now - start;
+                                    submitForm('questionnaire', timestamp);
+                                    console.log("アンケートを送信完了");
+                                }, questionnaireTime);
+
+                                setTimeout(function() {
+                                    console.log(`休憩：${breakTime / 1000}秒経過しました`);
+                                    // 次の動画を再生
+                                    playNextVideo();
+                                }, breakTime + questionnaireTime);
+                            }
+
+                            
                         }
                     }
                 }
@@ -734,20 +757,12 @@
                 playerContainer.style.display = "block";      
             }
 
-            // 回答フォームを表示
-            var quizForm = document.getElementById("quizForm");
-            if (quizForm) {
-                quizForm.style.display = "block";
-            }
-
             if (quizIndex == 0) {
-                 // 例題も含めて1番最初の動画の場合
+                 // 1番最初の動画の場合（ここでは説明動画）
                  player.playVideo();
             } else {
                 if (player) {
                     player = null
-                }
-                if(player == null) {
                     createNewPlayer(false);
                 }
             }
