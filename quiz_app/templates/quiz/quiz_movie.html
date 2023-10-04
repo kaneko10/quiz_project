@@ -122,7 +122,7 @@
         <!-- <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdJagml4y_YcnofXxFxwgn8mGsZ7I3jRXAo4j65MlSKR_uP6w/viewform?embedded=true" width="640" height="653" frameborder="0" marginheight="0" marginwidth="0">読み込んでいます…</iframe> -->
         <form method="post" action="{% url 'quiz_movie' person_id=person_id %}">
             <!-- 質問1 -->
-            <h3>質問1：感想</h3>
+            <h3>質問1：問題に対する感想</h3>
             <label for="q1_delight">
                 <input type="radio" name="q1" id="q1_delight" value="delight"> Delight
             </label>
@@ -199,23 +199,38 @@
             <label for="q3_not_at_all_helpful">
                 <input type="radio" name="q3" id="q3_not_at_all_helpful" value="not_at_all_helpful"> まったくそう思わない
             </label>
-    
+
             <!-- 質問4 -->
-            <h3>質問4：クイズ開始時を0として現在の疲労度を選択してください。</h3>
-            <label for="q4_zero">
-                <input type="radio" name="q4" id="q4_zero" value="zero"> 0
+            <h3>質問4：見たことがある問題か？</h3>
+            <label for="q4_yes">
+                <input type="radio" name="q4" id="q4_yes" value="yes"> はい
             </label>
-            <label for="q4_one">
-                <input type="radio" name="q4" id="q4_one" value="one"> 1
+            <label for="q4_no">
+                <input type="radio" name="q4" id="q4_no" value="no"> いいえ
             </label>
-            <label for="q4_two">
-                <input type="radio" name="q4" id="q4_two" value="two"> 2
+    
+            <!-- 質問5 -->
+            <h3>質問5：クイズ開始時を0として現在の疲労度を選択してください</h3>
+            <label for="q5_zero">
+                <input type="radio" name="q5" id="q5_zero" value="zero"> 0
             </label>
-            <label for="q4_three">
-                <input type="radio" name="q4" id="q4_three" value="three"> 3
+            <label for="q5_one">
+                <input type="radio" name="q5" id="q5_one" value="one"> 1
             </label>
-            <label for="q4_four">
-                <input type="radio" name="q4" id="q4_four" value="four"> 4
+            <label for="q5_two">
+                <input type="radio" name="q5" id="q5_two" value="two"> 2
+            </label>
+            <label for="q5_three">
+                <input type="radio" name="q5" id="q5_three" value="three"> 3
+            </label>
+            <label for="q5_four">
+                <input type="radio" name="q5" id="q5_four" value="four"> 4
+            </label>
+
+            <!-- 質問6 -->
+            <h3>質問6：自由に感想を書いてください（入力自由）</h3>
+            <label for="q6_free">
+                <input type="text" name="q6" id="q6_free">
             </label>
         </form>
     </div>
@@ -230,8 +245,8 @@
         var currentMovieID = "";
         var person_id = "";
 
-        const questionnaireTime = 3000; // (ms)
-        const breakTime = 3000  // 問題間の休憩時間
+        const questionnaireTime = 10000; // (ms)
+        const breakTime = 2000  // 問題間の休憩時間
 
         var isPlaying = false;
         var isFirstPaused = true;
@@ -890,6 +905,12 @@
             }
         });
 
+        document.getElementById("q6_free").addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // デフォルトの動作をキャンセル
+            }
+        });
+
         // フォーム送信
         function submitForm(action, timestamp) {
             console.log("アンケートを送信");
@@ -901,6 +922,7 @@
                 q2_ans: getRadioButtonValue("q2_ans"),
                 q3: getRadioButtonValue("q3"),
                 q4: getRadioButtonValue("q4"),
+                q5: getRadioButtonValue("q5"),
                 person_id: person_id,
                 movie_id: currentMovieID,
                 timestamp: timestamp,
@@ -985,11 +1007,18 @@
             resetRadioButtonCheck("q3_not_at_all_helpful");
 
             // Q4
-            resetRadioButtonCheck("q4_zero");
-            resetRadioButtonCheck("q4_one");
-            resetRadioButtonCheck("q4_two");
-            resetRadioButtonCheck("q4_three");
-            resetRadioButtonCheck("q4_four");
+            resetRadioButtonCheck("q4_yes");
+            resetRadioButtonCheck("q4_no");
+
+            // Q5
+            resetRadioButtonCheck("q5_zero");
+            resetRadioButtonCheck("q5_one");
+            resetRadioButtonCheck("q5_two");
+            resetRadioButtonCheck("q5_three");
+            resetRadioButtonCheck("q5_four");
+
+            // Q6
+            document.getElementById("q6_free").value = "";
         }
 
         function resetRadioButtonCheck(id) {

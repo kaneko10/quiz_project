@@ -176,6 +176,7 @@ def quiz_movie_view(request, person_id):
             q2_ans = data.get('q2_ans')
             q3 = data.get('q3')
             q4 = data.get('q4')
+            q5 = data.get('q5')
             # ボタンが押された時刻をデータベースに保存
             Questionnaire.objects.create(
                 person_id=person_id,
@@ -185,6 +186,7 @@ def quiz_movie_view(request, person_id):
                 q2_ans = q2_ans,
                 q3 = q3,
                 q4 = q4,
+                q5 = q5,
                 time = timestamp
             )
             print("アンケート回答をデータベースに保存しました")

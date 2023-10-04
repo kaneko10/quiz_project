@@ -25,6 +25,7 @@ class Questionnaire(models.Model):
     q2_ans = models.CharField(max_length=30)
     q3 = models.CharField(max_length=30)
     q4 = models.CharField(max_length=30)
+    q5 = models.CharField(max_length=30)
     time = models.CharField(max_length=30)
 
 class QuizOrder(models.Model):
