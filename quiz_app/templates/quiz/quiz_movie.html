@@ -82,6 +82,11 @@
 
     <div id="clock"></div>
 
+    <!-- 問題間の休憩で情報を出す -->
+    <div id="quizInfoContainer" style="display: none;">
+        <p id="quizInfo"></p>
+    </div>
+
     <!-- クイズ動画再生エリア -->
     <div id="playerContainer" style="display: none;">
         <!-- <div id="player"></div> -->
@@ -432,6 +437,11 @@
             // createNewPlayer(true);
         }
 
+        var riddleFirstIndex;
+        var riddleQuizNum;
+        var mysteryFirstIndex;
+        var mysteryQuizNum;
+
         // ランダムな順番にした動画IDを生成
         function makeQuizMovieIDs() {
             var quiz_movie_ids = [];
@@ -455,24 +465,7 @@
             const quiz_movie_ex = '4t8JCicyYfc' // 仮置き（クイズノック）
             quiz_movie_ids.push(quiz_movie_ex);
 
-            // 謎解き
-            const quiz_movie_mystery = [
-                'dFxEED-qX2I',  // アーモンド
-                'PTX-tsGAj4Q',  // 赤身
-                '3joBYp4EbRc',  // いのしし
-                'ypw7lRH-z8',  // チューイングガム
-                'HLvj49nrwz8',  // マスカット
-                'd6pQX7-l_Ks',  // カッパ
-                'ZDQpgvcspEc',  // 太陽系
-                // '4t8JCicyYfc',  // クイズノック
-                // 'qPHSalN8k0I',  // クイズノック
-                // 'Ns8-e-5Ll6c',  // クイズノック
-                // '4t8JCicyYfc',  // クイズノック
-                // 'qPHSalN8k0I',  // クイズノック
-                // 'Ns8-e-5Ll6c',  // クイズノック
-                // '4t8JCicyYfc',  // クイズノック
-            ];
-
+            // 本番用クイズ
             // なぞなぞ
             const quiz_movie_riddle = [
                 'tp8JXhzyBrY',  // 蚊  
@@ -493,14 +486,38 @@
                 // 'qPHSalN8k0I',  // クイズノック
             ];
 
-            const randoms_mystery = makeRandomArray(0, quiz_movie_mystery.length - 1);
-            for (i = 0; i < randoms_mystery.length; i++) {
-                quiz_movie_ids.push(quiz_movie_mystery[randoms_mystery[i]]);
-            }
+            // 謎解き
+            const quiz_movie_mystery = [
+                'dFxEED-qX2I',  // アーモンド
+                'PTX-tsGAj4Q',  // 赤身
+                '3joBYp4EbRc',  // いのしし
+                'Iypw7lRH-z8',  // チューイングガム
+                'HLvj49nrwz8',  // マスカット
+                'd6pQX7-l_Ks',  // カッパ
+                'ZDQpgvcspEc',  // 太陽系
+                // '4t8JCicyYfc',  // クイズノック
+                // 'qPHSalN8k0I',  // クイズノック
+                // 'Ns8-e-5Ll6c',  // クイズノック
+                // '4t8JCicyYfc',  // クイズノック
+                // 'qPHSalN8k0I',  // クイズノック
+                // 'Ns8-e-5Ll6c',  // クイズノック
+                // '4t8JCicyYfc',  // クイズノック
+            ];
+
+            riddleFirstIndex = quiz_movie_ids.length;
+            riddleQuizNum = quiz_movie_riddle.length;
 
             const randoms_riddle = makeRandomArray(0, quiz_movie_riddle.length - 1);
             for (i = 0; i < randoms_riddle.length; i++) {
                 quiz_movie_ids.push(quiz_movie_riddle[randoms_riddle[i]]);
+            }
+
+            mysteryFirstIndex = quiz_movie_ids.length;
+            mysteryQuizNum = quiz_movie_mystery.length;
+
+            const randoms_mystery = makeRandomArray(0, quiz_movie_mystery.length - 1);
+            for (i = 0; i < randoms_mystery.length; i++) {
+                quiz_movie_ids.push(quiz_movie_mystery[randoms_mystery[i]]);
             }
 
             // POSTリクエストを送信して動画の順番データデータをサーバーに送信
@@ -652,6 +669,8 @@
                             const timestamp = now - start;
                             console.log("終了時刻： " + timestamp);
 
+                            const endedMovieIndex = quizIndex;
+
                             // 動画の再生終了時刻の保存をサーバーに要求
                             orderSaveDate('ended', timestamp)
                             isPlaying = false;
@@ -664,18 +683,18 @@
                                 playerContainer.style.display = "none";
                             }
 
-                            const endedMovieID = quizIndex - 1;
+                            console.log("endedMovieIndex: " + endedMovieIndex);
 
-                            if (endedMovieID == 0) {
+                            if (endedMovieIndex == 0) {
                                 // 説明動画の場合
                                 setTimeout(function() {
                                     console.log(`休憩：${breakTime / 1000}秒経過しました`);
                                     // 次の動画を再生
                                     playNextVideo();
-                                }, breakTime);
+                                }, 2000);
 
                             } else {
-                                // クイズ問題の場合
+                                // クイズ動画の場合
 
                                 // 回答フォームを非表示
                                 var quizForm = document.getElementById("quizForm");
@@ -711,12 +730,41 @@
                                     const timestamp = now - start;
                                     submitForm('questionnaire', timestamp);
                                     console.log("アンケートを送信完了");
+
+                                    // 次のクイズの情報を表示
+                                    var quizInfoContainer = document.getElementById("quizInfoContainer");
+                                    quizInfoContainer.style.display = "block";
+
+                                    var quizInfo = document.getElementById("quizInfo");
+
+                                    if (endedMovieIndex >= riddleFirstIndex) {
+                                        if (endedMovieIndex < mysteryFirstIndex - 1) {
+                                            const what_quiz = endedMovieIndex - riddleFirstIndex + 2;
+                                            var quizInfoStr = `次はなぞなぞ${what_quiz}問目`;
+                                            quizInfoStr += `（残り${riddleQuizNum - what_quiz}問）`;
+                                            quizInfo.textContent = quizInfoStr;
+                                        } else if (endedMovieIndex == mysteryFirstIndex - 1) {
+                                            var quizInfoStr = `次は謎解きです（全${mysteryQuizNum}問）`;
+                                            quizInfo.textContent = quizInfoStr;
+                                        } else {
+                                            const what_quiz = endedMovieIndex - mysteryFirstIndex + 2;
+                                            var quizInfoStr = `次は謎解き${what_quiz}問目`;
+                                            quizInfoStr += `（残り${mysteryQuizNum - what_quiz}問）`;
+                                            quizInfo.textContent = quizInfoStr;
+                                        } 
+                                    } 
+
                                 }, questionnaireTime);
 
                                 setTimeout(function() {
                                     console.log(`休憩：${breakTime / 1000}秒経過しました`);
                                     // 次の動画を再生
                                     playNextVideo();
+
+                                    // 次のクイズの情報を非表示
+                                    var quizInfoContainer = document.getElementById("quizInfoContainer");
+                                    quizInfoContainer.style.display = "none"
+
                                 }, breakTime + questionnaireTime);
                             }
 
@@ -770,7 +818,6 @@
 
         function playNextVideo() {
             const exampleIndex = 1;
-            const realIndex = 2;
 
             if (quizIndex == exampleIndex) {
                 // 例題ボタンを表示
@@ -778,7 +825,7 @@
                 if (exPlayButton) {
                     exPlayButton.style.display = "block";
                 }
-            } else if (quizIndex == realIndex) {
+            } else if (quizIndex == riddleFirstIndex) {
                 // 再生ボタンを表示
                 var playButton = document.getElementById("playButton");
                 if (playButton) {
@@ -811,6 +858,7 @@
                         // quizIndexの値をインクリメント
                         var responseData = JSON.parse(xhr.responseText);
                         quizIndex = responseData.quizIndex;
+                        console.log("quizIndexを更新しました");
                         // console.log("Received quizIndex: " + quizIndex);
                     }
                 }
