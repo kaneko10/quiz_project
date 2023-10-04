@@ -18,13 +18,13 @@ def input_name_expt1(request):
     global person_id
 
     if request.method == "POST":
-        print("POSTリクエスト")
+        # print("POSTリクエスト")
         form = PersonForm(request.POST)
         if form.is_valid():
             form.save()  # フォームのデータをデータベースに保存
             name = form.cleaned_data['name']
             person_id = name
-            print("フォームをデータベースに保存しました")
+            # print("フォームをデータベースに保存しました")
 
             redirect_url = redirect("make_expression", person_id=person_id)
             parameters = urlencode({"person_id": person_id})
@@ -33,12 +33,12 @@ def input_name_expt1(request):
 
     elif request.method == 'GET':
         form = PersonForm()
-        print("GETリクエスト")
+        # print("GETリクエスト")
         return render(request, 'quiz/input_name_expt1.html', {'form': form})
 
 def make_expression_view(request, person_id):
     if request.method == "POST":
-        print("POSTリクエスト")
+        # print("POSTリクエスト")
         data = json.loads(request.body.decode('utf-8'))  # JSONデータを解析
         action = data.get('action')
         person_id = data.get('person_id')
@@ -56,7 +56,7 @@ def make_expression_view(request, person_id):
                 play_time_1s=timestamp_1s,
                 current_movie_time=str(current_movie_time),
             )
-            print("save play movie time")
+            # print("save play movie time")
             
             # JSONレスポンスを返す（Ajaxリクエストに対応）
             return JsonResponse({"message": "Success"})
@@ -81,9 +81,9 @@ def make_expression_view(request, person_id):
 
             return JsonResponse({"message": "Success"})
 
-    print("first access make_expression.html")
+    # print("first access make_expression.html")
     person_id = request.GET.get('person_id', '')
-    print("person_id: " + person_id)
+    # print("person_id: " + person_id)
     template = loader.get_template("quiz/make_expression.html")
     context = {
         "person_id": person_id,
@@ -97,13 +97,13 @@ def input_name_expt2(request):
     global whether_answer
 
     if request.method == "POST":
-        print("POSTリクエスト")
+        # print("POSTリクエスト")
         form = PersonForm(request.POST)
         if form.is_valid():
             form.save()  # フォームのデータをデータベースに保存
             name = form.cleaned_data['name']
             person_id = name
-            print("フォームをデータベースに保存しました")
+            # print("フォームをデータベースに保存しました")
 
             # 回答するかしないか決定
             id_str = form.cleaned_data['id_str']
@@ -112,10 +112,10 @@ def input_name_expt2(request):
             # IDが偶数：回答する
             # IDが奇数：回答しない
             if id_int % 2 == 1:
-                print("回答しないグループです")
+                # print("回答しないグループです")
                 whether_answer = False
             else:
-                print("回答グループです")
+                # print("回答グループです")
                 whether_answer = True
 
             WhetherAnswer.objects.create(
@@ -126,7 +126,7 @@ def input_name_expt2(request):
 
             return render(request, 'quiz/input_name_expt2.html', {'form': form, 'name': name, 'is_post_request': True})
         elif 'next' in request.POST:
-            print("person_id: " + person_id)
+            # print("person_id: " + person_id)
             redirect_url = redirect("quiz_movie", person_id=person_id)
             parameters = urlencode({"person_id": person_id})
             url = f"{redirect_url['Location']}?{parameters}"
@@ -134,12 +134,12 @@ def input_name_expt2(request):
 
     elif request.method == 'GET':
         form = PersonForm()
-        print("GETリクエスト")
+        # print("GETリクエスト")
         return render(request, 'quiz/input_name_expt2.html', {'form': form})
     
 def quiz_movie_view(request, person_id):
     if request.method == "POST":
-        print("POSTリクエスト")
+        # print("POSTリクエスト")
         data = json.loads(request.body.decode('utf-8'))  # JSONデータを解析
         action = data.get('action')
         person_id = data.get('person_id')
@@ -157,7 +157,7 @@ def quiz_movie_view(request, person_id):
                 play_time_1s=timestamp_1s,
                 current_movie_time=str(current_movie_time),
             )
-            print("save play movie time")
+            # print("save play movie time")
             
             # JSONレスポンスを返す（Ajaxリクエストに対応）
             return JsonResponse({"message": "Success"})
@@ -171,7 +171,7 @@ def quiz_movie_view(request, person_id):
                 answer=answer, 
                 time=timestamp
             )
-            print("save quiz answer and time")
+            # print("save quiz answer and time")
 
             # JSONレスポンスを返す（Ajaxリクエストに対応）
             return JsonResponse({"message": "Success"})
@@ -187,7 +187,7 @@ def quiz_movie_view(request, person_id):
 
             quizIndex = data.get('quizIndex')
             quizIndex += 1
-            print(f"Next Quiz Number {quizIndex}")
+            # print(f"Next Quiz Number {quizIndex}")
             
             return JsonResponse({"message": "Success", "quizIndex": quizIndex})
         elif action == 'questionnaire':
@@ -211,7 +211,7 @@ def quiz_movie_view(request, person_id):
                 q5 = q5,
                 time = timestamp
             )
-            print("アンケート回答をデータベースに保存しました")
+            # print("アンケート回答をデータベースに保存しました")
             return JsonResponse({"message": "Success"})
         
         elif action == 'quiz_order':
@@ -223,11 +223,11 @@ def quiz_movie_view(request, person_id):
             random_index_riddle  = ""
 
             for index in randoms_mystery:
-                print("index: " + str(index))
+                # print("index: " + str(index))
                 random_index_mystery += str(index) + ", "
 
             for index in randoms_riddle:
-                print("index: " + str(index))
+                # print("index: " + str(index))
                 random_index_riddle += str(index) + ", "
 
             QuizOrder.objects.create(
@@ -262,9 +262,9 @@ def quiz_movie_view(request, person_id):
 
             return JsonResponse({"message": "Success"})
 
-    print("first access quiz_movie.html")
+    # print("first access quiz_movie.html")
     person_id = request.GET.get('person_id', '')
-    print("person_id: " + person_id)
+    # print("person_id: " + person_id)
     template = loader.get_template("quiz/quiz_movie.html")
     context = {
         "text": person_id,

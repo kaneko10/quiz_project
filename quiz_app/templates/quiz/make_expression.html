@@ -135,24 +135,24 @@
                 return;
             }
 
-            console.log("Created MediaRecorder", mediaRecorder);
+            // console.log("Created MediaRecorder", mediaRecorder);
 
             mediaRecorder.onstop = event => {
-                console.log("Recorder stopped: ", event);
+                // console.log("Recorder stopped: ", event);
             };
 
             mediaRecorder.ondataavailable = handleDataAvailable;
             mediaRecorder.start(5);
             start = (new Date()).getTime();
-            console.log("MediaRecorder started", mediaRecorder);
+            // console.log("MediaRecorder started", mediaRecorder);
         }
 
         function stopRecording() {
             mediaRecorder.stop();
             const timestamp = now - start;
-            console.log("録画停止： " + timestamp);
+            // console.log("録画停止： " + timestamp);
             orderSaveData('stopRecord', [timestamp])
-            console.log("Recorded media.");
+            // console.log("Recorded media.");
         }
 
         cameraONBtn.addEventListener("click", () => {
@@ -176,7 +176,7 @@
         });
 
         recordBtn.addEventListener("click", () => {
-            console.log("録画開始ボタンが押されました");
+            // console.log("録画開始ボタンが押されました");
             startRecording();
             recordBtn.style.display = "none";
 
@@ -283,24 +283,24 @@
                             console.log("プレーヤーの準備が完了しました。");
                         } else {
                             event.target.playVideo(); // 自動再生
-                            console.log("動画の再生を開始：onReady");
+                            // console.log("動画の再生を開始：onReady");
                         }
                     },
                     'onStateChange': function(event) {
                         if (event.data == YT.PlayerState.PLAYING) {
                             // PLAYINGだと、本当の再生開始時刻より若干遅い
                             const timestamp_0s = now - start;
-                            console.log("再生時刻: " + timestamp_0s);
+                            // console.log("再生時刻: " + timestamp_0s);
 
                             if (!isPlaying) {
                                 var interval = setInterval(function() {
                                     currentTime = event.target.getCurrentTime();
                                     if (currentTime >= 1) {
                                         const timestamp_1s = now - start;
-                                        console.log("1秒の時: " + timestamp_1s);
+                                        // console.log("1秒の時: " + timestamp_1s);
                                         clearInterval(interval); // タイマーを停止
                                         const currentTimeFixed = currentTime.toFixed(10);
-                                        console.log(`現在の再生時間: ${currentTimeFixed}秒`);
+                                        // console.log(`現在の再生時間: ${currentTimeFixed}秒`);
 
                                         // 動画の再生時刻の保存をサーバーに要求
                                         orderSaveData('play', [timestamp_0s, timestamp_1s, currentTimeFixed]);
@@ -310,16 +310,16 @@
                             }
 
                             // 動画クリックするごとに毎回実行される
-                            console.log("動画の再生を開始：PLAYING");
+                            // console.log("動画の再生を開始：PLAYING");
 
                         } else if (event.data === YT.PlayerState.PAUSED) {
                             // 動画が一時停止されたときに再度再生
                             event.target.playVideo();
                         } else if (event.data === YT.PlayerState.ENDED) {
-                            console.log("動画の再生が終了しました");
+                            // console.log("動画の再生が終了しました");
 
                             const timestamp = now - start;
-                            console.log("終了時刻： " + timestamp);
+                            // console.log("終了時刻： " + timestamp);
 
                             // 動画の再生終了時刻の保存をサーバーに要求
                             orderSaveData('ended', [timestamp])
@@ -333,7 +333,7 @@
                             }
 
                             setTimeout(function() {
-                                console.log(`休憩：${breakTime / 1000}秒経過しました`);
+                                // console.log(`休憩：${breakTime / 1000}秒経過しました`);
                                 // 次の動画を再生
                                 playNextVideo();
                             }, 2000);
@@ -374,11 +374,11 @@
 
             xhr.onload = function() {
                 if (xhr.status === 200) {
-                    if (action == 'play') {
-                        console.log("再生開始時刻の保存が成功しました");
-                    } else if(action == 'ended') {
-                        console.log("再生終了時刻の保存が成功しました");
-                    }
+                    // if (action == 'play') {
+                    //     console.log("再生開始時刻の保存が成功しました");
+                    // } else if(action == 'ended') {
+                    //     console.log("再生終了時刻の保存が成功しました");
+                    // }
                 }
             };
             var context;
