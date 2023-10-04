@@ -32,12 +32,18 @@ def save_name(request):
             # 回答するかしないか決定
             id_str = form.cleaned_data['id_str']
             id_int = int(id_str)
+
+            # IDが偶数：回答する
+            # IDが奇数：回答しない
             if id_int % 2 == 1:
+                print("回答しないグループです")
                 whether_answer = False
             else:
+                print("回答グループです")
                 whether_answer = True
 
             WhetherAnswer.objects.create(
+                id_str=id_str,
                 name=name,
                 whether_answer=whether_answer,
             )

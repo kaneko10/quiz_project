@@ -53,5 +53,6 @@ class Person(models.Model):
     name = models.CharField(verbose_name='名前', max_length=30)
 
 class WhetherAnswer(models.Model):
+    id_str = models.CharField(verbose_name='ID', max_length=10)
     name = models.CharField(max_length=30)
     whether_answer = models.BooleanField()
