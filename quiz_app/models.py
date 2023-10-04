@@ -3,18 +3,25 @@ from django.db import models
 class PlayTime(models.Model):
     person_id = models.CharField(max_length=30)
     movie_id = models.CharField(max_length=30)
-    play_time = models.CharField(max_length=30)
+    play_time = models.CharField(max_length=30, default=None)
+
+class PausedTime(models.Model):
+    person_id = models.CharField(max_length=30)
+    movie_id = models.CharField(max_length=30)
+    play_time_before = models.CharField(max_length=30, default=None)
+    play_time_after = models.CharField(max_length=30, default=None)
+    current_movie_time = models.CharField(max_length=30, default=None)
 
 class EndedTime(models.Model):
     person_id = models.CharField(max_length=30)
     movie_id = models.CharField(max_length=30)
-    ended_time = models.CharField(max_length=30)
+    ended_time = models.CharField(max_length=30, default=None)
 
 class QuizAnswerTime(models.Model):
     person_id = models.CharField(max_length=30)
     movie_id = models.CharField(max_length=30)
     answer = models.CharField(max_length=50)
-    time = models.CharField(max_length=30)
+    time = models.CharField(max_length=30, default=None)
 
 # アンケート
 class Questionnaire(models.Model):
@@ -26,7 +33,7 @@ class Questionnaire(models.Model):
     q3 = models.CharField(max_length=30)
     q4 = models.CharField(max_length=30)
     q5 = models.CharField(max_length=30)
-    time = models.CharField(max_length=30)
+    time = models.CharField(max_length=30, default=None)
 
 class QuizOrder(models.Model):
     person_id = models.CharField(max_length=30)

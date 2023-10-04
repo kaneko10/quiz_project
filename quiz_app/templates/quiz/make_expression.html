@@ -260,6 +260,8 @@
 
             // console.log("videoID: " + quizIndex)
             currentMovieID = quiz_movie_ids[quizIndex]
+            var currentTime;
+
             player = new YT.Player('player', {
                 videoId: currentMovieID,  // 埋め込むYouTube動画のIDを指定
                 playerVars: {
@@ -287,11 +289,11 @@
 
                             if (isFirstPaused) {
                                 var interval = setInterval(function() {
-                                    const currentTime = event.target.getCurrentTime();
+                                    currentTime = event.target.getCurrentTime();
                                     if (currentTime >= 1) {
                                         event.target.pauseVideo();
                                         clearInterval(interval); // タイマーを停止
-                                        console.log(`現在の再生時間: ${currentTime}秒`);
+                                        console.log(`現在の再生時間: ${currentTime.toFixed(10)}秒`);
                                     }
                                 }, 5); // 5msごとに更新
                             }
@@ -301,17 +303,26 @@
 
                             if (!isPlaying) {
                                 // 動画の再生時刻の保存をサーバーに要求
-                                orderSaveDate('play', timestamp)
+                                orderSaveDate('play', [timestamp])
                                 isPlaying = true;
                             }
 
                         } else if (event.data === YT.PlayerState.PAUSED) {
                             if (isFirstPaused) {
                                 setTimeout(function() {
+                                    const timestamp_before = now - start;
+                                    console.log("再生時刻(PAUSED): " + timestamp_before);
+
                                     event.target.playVideo();
+
                                     // ここの再生時刻の方が真の値に近い、けどまだ若干遅い
-                                    const timestamp = now - start;
-                                    console.log("再生時刻(PAUSED): " + timestamp);
+                                    const timestamp_after = now - start;
+                                    console.log("再生時刻(PAUSED): " + timestamp_after);
+
+                                    const currentTimeFixed = currentTime.toFixed(10);
+
+                                    orderSaveDate('paused', [timestamp_before, timestamp_after, currentTimeFixed]);
+                                    isPlaying = false;
                                 }, 1000);
                                 isFirstPaused = false;
                             } else {
@@ -325,7 +336,7 @@
                             console.log("終了時刻： " + timestamp);
 
                             // 動画の再生終了時刻の保存をサーバーに要求
-                            orderSaveDate('ended', timestamp)
+                            orderSaveDate('ended', [timestamp])
                             isPlaying = false;
                             isFirstPaused = true;
 
@@ -370,7 +381,7 @@
             stopBtn.style.display = "block";
         }
 
-        function orderSaveDate(action, timestamp) {
+        function orderSaveDate(action, data) {
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "{% url 'make_expression' person_id=person_id %}", true);
             xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
@@ -385,12 +396,26 @@
                     }
                 }
             };
-            var context = { 
-                action: action, 
-                person_id: person_id,
-                movie_id: currentMovieID,
-                timestamp: timestamp,
-            };
+            var context;
+            if (action == "paused") {
+                context = { 
+                    action: action, 
+                    quizIndex: quizIndex,
+                    person_id: person_id,
+                    movie_id: currentMovieID,
+                    timestamp_before: data[0],
+                    timestamp_after: data[1],
+                    current_movie_time: data[2],
+                };
+            } else {
+                context = { 
+                    action: action, 
+                    quizIndex: quizIndex,
+                    person_id: person_id,
+                    movie_id: currentMovieID,
+                    timestamp: data[0],
+                };
+            }
             var data = JSON.stringify(context);  // JSONデータとして識別子を送信
             xhr.send(data);
         }

@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from urllib.parse import urlencode
 
-from .models import PlayTime, QuizAnswerTime, Questionnaire, QuizOrder, Person, EndedTime, WhetherAnswer
+from .models import PlayTime, QuizAnswerTime, Questionnaire, QuizOrder, Person, EndedTime, WhetherAnswer, PausedTime
 from .forms import PersonForm
 
 import json
@@ -42,10 +42,10 @@ def make_expression_view(request, person_id):
         data = json.loads(request.body.decode('utf-8'))  # JSONデータを解析
         action = data.get('action')
         person_id = data.get('person_id')
-        timestamp = data.get('timestamp')
 
         if action == 'play':
             movie_id = data.get('movie_id')
+            timestamp = data.get('timestamp')
             # ボタンが押された時刻をデータベースに保存
             PlayTime.objects.create(
                 person_id=person_id,
@@ -55,8 +55,26 @@ def make_expression_view(request, person_id):
             print("save play movie time")
             
             return JsonResponse({"message": "Success"})
+        elif action == 'paused':
+            movie_id = data.get('movie_id')
+            timestamp_before = data.get('timestamp_before')
+            timestamp_after = data.get('timestamp_after')
+            current_movie_time = data.get('current_movie_time')
+            # ボタンが押された時刻をデータベースに保存
+            PausedTime.objects.create(
+                person_id=person_id, 
+                movie_id=movie_id,
+                play_time_before=timestamp_before,
+                play_time_after=timestamp_after,
+                current_movie_time=str(current_movie_time),
+            )
+            print("save play movie time")
+            
+            # JSONレスポンスを返す（Ajaxリクエストに対応）
+            return JsonResponse({"message": "Success"})
         elif action == 'ended':
             movie_id = data.get('movie_id')
+            timestamp = data.get('timestamp')
             # ボタンが押された時刻をデータベースに保存
             EndedTime.objects.create(
                 person_id=person_id, 
@@ -128,10 +146,10 @@ def quiz_movie_view(request, person_id):
         data = json.loads(request.body.decode('utf-8'))  # JSONデータを解析
         action = data.get('action')
         person_id = data.get('person_id')
-        timestamp = data.get('timestamp')
 
         if action == 'play':
             movie_id = data.get('movie_id')
+            timestamp = data.get('timestamp')
             # ボタンが押された時刻をデータベースに保存
             PlayTime.objects.create(
                 person_id=person_id, 
@@ -142,9 +160,27 @@ def quiz_movie_view(request, person_id):
             
             # JSONレスポンスを返す（Ajaxリクエストに対応）
             return JsonResponse({"message": "Success"})
+        elif action == 'paused':
+            movie_id = data.get('movie_id')
+            timestamp_before = data.get('timestamp_before')
+            timestamp_after = data.get('timestamp_after')
+            current_movie_time = data.get('current_movie_time')
+            # ボタンが押された時刻をデータベースに保存
+            PausedTime.objects.create(
+                person_id=person_id, 
+                movie_id=movie_id,
+                play_time_before=timestamp_before,
+                play_time_after=timestamp_after,
+                current_movie_time=str(current_movie_time),
+            )
+            print("save play movie time")
+            
+            # JSONレスポンスを返す（Ajaxリクエストに対応）
+            return JsonResponse({"message": "Success"})
         elif action == 'answer':
             answer = data.get('answer')
             movie_id = data.get('movie_id')
+            timestamp = data.get('timestamp')
             QuizAnswerTime.objects.create(
                 person_id=person_id, 
                 movie_id=movie_id,
@@ -157,6 +193,7 @@ def quiz_movie_view(request, person_id):
             return JsonResponse({"message": "Success"})
         elif action == 'ended':
             movie_id = data.get('movie_id')
+            timestamp = data.get('timestamp')
             # ボタンが押された時刻をデータベースに保存
             EndedTime.objects.create(
                 person_id=person_id, 
@@ -171,6 +208,7 @@ def quiz_movie_view(request, person_id):
             return JsonResponse({"message": "Success", "quizIndex": quizIndex})
         elif action == 'questionnaire':
             movie_id = data.get('movie_id')
+            timestamp = data.get('timestamp')
             q1 = data.get('q1')
             q2_que = data.get('q2_que')
             q2_ans = data.get('q2_ans')
@@ -196,6 +234,7 @@ def quiz_movie_view(request, person_id):
             randoms_mystery = data.get('randoms_mystery')
             randoms_riddle = data.get('randoms_riddle')
             movie_ids = data.get('movie_ids')
+            timestamp = data.get('timestamp')
             random_index_mystery  = ""
             random_index_riddle  = ""
 
