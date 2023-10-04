@@ -250,8 +250,8 @@
         var currentMovieID = "";
         var person_id = "";
 
-        const questionnaireTime = 10000; // (ms)
-        const breakTime = 2000  // 問題間の休憩時間
+        const questionnaireTime = 1000; // (ms)
+        const breakTime = 1000;  // 問題間の休憩時間
 
         var isPlaying = false;
 
@@ -744,17 +744,21 @@
                                         if (endedMovieIndex < mysteryFirstIndex - 1) {
                                             const what_quiz = endedMovieIndex - riddleFirstIndex + 2;
                                             var quizInfoStr = `次はなぞなぞ${what_quiz}問目`;
-                                            quizInfoStr += `（残り${riddleQuizNum - what_quiz}問）`;
+                                            quizInfoStr += `（残り${riddleQuizNum - what_quiz + 1}問）`;
                                             quizInfo.textContent = quizInfoStr;
                                         } else if (endedMovieIndex == mysteryFirstIndex - 1) {
                                             var quizInfoStr = `次は謎解きです（全${mysteryQuizNum}問）`;
                                             quizInfo.textContent = quizInfoStr;
-                                        } else {
+                                        } else if (endedMovieIndex < quiz_movie_ids.length - 1) {
                                             const what_quiz = endedMovieIndex - mysteryFirstIndex + 2;
                                             var quizInfoStr = `次は謎解き${what_quiz}問目`;
-                                            quizInfoStr += `（残り${mysteryQuizNum - what_quiz}問）`;
+                                            quizInfoStr += `（残り${mysteryQuizNum - what_quiz + 1}問）`;
                                             quizInfo.textContent = quizInfoStr;
-                                        } 
+                                        } else {
+                                            // 次のクイズの情報を非表示
+                                            var quizInfoContainer = document.getElementById("quizInfoContainer");
+                                            quizInfoContainer.style.display = "none";
+                                        }
                                     } 
 
                                 }, questionnaireTime);
