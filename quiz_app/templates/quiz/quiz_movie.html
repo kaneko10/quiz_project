@@ -80,6 +80,11 @@
         <button id="download" style="display: none;">ダウンロード</button>
     </div>
 
+    <!-- 録画ができない場合に表示される -->
+    <div id="cameraInfoContainer" style="display: none;">
+        <p id="cameraInfo">カメラが非対応です</p>
+    </div>
+
     <div id="clock"></div>
 
     <!-- 問題間の休憩で情報を出す -->
@@ -330,39 +335,54 @@
         }
 
         function cameraONAns() {
-            console.log("回答グループがカメラをオンにしました");
-            navigator.mediaDevices
-                .getUserMedia({ video: true })
-                .then(getLocalMediaStream)
-                .catch(handleLocalMediaStreamError);
+            // VP9をサポートしている場合
+            if (supportedCodecs) {
+                console.log("回答グループがカメラをオンにしました");
+                navigator.mediaDevices
+                    .getUserMedia({ video: true })
+                    .then(getLocalMediaStream)
+                    .catch(handleLocalMediaStreamError);
 
-            const cameraONAnsBtn = document.getElementById("cameraON-ans");
-            cameraONAnsBtn.style.display = "none";
+                const cameraONAnsBtn = document.getElementById("cameraON-ans");
+                cameraONAnsBtn.style.display = "none";
 
-            whether_answer = true;
+                whether_answer = true;
 
-            quiz_movie_ids = makeQuizMovieIDs();
-            console.log("quiz_movie_ids: " + quiz_movie_ids);
+                quiz_movie_ids = makeQuizMovieIDs();
+                console.log("quiz_movie_ids: " + quiz_movie_ids);
 
-            createNewPlayer(true);
+                createNewPlayer(true);
+            } else {
+                var cameraInfoContainer = document.getElementById("cameraInfoContainer");
+                if (cameraInfoContainer) {
+                    cameraInfoContainer.style.display = "block";
+                }
+            }
         }
 
         function cameraONNotAns() {
-            console.log("回答しないグループがカメラをオンにしました");
-            navigator.mediaDevices
-                .getUserMedia({ video: true })
-                .then(getLocalMediaStream)
-                .catch(handleLocalMediaStreamError);
+            if (supportedCodecs) {
+                console.log("回答しないグループがカメラをオンにしました");
+                navigator.mediaDevices
+                    .getUserMedia({ video: true })
+                    .then(getLocalMediaStream)
+                    .catch(handleLocalMediaStreamError);
 
-            const cameraONNotAnsBtn = document.getElementById("cameraON-notAns");
-            cameraONNotAnsBtn.style.display = "none";
+                const cameraONNotAnsBtn = document.getElementById("cameraON-notAns");
+                cameraONNotAnsBtn.style.display = "none";
 
-            whether_answer = false;
+                whether_answer = false;
 
-            quiz_movie_ids = makeQuizMovieIDs();
-            console.log("quiz_movie_ids: " + quiz_movie_ids);
+                quiz_movie_ids = makeQuizMovieIDs();
+                console.log("quiz_movie_ids: " + quiz_movie_ids);
 
-            createNewPlayer(true);
+                createNewPlayer(true);
+            } else {
+                var cameraInfoContainer = document.getElementById("cameraInfoContainer");
+                if (cameraInfoContainer) {
+                    cameraInfoContainer.style.display = "block";
+                }
+            }
         }
 
         recordBtn.addEventListener("click", () => {
@@ -442,18 +462,18 @@
             if (whether_answer) {
                 // 回答グループ
                 console.log("回答グループ用の説明動画を設定");
-                explain_movie = 'dFxEED-qX2I';  // 仮（アーモンド）
+                explain_movie = 'qPHSalN8k0I';  // クイズノック（仮）
             } else {
                 // 回答しないグループ
                 console.log("回答しないグループ用の説明動画を設定");
-                explain_movie = 'tp8JXhzyBrY';  // 仮（蚊）
+                explain_movie = 'Ns8-e-5Ll6c';  // クイズノック（蚊）
             }
 
             quiz_movie_ids.push(explain_movie);
 
             // 例題
-            // const quiz_movie_ex = 'IsTm-LsudI0'
-            const quiz_movie_ex = '4t8JCicyYfc' // 仮置き（クイズノック）
+            const quiz_movie_ex = 'IsTm-LsudI0'
+            // const quiz_movie_ex = '4t8JCicyYfc' // クイズノック
             quiz_movie_ids.push(quiz_movie_ex);
 
             // 本番用クイズ

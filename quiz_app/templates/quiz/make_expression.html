@@ -43,6 +43,11 @@
         <button id="download" style="display: none;">ダウンロード</button>
     </div>
 
+    <!-- 録画ができない場合に表示される -->
+    <div id="cameraInfoContainer" style="display: none;">
+        <p id="cameraInfo">カメラが非対応です</p>
+    </div>
+
     <div id="clock"></div>
 
     <!-- クイズ動画再生エリア -->
@@ -149,16 +154,23 @@
         }
 
         cameraONBtn.addEventListener("click", () => {
-            navigator.mediaDevices
+            if (supportedCodecs) {
+                navigator.mediaDevices
                 .getUserMedia({ video: true })
                 .then(getLocalMediaStream)
                 .catch(handleLocalMediaStreamError);
 
-            cameraONBtn.style.display = "none";
+                cameraONBtn.style.display = "none";
 
-            quiz_movie_ids = makeQuizMovieIDs();
+                quiz_movie_ids = makeQuizMovieIDs();
 
-            createNewPlayer(true);
+                createNewPlayer(true);
+            } else {
+                var cameraInfoContainer = document.getElementById("cameraInfoContainer");
+                if (cameraInfoContainer) {
+                    cameraInfoContainer.style.display = "block";
+                }
+            }
         });
 
         recordBtn.addEventListener("click", () => {
