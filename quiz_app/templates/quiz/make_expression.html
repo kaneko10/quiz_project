@@ -94,7 +94,7 @@
         updateClock();
 
         // 10msごとに更新
-        setInterval(updateClock, 10);
+        setInterval(updateClock, 2);
 
         const localVideo = document.getElementById("local");
         const cameraONBtn = document.getElementById("cameraON");
@@ -179,7 +179,7 @@
             console.log("録画開始ボタンが押されました");
             startRecording();
             recordBtn.style.display = "none";
-            
+
             setTimeout(function() {
                 videoOFFBtn.style.display = "block";
             }, 3000);
@@ -306,7 +306,7 @@
                                         orderSaveData('play', [timestamp_0s, timestamp_1s, currentTimeFixed]);
                                         isPlaying = true;
                                     }
-                                }, 5); // 5msごとに更新
+                                }, 2); // 2msごとに更新
                             }
 
                             // 動画クリックするごとに毎回実行される

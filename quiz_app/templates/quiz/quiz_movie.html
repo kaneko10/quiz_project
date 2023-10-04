@@ -273,8 +273,8 @@
         // 初回表示
         updateClock();
 
-        // 10msごとに更新
-        setInterval(updateClock, 10);
+        // 2msごとに更新
+        setInterval(updateClock, 2);
 
         const localVideo = document.getElementById("local");
         // const cameraONAnswerBtn = document.getElementById("cameraON-answer");
@@ -659,7 +659,7 @@
                                         orderSaveData('play', [timestamp_0s, timestamp_1s, currentTimeFixed]);
                                         isPlaying = true;
                                     }
-                                }, 5); // 5msごとに更新
+                                }, 2); // 2msごとに更新
                             }
 
                             // 動画クリックするごとに毎回実行される
