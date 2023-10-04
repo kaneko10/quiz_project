@@ -8,9 +8,12 @@
 <body>
     {% if name %}
     <h1>{{ name }}</h1>
+
+    <div id="startRouletteContainer">
+        <button type="button" id="startRoulette" onclick="startRoulette()">スタート</button>
+    </div>
     {% else %}
     <h1>名前入力</h1>
-    {% endif %}
 
     <!-- 名前入力フォーム -->
     <div id="nameForm">
@@ -28,9 +31,6 @@
             <button type="submit" name="personInfo" value="personInfo">決定</button>
         </form>
     </div>
-
-    {% if name %}
-    <button type="button" id="startRoulette" onclick="startRoulette()">スタート</button>
     {% endif %}
 
     <div id="rouletteContainer" style="display: none;">
@@ -38,16 +38,21 @@
         <button type="button" id="stopRoulette" onclick="stopRoulette()">ストップ</button>
     </div>
 
-    <form method="post" action="{% url 'input_name_expt2' %}">
-        {% csrf_token %}
-        <button type="sumit" id="next" name="next" value="next">次へ</button>
-    </form>
+    <div id="nextContainer" style="display: none;">
+        <form method="post" action="{% url 'input_name_expt2' %}">
+            {% csrf_token %}
+            <button type="sumit" id="next" name="next" value="next">次へ</button>
+        </form>
+    </div>
 
     <script>
         var interval;
 
         function startRoulette() {
             console.log("ルーレット開始");
+
+            const startRouletteContainer = document.getElementById("startRouletteContainer");
+            startRouletteContainer.style.display = "none";
 
             const rouletteContainer = document.getElementById("rouletteContainer");
             rouletteContainer.style.display = "block";
@@ -67,7 +72,13 @@
         }
 
         function stopRoulette() {
-            clearInterval(interval); 
+            clearInterval(interval);
+
+            const stopRouletteBtn = document.getElementById("stopRoulette");
+            stopRouletteBtn.style.display = "none";
+
+            const nextContainer = document.getElementById("nextContainer");
+            nextContainer.style.display = "block";            
         }
 
     </script>
