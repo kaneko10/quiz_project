@@ -10,6 +10,8 @@ from .forms import PersonForm
 
 import json
 
+# デプロイブランチにマージするため作成
+
 person_id = ""
 whether_answer = False
 
