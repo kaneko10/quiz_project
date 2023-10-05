@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    <link rel="icon" type="image/png" href="{% static 'quiz_app/icon/favicon.png' %}">
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+
+<body>
+    {% if name %}
+    <h3 class="text-center py-5">{{ name }}</h3>
+
+    <div class="text-center" id="startRouletteContainer">
+        <button type="button" class="btn btn-secondary" id="startRoulette" onclick="startRoulette()">スタート</button>
+    </div>
+    {% else %}
+    <h3 class="text-center py-5">入力欄</h3>
+
+    <!-- 名前入力フォーム -->
+    <div class="container-fluid text-center" id="nameForm">
+        <form method="post" action="{% url 'input_name_expt2' %}">
+            {% csrf_token %}
+            {% for item in form %}
+            <div class="mb-3">
+                <label for="{{item.id_for_label}}" class="form-label">{{item.label}}</label>
+                <div class="form-input">
+                    {{ item }}
+                </div>
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-secondary" name="personInfo" value="personInfo">決定</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="text-center" id="rouletteContainer" style="display: none;">
+        <p class="fs-3 text-xxl-center" id="randomNumber"></p>
+        <button type="button" class="btn btn-secondary" id="stopRoulette" onclick="stopRoulette()">ストップ</button>
+    </div>
+
+    <div class="text-center" id="nextContainer" style="display: none;">
+        <form method="post" action="{% url 'input_name_expt2' %}">
+            {% csrf_token %}
+            <button type="sumit" class="btn btn-secondary" id="next" name="next" value="next">次へ</button>
+        </form>
+    </div>
+
+    <script>
+        var interval;
+
+        function startRoulette() {
+            // console.log("ルーレット開始");
+
+            const startRouletteContainer = document.getElementById("startRouletteContainer");
+            startRouletteContainer.style.display = "none";
+
+            const rouletteContainer = document.getElementById("rouletteContainer");
+            rouletteContainer.style.display = "block";
+
+
+            const randomNumberElement = document.getElementById("randomNumber");
+
+            interval = setInterval(function() {
+                const randomNumber = getRandomThreeDigitNumber();
+                randomNumberElement.textContent = randomNumber;
+            }, 100);
+        }
+
+        function getRandomThreeDigitNumber() {
+            // 100から999までのランダムな整数を生成
+            return Math.floor(Math.random() * 900) + 100;
+        }
+
+        function stopRoulette() {
+            clearInterval(interval);
+
+            const stopRouletteBtn = document.getElementById("stopRoulette");
+            stopRouletteBtn.style.display = "none";
+
+            const nextContainer = document.getElementById("nextContainer");
+            nextContainer.style.display = "block";            
+        }
+
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
