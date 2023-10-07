@@ -72,6 +72,7 @@
 
     <div class="text-center">
         <video id="local" playsinline autoplay muted></video>
+        <img id="overlay" src="{% static 'quiz_app/images/image_guide.png' %}" style="position: absolute; top: 46%; left: 50%; transform: translate(-50%, -50%); display: none;">
     </div>
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button type="button" class="btn btn-secondary" id="record" style="display: none;">録画開始</button>
@@ -316,6 +317,7 @@
         setInterval(updateClock, 2);
 
         const localVideo = document.getElementById("local");
+        const overlayImage = document.getElementById('overlay');
         // const cameraONAnswerBtn = document.getElementById("cameraON-answer");
         // const cameraONNotAnswerBtn = document.getElementById("cameraON-notAanswer");
         const recordBtn = document.getElementById("record");
@@ -387,6 +389,10 @@
                 const cameraONAnsBtn = document.getElementById("cameraON-ans");
                 cameraONAnsBtn.style.display = "none";
 
+                // オーバーレイ画像を表示
+                overlayImage.style.display = 'block';
+                overlayImage.style.width = '255px';
+
                 whether_answer = true;
 
                 quiz_movie_ids = makeQuizMovieIDs();
@@ -411,6 +417,10 @@
 
                 const cameraONNotAnsBtn = document.getElementById("cameraON-notAns");
                 cameraONNotAnsBtn.style.display = "none";
+
+                // オーバーレイ画像を表示
+                overlayImage.style.display = 'block';
+                overlayImage.style.width = '255px';
 
                 whether_answer = false;
 
@@ -657,7 +667,7 @@
                 width: 784,
                 videoId: currentMovieID,  // 埋め込むYouTube動画のIDを指定
                 playerVars: {
-                    'controls': 0,  // コントロールを非表示にする
+                    // 'controls': 0,  // コントロールを非表示にする
                     'disablekb': 1,  // キーボード操作を無効にする
                     'showinfo': 0,   // タイトルとアップロード者情報を非表示にする
                     'rel': 0,        // 関連動画を非表示にする
