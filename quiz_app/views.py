@@ -81,7 +81,10 @@ def make_expression_view(request, person_id):
                     ended_time=timestamp,
                 )
 
-                return JsonResponse({"message": "Success"})
+                quizIndex = data.get('quizIndex')
+                quizIndex += 1
+                
+                return JsonResponse({"message": "Success", "quizIndex": quizIndex})
             elif action == 'stopRecord':
                 timestamp = data.get('timestamp')
                 # ボタンが押された時刻をデータベースに保存

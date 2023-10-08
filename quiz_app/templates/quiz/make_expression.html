@@ -64,7 +64,9 @@
     <div class="text-center">
         <form method="post" action="{% url 'make_expression' person_id=person_id %}" id="playVideoForm">
             {% csrf_token %}
-            <!-- 1つ目の動画再生ボタン -->
+             <!-- 例題の動画再生ボタン -->
+             <button type="button" class="btn btn-secondary" id="exPlayButton" style="display: none;" onclick="playingVideo()">練習</button>
+            <!-- 本番用動画再生ボタン -->
             <button type="button" class="btn btn-secondary" id="playButton" style="display: none;" onclick="playingVideo()">開始</button>
         </form>
     </div>
@@ -210,10 +212,10 @@
             const videoContainer = document.getElementById("videoContainer");
             videoContainer.style.display = "none";
 
-            // 開始ボタンを表示
-            var playButton = document.getElementById("playButton");
-            if (playButton) {
-                playButton.style.display = "block";
+            // 例題ボタンを表示
+            var exPlayButton = document.getElementById("exPlayButton");
+            if (exPlayButton) {
+                exPlayButton.style.display = "block";
             }
         });
 
@@ -266,6 +268,7 @@
         // 動画IDを作成
         function makeQuizMovieIDs() {
             var quiz_movie_ids = [
+                'qPHSalN8k0I',  // 練習用（クイズノック、仮）
                 '2-tDAhyJGvU',
             ];
 
@@ -373,26 +376,49 @@
 
         // 動画を再生する関数
         function playingVideo() {
-            // 再生ボタンを非表示
-            var playButton = document.getElementById("playButton");
-            if (playButton) {
-                playButton.style.display = "none";
-            }
-
             // 動画を表示
             var playerContainer = document.getElementById("playerContainer");
             if (playerContainer) {
                 playerContainer.style.display = "block";      
             }
 
-            player.playVideo();
+            if (quizIndex == 0) {
+                // 例題ボタンを非表示
+                var exPlayButton = document.getElementById("exPlayButton");
+                if (exPlayButton) {
+                    exPlayButton.style.display = "none";
+                }
+
+                 // 1番最初の動画の場合（ここでは例題動画）
+                 player.playVideo();
+            } else {
+                // 再生ボタンを非表示
+                var playButton = document.getElementById("playButton");
+                if (playButton) {
+                    playButton.style.display = "none";
+                }
+                
+                if (player) {
+                    player = null
+                    createNewPlayer(false);
+                }
+            }
         }
 
         function playNextVideo() {
-            // webカメラの映像を表示
-            const videoContainer = document.getElementById("videoContainer");
-            videoContainer.style.display = "block";
-            stopBtn.style.display = "block";
+
+            if (quizIndex < quiz_movie_ids.length) {
+                // 再生ボタンを表示
+                var playButton = document.getElementById("playButton");
+                if (playButton) {
+                    playButton.style.display = "block";
+                }
+            } else {
+                // webカメラの映像を表示
+                const videoContainer = document.getElementById("videoContainer");
+                videoContainer.style.display = "block";
+                stopBtn.style.display = "block";
+            }
         }
 
         function orderSaveData(action, data) {
@@ -403,11 +429,11 @@
 
             xhr.onload = function() {
                 if (xhr.status === 200) {
-                    // if (action == 'play') {
-                    //     console.log("再生開始時刻の保存が成功しました");
-                    // } else if(action == 'ended') {
-                    //     console.log("再生終了時刻の保存が成功しました");
-                    // }
+                    if (action == 'ended') {
+                        // quizIndexの値をインクリメント
+                        var responseData = JSON.parse(xhr.responseText);
+                        quizIndex = responseData.quizIndex;
+                    }
                 }
             };
             var context;
