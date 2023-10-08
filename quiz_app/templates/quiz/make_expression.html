@@ -69,6 +69,13 @@
         </form>
     </div>
 
+    <div class="container py-5 text-center" id="nextContainer" style="display: none;">
+        <form method="post" action="{% url 'make_expression' person_id=person_id %}">
+            {% csrf_token %}
+            <button type="sumit" class="btn btn-secondary" id="next" name="next" value="next">実験2へ</button>
+        </form>
+    </div>
+
 
     <script>
         var player;
@@ -227,6 +234,11 @@
                 document.body.removeChild(a);
                 window.URL.revokeObjectURL(url);
             }, 100);
+
+
+
+            const nextContainer = document.getElementById("nextContainer");
+            nextContainer.style.display = "block"; 
         });
 
 
