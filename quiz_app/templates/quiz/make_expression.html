@@ -35,7 +35,7 @@
         <p class="text-md-center py-1">{{person_id}}</p>
     </div>
 
-    <div class="text-center">
+    <div class="text-center" id="videoContainer">
         <video id="local" playsinline autoplay muted></video>
         <img id="overlay" src="{% static 'quiz_app/images/image_guide.png' %}" style="position: absolute; top: 46%; left: 50%; transform: translate(-50%, -50%); display: none;">
     </div>
@@ -206,7 +206,9 @@
 
         videoOFFBtn.addEventListener("click", () => {
             videoOFFBtn.style.display = "none";
-            localVideo.style.display = "none";
+
+            const videoContainer = document.getElementById("videoContainer");
+            videoContainer.style.display = "none";
 
             // 開始ボタンを表示
             var playButton = document.getElementById("playButton");
@@ -388,7 +390,8 @@
 
         function playNextVideo() {
             // webカメラの映像を表示
-            localVideo.style.display = "block";
+            const videoContainer = document.getElementById("videoContainer");
+            videoContainer.style.display = "block";
             stopBtn.style.display = "block";
         }
 

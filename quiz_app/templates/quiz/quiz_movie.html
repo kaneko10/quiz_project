@@ -70,7 +70,7 @@
         {% endif %}
     </div>
 
-    <div class="text-center">
+    <div class="text-center" id="videoContainer">
         <video id="local" playsinline autoplay muted></video>
         <img id="overlay" src="{% static 'quiz_app/images/image_guide.png' %}" style="position: absolute; top: 46%; left: 50%; transform: translate(-50%, -50%); display: none;">
     </div>
@@ -448,7 +448,9 @@
 
         videoOFFBtn.addEventListener("click", () => {
             videoOFFBtn.style.display = "none";
-            localVideo.style.display = "none";
+            
+            const videoContainer = document.getElementById("videoContainer");
+            videoContainer.style.display = "none";
 
             // 説明動画ボタンを表示
             var explaionButton = document.getElementById("explaionButton");
@@ -898,7 +900,8 @@
             } else {
                 // 問題が全て終了した場合
                 // webカメラの映像を表示
-                localVideo.style.display = "block";
+                const videoContainer = document.getElementById("videoContainer");
+                videoContainer.style.display = "block";
                 stopBtn.style.display = "block";
             }
         }
