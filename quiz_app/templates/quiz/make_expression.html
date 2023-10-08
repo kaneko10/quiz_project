@@ -32,10 +32,10 @@
 <body>
     <div class="container-sm">
         <div class="text-end py-2" id="clock"></div>
-        <p class="text-md-center py-1">{{person_id}}</p>
+        <!-- <p class="text-md-center py-1">{{person_id}}</p> -->
     </div>
 
-    <div class="text-center">
+    <div class="text-center py-5" id="videoContainer">
         <video id="local" playsinline autoplay muted></video>
         <img id="overlay" src="{% static 'quiz_app/images/image_guide.png' %}" style="position: absolute; top: 46%; left: 50%; transform: translate(-50%, -50%); display: none;">
     </div>
@@ -43,7 +43,7 @@
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <button type="button" class="btn btn-secondary" id="cameraON">カメラオン</button>
         <button type="button" class="btn btn-secondary" id="record" style="display: none;">録画開始</button>
-        <button type="button" class="btn btn-secondary" id="videoOFF" style="display: none;">ビデオオフ</button>
+        <button type="button" class="btn btn-secondary" id="videoOFF" style="display: none;">確認した</button>
         <button type="button" class="btn btn-secondary" id="stop" style="display: none;">録画停止</button>
         <button type="button" class="btn btn-secondary" id="play" style="display: none;">再生</button>
         <button type="button" class="btn btn-secondary" id="download" style="display: none;">ダウンロード</button>
@@ -61,11 +61,20 @@
         </div>
     </div>
 
-    <div class="text-center">
+    <div class="text-center py-5">
         <form method="post" action="{% url 'make_expression' person_id=person_id %}" id="playVideoForm">
             {% csrf_token %}
-            <!-- 1つ目の動画再生ボタン -->
+             <!-- 例題の動画再生ボタン -->
+             <button type="button" class="btn btn-secondary" id="exPlayButton" style="display: none;" onclick="playingVideo()">練習</button>
+            <!-- 本番用動画再生ボタン -->
             <button type="button" class="btn btn-secondary" id="playButton" style="display: none;" onclick="playingVideo()">開始</button>
+        </form>
+    </div>
+
+    <div class="container py-0 text-center" id="nextContainer" style="display: none;">
+        <form method="post" action="{% url 'make_expression' person_id=person_id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-secondary" id="expt2" name="expt2" value="expt2">実験2へ</button>
         </form>
     </div>
 
@@ -199,13 +208,16 @@
 
         videoOFFBtn.addEventListener("click", () => {
             videoOFFBtn.style.display = "none";
+
+            const videoContainer = document.getElementById("videoContainer");
+            videoContainer.style.display = "none";
             localVideo.style.display = "none";
             overlayImage.style.display = 'none';
 
-            // 開始ボタンを表示
-            var playButton = document.getElementById("playButton");
-            if (playButton) {
-                playButton.style.display = "block";
+            // 例題ボタンを表示
+            var exPlayButton = document.getElementById("exPlayButton");
+            if (exPlayButton) {
+                exPlayButton.style.display = "block";
             }
         });
 
@@ -228,6 +240,11 @@
                 document.body.removeChild(a);
                 window.URL.revokeObjectURL(url);
             }, 100);
+
+
+
+            const nextContainer = document.getElementById("nextContainer");
+            nextContainer.style.display = "block"; 
         });
 
 
@@ -253,6 +270,7 @@
         // 動画IDを作成
         function makeQuizMovieIDs() {
             var quiz_movie_ids = [
+                'qPHSalN8k0I',  // 練習用（クイズノック、仮）
                 '2-tDAhyJGvU',
             ];
 
@@ -360,25 +378,49 @@
 
         // 動画を再生する関数
         function playingVideo() {
-            // 再生ボタンを非表示
-            var playButton = document.getElementById("playButton");
-            if (playButton) {
-                playButton.style.display = "none";
-            }
-
             // 動画を表示
             var playerContainer = document.getElementById("playerContainer");
             if (playerContainer) {
                 playerContainer.style.display = "block";      
             }
 
-            player.playVideo();
+            if (quizIndex == 0) {
+                // 例題ボタンを非表示
+                var exPlayButton = document.getElementById("exPlayButton");
+                if (exPlayButton) {
+                    exPlayButton.style.display = "none";
+                }
+
+                 // 1番最初の動画の場合（ここでは例題動画）
+                 player.playVideo();
+            } else {
+                // 再生ボタンを非表示
+                var playButton = document.getElementById("playButton");
+                if (playButton) {
+                    playButton.style.display = "none";
+                }
+                
+                if (player) {
+                    player = null
+                    createNewPlayer(false);
+                }
+            }
         }
 
         function playNextVideo() {
-            // webカメラの映像を表示
-            localVideo.style.display = "block";
-            stopBtn.style.display = "block";
+
+            if (quizIndex < quiz_movie_ids.length) {
+                // 再生ボタンを表示
+                var playButton = document.getElementById("playButton");
+                if (playButton) {
+                    playButton.style.display = "block";
+                }
+            } else {
+                // webカメラの映像を表示
+                const videoContainer = document.getElementById("videoContainer");
+                videoContainer.style.display = "block";
+                stopBtn.style.display = "block";
+            }
         }
 
         function orderSaveData(action, data) {
@@ -389,11 +431,11 @@
 
             xhr.onload = function() {
                 if (xhr.status === 200) {
-                    // if (action == 'play') {
-                    //     console.log("再生開始時刻の保存が成功しました");
-                    // } else if(action == 'ended') {
-                    //     console.log("再生終了時刻の保存が成功しました");
-                    // }
+                    if (action == 'ended') {
+                        // quizIndexの値をインクリメント
+                        var responseData = JSON.parse(xhr.responseText);
+                        quizIndex = responseData.quizIndex;
+                    }
                 }
             };
             var context;
