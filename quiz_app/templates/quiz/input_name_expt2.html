@@ -10,32 +10,11 @@
 </head>
 
 <body>
-    {% if name %}
-    <h3 class="text-center py-5">{{ name }}</h3>
+    <h3 class="text-center py-5">{{ person_id }}</h3>
 
     <div class="text-center" id="startRouletteContainer">
         <button type="button" class="btn btn-secondary" id="startRoulette" onclick="startRoulette()">スタート</button>
     </div>
-    {% else %}
-    <h3 class="text-center py-5">入力欄</h3>
-
-    <!-- 名前入力フォーム -->
-    <div class="container-fluid text-center" id="nameForm">
-        <form method="post" action="{% url 'input_name_expt2' %}">
-            {% csrf_token %}
-            {% for item in form %}
-            <div class="mb-3">
-                <label for="{{item.id_for_label}}" class="form-label">{{item.label}}</label>
-                <div class="form-input">
-                    {{ item }}
-                </div>
-            </div>
-            {% endfor %}
-
-            <button type="submit" class="btn btn-secondary" name="personInfo" value="personInfo">決定</button>
-        </form>
-    </div>
-    {% endif %}
 
     <div class="text-center" id="rouletteContainer" style="display: none;">
         <p class="fs-3 text-xxl-center" id="randomNumber"></p>
@@ -43,9 +22,9 @@
     </div>
 
     <div class="text-center" id="nextContainer" style="display: none;">
-        <form method="post" action="{% url 'input_name_expt2' %}">
+        <form method="post" action="{% url 'input_name_expt2'  person_id=person_id%}">
             {% csrf_token %}
-            <button type="sumit" class="btn btn-secondary" id="next" name="next" value="next">次へ</button>
+            <button type="submit" class="btn btn-secondary" id="next" name="next" value="next">次へ</button>
         </form>
     </div>
 

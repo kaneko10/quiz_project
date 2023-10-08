@@ -22,8 +22,7 @@ def input_name_expt1(request):
         form = PersonForm(request.POST)
         if form.is_valid():
             form.save()  # フォームのデータをデータベースに保存
-            name = form.cleaned_data['name']
-            person_id = name
+            person_id = form.cleaned_data['person_id']
             # print("フォームをデータベースに保存しました")
 
             redirect_url = redirect("make_expression", person_id=person_id)
@@ -39,16 +38,18 @@ def input_name_expt1(request):
 def make_expression_view(request, person_id):
     if request.method == "POST":
 
-        if 'next' in request.POST:
+        if 'expt2' in request.POST:
             # print("person_id: " + person_id)
-            redirect_url = redirect("quiz_movie", person_id=person_id)
+            # print(実験2へ)
+            redirect_url = redirect("input_name_expt2", person_id=person_id)
+            print(redirect_url)
             parameters = urlencode({"person_id": person_id})
             url = f"{redirect_url['Location']}?{parameters}"
+            print(url)
             return redirect(url)
         
         else:
-            # AJAXリクエスト
-            # print("POSTリクエスト")
+            # print("AJAXリクエスト")
             data = json.loads(request.body.decode('utf-8'))  # JSONデータを解析
             action = data.get('action')
             person_id = data.get('person_id')
@@ -102,8 +103,8 @@ def make_expression_view(request, person_id):
 
 
 # 実験2：なぞなぞと謎解き
-def input_name_expt2(request):
-    global person_id
+def input_name_expt2(request, person_id):
+    # global person_id
     global whether_answer
 
     if request.method == "POST":
@@ -111,17 +112,15 @@ def input_name_expt2(request):
         form = PersonForm(request.POST)
         if form.is_valid():
             form.save()  # フォームのデータをデータベースに保存
-            name = form.cleaned_data['name']
-            person_id = name
+            person_id = form.cleaned_data['person_id']
             # print("フォームをデータベースに保存しました")
 
             # 回答するかしないか決定
-            id_str = form.cleaned_data['id_str']
-            id_int = int(id_str)
+            person_id_int = int(person_id)
 
-            # IDが偶数：回答する
             # IDが奇数：回答しない
-            if id_int % 2 == 1:
+            # IDが偶数：回答する
+            if person_id_int % 2 == 1:
                 # print("回答しないグループです")
                 whether_answer = False
             else:
@@ -129,12 +128,11 @@ def input_name_expt2(request):
                 whether_answer = True
 
             WhetherAnswer.objects.create(
-                id_str=id_str,
-                name=name,
+                person_id=person_id,
                 whether_answer=whether_answer,
             )
 
-            return render(request, 'quiz/input_name_expt2.html', {'form': form, 'name': name, 'is_post_request': True})
+            return render(request, 'quiz/input_name_expt2.html', {'form': form, 'person_id': person_id, 'is_post_request': True})
         elif 'next' in request.POST:
             # print("person_id: " + person_id)
             redirect_url = redirect("quiz_movie", person_id=person_id)
@@ -143,9 +141,12 @@ def input_name_expt2(request):
             return redirect(url)
 
     elif request.method == 'GET':
-        form = PersonForm()
-        # print("GETリクエスト")
-        return render(request, 'quiz/input_name_expt2.html', {'form': form})
+        person_id = request.GET.get('person_id', '')
+        template = loader.get_template("quiz/input_name_expt2.html")
+        context = {
+            "person_id": person_id,
+        }
+        return HttpResponse(template.render(context, request))
     
 def quiz_movie_view(request, person_id):
     if request.method == "POST":
@@ -277,7 +278,7 @@ def quiz_movie_view(request, person_id):
     # print("person_id: " + person_id)
     template = loader.get_template("quiz/quiz_movie.html")
     context = {
-        "text": person_id,
+        "person_id": person_id,
         "isPlaying": False,
         "person_id": person_id,
         "whether_answer": whether_answer
