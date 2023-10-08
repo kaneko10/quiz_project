@@ -163,6 +163,10 @@
             mediaRecorder.start(5);
             start = (new Date()).getTime();
             // console.log("MediaRecorder started", mediaRecorder);
+
+            // オーバーレイ画像を表示
+            overlayImage.style.display = 'block';
+            overlayImage.style.width = '255px';
         }
 
         function stopRecording() {
@@ -181,9 +185,6 @@
                 .catch(handleLocalMediaStreamError);
 
                 cameraONBtn.style.display = "none";
-                // オーバーレイ画像を表示
-                overlayImage.style.display = 'block';
-                overlayImage.style.width = '255px';
 
                 quiz_movie_ids = makeQuizMovieIDs();
 
