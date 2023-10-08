@@ -107,36 +107,10 @@ def make_expression_view(request, person_id):
 
 # 実験2：なぞなぞと謎解き
 def input_name_expt2(request, person_id):
-    # global person_id
     global whether_answer
 
     if request.method == "POST":
-        # print("POSTリクエスト")
-        form = PersonForm(request.POST)
-        if form.is_valid():
-            form.save()  # フォームのデータをデータベースに保存
-            person_id = form.cleaned_data['person_id']
-            # print("フォームをデータベースに保存しました")
-
-            # 回答するかしないか決定
-            person_id_int = int(person_id)
-
-            # IDが奇数：回答しない
-            # IDが偶数：回答する
-            if person_id_int % 2 == 1:
-                # print("回答しないグループです")
-                whether_answer = False
-            else:
-                # print("回答グループです")
-                whether_answer = True
-
-            WhetherAnswer.objects.create(
-                person_id=person_id,
-                whether_answer=whether_answer,
-            )
-
-            return render(request, 'quiz/input_name_expt2.html', {'form': form, 'person_id': person_id, 'is_post_request': True})
-        elif 'next' in request.POST:
+        if 'next' in request.POST:
             # print("person_id: " + person_id)
             redirect_url = redirect("quiz_movie", person_id=person_id)
             parameters = urlencode({"person_id": person_id})
@@ -145,6 +119,24 @@ def input_name_expt2(request, person_id):
 
     elif request.method == 'GET':
         person_id = request.GET.get('person_id', '')
+
+        # 回答するかしないか決定
+        person_id_int = int(person_id)
+
+        # IDが奇数：回答しない
+        # IDが偶数：回答する
+        if person_id_int % 2 == 1:
+            # print("回答しないグループです")
+            whether_answer = False
+        else:
+            # print("回答グループです")
+            whether_answer = True
+
+        WhetherAnswer.objects.create(
+            person_id=person_id,
+            whether_answer=whether_answer,
+        )
+
         template = loader.get_template("quiz/input_name_expt2.html")
         context = {
             "person_id": person_id,
