@@ -271,13 +271,6 @@
                 <input class="form-check-input" type="radio" name="q5" id="q5_four" value="four">
                 <label class="form-check-label" for="q5_four">4</label>
             </div>            
-
-            <!-- 質問6 -->
-            <p></p>
-            <p class="fs-5 text-start">質問6：自由に感想を書いてください（入力自由）</p>
-            <div class="form-group">
-                <input type="text" class="form-control" name="q6" id="q6_free">
-            </div>
         </form>
     </div>
 
@@ -997,12 +990,6 @@
             }
         });
 
-        document.getElementById("q6_free").addEventListener("keypress", function (event) {
-            if (event.key === "Enter") {
-                event.preventDefault(); // デフォルトの動作をキャンセル
-            }
-        });
-
         // フォーム送信
         function submitForm(action, timestamp) {
             // console.log("アンケートを送信");
@@ -1108,9 +1095,6 @@
             resetRadioButtonCheck("q5_two");
             resetRadioButtonCheck("q5_three");
             resetRadioButtonCheck("q5_four");
-
-            // Q6
-            document.getElementById("q6_free").value = "";
         }
 
         function resetRadioButtonCheck(id) {
