@@ -10,13 +10,13 @@
 </head>
 
 <body>
-    <h3 class="text-center py-5">{{ person_id }}</h3>
+    <!-- <h3 class="text-center py-5">{{ person_id }}</h3> -->
 
-    <div class="text-center" id="startRouletteContainer">
+    <div class="text-center py-5" id="startRouletteContainer">
         <button type="button" class="btn btn-secondary" id="startRoulette" onclick="startRoulette()">スタート</button>
     </div>
 
-    <div class="text-center" id="rouletteContainer" style="display: none;">
+    <div class="text-center py-5" id="rouletteContainer" style="display: none;">
         <p class="fs-3 text-xxl-center" id="randomNumber"></p>
         <button type="button" class="btn btn-secondary" id="stopRoulette" onclick="stopRoulette()">ストップ</button>
     </div>

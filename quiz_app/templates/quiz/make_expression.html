@@ -32,10 +32,10 @@
 <body>
     <div class="container-sm">
         <div class="text-end py-2" id="clock"></div>
-        <p class="text-md-center py-1">{{person_id}}</p>
+        <!-- <p class="text-md-center py-1">{{person_id}}</p> -->
     </div>
 
-    <div class="text-center" id="videoContainer">
+    <div class="text-center py-5" id="videoContainer">
         <video id="local" playsinline autoplay muted></video>
         <img id="overlay" src="{% static 'quiz_app/images/image_guide.png' %}" style="position: absolute; top: 46%; left: 50%; transform: translate(-50%, -50%); display: none;">
     </div>
@@ -61,7 +61,7 @@
         </div>
     </div>
 
-    <div class="text-center">
+    <div class="text-center py-5">
         <form method="post" action="{% url 'make_expression' person_id=person_id %}" id="playVideoForm">
             {% csrf_token %}
              <!-- 例題の動画再生ボタン -->
@@ -71,7 +71,7 @@
         </form>
     </div>
 
-    <div class="container py-5 text-center" id="nextContainer" style="display: none;">
+    <div class="container py-0 text-center" id="nextContainer" style="display: none;">
         <form method="post" action="{% url 'make_expression' person_id=person_id %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-secondary" id="expt2" name="expt2" value="expt2">実験2へ</button>
