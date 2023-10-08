@@ -128,150 +128,151 @@
             <div id="progress-bar">0%</div>
         </div>
 
-        <p></p>
-        <!-- <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdJagml4y_YcnofXxFxwgn8mGsZ7I3jRXAo4j65MlSKR_uP6w/viewform?embedded=true" width="640" height="653" frameborder="0" marginheight="0" marginwidth="0">読み込んでいます…</iframe> -->
-        <form method="post" action="{% url 'quiz_movie' person_id=person_id %}">
-            <p class="fs-5 text-start">質問1：問題に対する感想</p>
-            <!-- 質問1 -->
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="q1" id="q1_delight" value="delight">
-                <label for="q1_delight">Delight</label> 
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="q1" id="q1_boredom" value="boredom">
-                <label for="q1_boredom">Boredom</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="q1" id="q1_confused" value="confused">
-                <label class="form-check-label" for="q1_confused">Confused</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="q1" id="q1_frustration" value="frustration">
-                <label class="form-check-label" for="q1_frustration">Frustration</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="q1" id="q1_concentration" value="concentration">
-                <label class="form-check-label" for="q1_concentration">Concentration</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="q1" id="q1_neutral" value="neutral">
-                <label class="form-check-label" for="q1_neutral">Neutral</label>
-            </div>
-    
-            <p></p>
-            <!-- 質問2 -->
-            <p class="fs-5 text-start">質問2：難易度</p>
-            <!-- <label for="q2_seen_difficulty"> -->
-                <p>問題を見たとき：</p>
+        <div class="container py-5">
+            <!-- <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdJagml4y_YcnofXxFxwgn8mGsZ7I3jRXAo4j65MlSKR_uP6w/viewform?embedded=true" width="640" height="653" frameborder="0" marginheight="0" marginwidth="0">読み込んでいます…</iframe> -->
+            <form method="post" action="{% url 'quiz_movie' person_id=person_id %}">
+                <p class="fs-5 text-start">質問1：問題に対する感想</p>
+                <!-- 質問1 -->
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="q2_que" id="q2_que_very_easy" value="very_easy">
-                    <label class="form-check-label" for="q2_que_very_easy">非常に簡単</label>
+                    <input class="form-check-input" type="radio" name="q1" id="q1_delight" value="delight">
+                    <label for="q1_delight">Delight</label> 
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="q2_que" id="q2_que_easy" value="easy">
-                    <label class="form-check-label" for="q2_que_easy">簡単</label>
+                    <input class="form-check-input" type="radio" name="q1" id="q1_boredom" value="boredom">
+                    <label for="q1_boredom">Boredom</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="q2_que" id="q2_que_normal" value="normal">
-                    <label class="form-check-label" for="q2_que_normal">ふつう</label>
+                    <input class="form-check-input" type="radio" name="q1" id="q1_confused" value="confused">
+                    <label class="form-check-label" for="q1_confused">Confused</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="q2_que" id="q2_que_hard" value="hard">
-                    <label class="form-check-label" for="q2_que_hard">難しい</label>
+                    <input class="form-check-input" type="radio" name="q1" id="q1_frustration" value="frustration">
+                    <label class="form-check-label" for="q1_frustration">Frustration</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="q2_que" id="q2_que_very_hard" value="very_hard">
-                    <label class="form-check-label" for="q2_que_very_hard">非常に難しい</label>
+                    <input class="form-check-input" type="radio" name="q1" id="q1_concentration" value="concentration">
+                    <label class="form-check-label" for="q1_concentration">Concentration</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="q1" id="q1_neutral" value="neutral">
+                    <label class="form-check-label" for="q1_neutral">Neutral</label>
+                </div>
+        
+                <p></p>
+                <!-- 質問2 -->
+                <p class="fs-5 text-start">質問2：難易度</p>
+                <!-- <label for="q2_seen_difficulty"> -->
+                    <p>問題を見たとき：</p>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="q2_que" id="q2_que_very_easy" value="very_easy">
+                        <label class="form-check-label" for="q2_que_very_easy">非常に簡単</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="q2_que" id="q2_que_easy" value="easy">
+                        <label class="form-check-label" for="q2_que_easy">簡単</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="q2_que" id="q2_que_normal" value="normal">
+                        <label class="form-check-label" for="q2_que_normal">ふつう</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="q2_que" id="q2_que_hard" value="hard">
+                        <label class="form-check-label" for="q2_que_hard">難しい</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="q2_que" id="q2_que_very_hard" value="very_hard">
+                        <label class="form-check-label" for="q2_que_very_hard">非常に難しい</label>
+                    </div>
+                    
+                <!-- </label> -->
+                <!-- <label for="q2_seen_difficulty"> -->
+                    <p></p>
+                    <p>答えを見たとき：</p>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="q2_ans" id="q2_ans_very_easy" value="very_easy">
+                        <label class="form-check-label" for="q2_ans_very_easy">非常に簡単</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="q2_ans" id="q2_ans_easy" value="easy">
+                        <label class="form-check-label" for="q2_ans_easy">簡単</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="q2_ans" id="q2_ans_normal" value="normal">
+                        <label class="form-check-label" for="q2_ans_normal">ふつう</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="q2_ans" id="q2_ans_hard" value="hard">
+                        <label class="form-check-label" for="q2_ans_hard">難しい</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="q2_ans" id="q2_ans_very_hard" value="very_hard">
+                        <label class="form-check-label" for="q2_ans_very_hard">非常に難しい</label>
+                    </div>
+                <!-- </label> -->
+        
+                <!-- 質問3 -->
+                <p></p>
+                <p class="fs-5 text-start">質問3：ヒントは役だったか？</p>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="q3" id="q3_helpful" value="helpful">
+                    <label class="form-check-label" for="q3_helpful">強くそう思う</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="q3" id="q3_somewhat_helpful" value="somewhat_helpful">
+                    <label class="form-check-label" for="q3_somewhat_helpful">そう思う</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="q3" id="q3_neutral" value="neutral">
+                    <label class="form-check-label" for="q3_neutral">どちらとも言えない</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="q3" id="q3_not_helpful" value="not_helpful">
+                    <label class="form-check-label" for="q3_not_helpful">そう思わない</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="q3" id="q3_not_at_all_helpful" value="not_at_all_helpful">
+                    <label class="form-check-label" for="q3_not_at_all_helpful">まったくそう思わない</label>
+                </div>
+
+
+                <!-- 質問4 -->
+                <p></p>
+                <p class="fs-5 text-start">質問4：見たことがある問題か？</p>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="q4" id="q4_yes" value="yes">
+                    <label class="form-check-label" for="q4_yes">はい</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="q4" id="q4_no" value="no">
+                    <label class="form-check-label" for="q4_no">いいえ</label>
                 </div>
                 
-            <!-- </label> -->
-            <!-- <label for="q2_seen_difficulty"> -->
+        
+                <!-- 質問5 -->
                 <p></p>
-                <p>答えを見たとき：</p>
+                <p class="fs-5 text-start">質問5：クイズ開始時を0として現在の疲労度を選択してください</p>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="q2_ans" id="q2_ans_very_easy" value="very_easy">
-                    <label class="form-check-label" for="q2_ans_very_easy">非常に簡単</label>
+                    <input class="form-check-input" type="radio" name="q5" id="q5_zero" value="zero">
+                    <label class="form-check-label" for="q5_zero">0</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="q2_ans" id="q2_ans_easy" value="easy">
-                    <label class="form-check-label" for="q2_ans_easy">簡単</label>
+                    <input class="form-check-input" type="radio" name="q5" id="q5_one" value="one">
+                    <label class="form-check-label" for="q5_one">1</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="q2_ans" id="q2_ans_normal" value="normal">
-                    <label class="form-check-label" for="q2_ans_normal">ふつう</label>
+                    <input class="form-check-input" type="radio" name="q5" id="q5_two" value="two">
+                    <label class="form-check-label" for="q5_two">2</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="q2_ans" id="q2_ans_hard" value="hard">
-                    <label class="form-check-label" for="q2_ans_hard">難しい</label>
+                    <input class="form-check-input" type="radio" name="q5" id="q5_three" value="three">
+                    <label class="form-check-label" for="q5_three">3</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="q2_ans" id="q2_ans_very_hard" value="very_hard">
-                    <label class="form-check-label" for="q2_ans_very_hard">非常に難しい</label>
-                </div>
-            <!-- </label> -->
-    
-            <!-- 質問3 -->
-            <p></p>
-            <p class="fs-5 text-start">質問3：ヒントは役だったか？</p>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="q3" id="q3_helpful" value="helpful">
-                <label class="form-check-label" for="q3_helpful">強くそう思う</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="q3" id="q3_somewhat_helpful" value="somewhat_helpful">
-                <label class="form-check-label" for="q3_somewhat_helpful">そう思う</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="q3" id="q3_neutral" value="neutral">
-                <label class="form-check-label" for="q3_neutral">どちらとも言えない</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="q3" id="q3_not_helpful" value="not_helpful">
-                <label class="form-check-label" for="q3_not_helpful">そう思わない</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="q3" id="q3_not_at_all_helpful" value="not_at_all_helpful">
-                <label class="form-check-label" for="q3_not_at_all_helpful">まったくそう思わない</label>
-            </div>
-
-
-            <!-- 質問4 -->
-            <p></p>
-            <p class="fs-5 text-start">質問4：見たことがある問題か？</p>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="q4" id="q4_yes" value="yes">
-                <label class="form-check-label" for="q4_yes">はい</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="q4" id="q4_no" value="no">
-                <label class="form-check-label" for="q4_no">いいえ</label>
-            </div>
-            
-    
-            <!-- 質問5 -->
-            <p></p>
-            <p class="fs-5 text-start">質問5：クイズ開始時を0として現在の疲労度を選択してください</p>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="q5" id="q5_zero" value="zero">
-                <label class="form-check-label" for="q5_zero">0</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="q5" id="q5_one" value="one">
-                <label class="form-check-label" for="q5_one">1</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="q5" id="q5_two" value="two">
-                <label class="form-check-label" for="q5_two">2</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="q5" id="q5_three" value="three">
-                <label class="form-check-label" for="q5_three">3</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="q5" id="q5_four" value="four">
-                <label class="form-check-label" for="q5_four">4</label>
-            </div>            
-        </form>
+                    <input class="form-check-input" type="radio" name="q5" id="q5_four" value="four">
+                    <label class="form-check-label" for="q5_four">4</label>
+                </div>            
+            </form>
+        </div>
     </div>
 
     <script>
