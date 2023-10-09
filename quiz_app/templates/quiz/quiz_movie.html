@@ -70,9 +70,9 @@
         {% endif %}
     </div>
 
-    <div class="text-center py-5" id="videoContainer">
-        <video id="local" playsinline autoplay muted></video>
-        <img id="overlay" src="{% static 'quiz_app/images/image_guide.png' %}" style="position: absolute; top: 46%; left: 50%; transform: translate(-50%, -50%); display: none;">
+    <div class="text-center py-5" id="videoContainer" style="position: relative;">
+        <video id="local" playsinline autoplay muted style="height: 50%;"></video>
+        <img id="overlay" src="{% static 'quiz_app/images/image_guide.png' %}" style="position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%); display: none;">
     </div>
 
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
