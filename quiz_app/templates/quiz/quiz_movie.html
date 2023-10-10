@@ -50,6 +50,10 @@
             line-height: 30px;
             color: white;
         }
+
+        #clickNone {
+            pointer-events: none; /* クリックを無効にする */
+        }
     </style>
 </head>
 
@@ -94,7 +98,7 @@
     </div>
 
     <!-- クイズ動画再生エリア -->
-    <div class="container">
+    <div class="container" id="clickNone">
         <div id="playerContainer" style="display: none;">
             <!-- <div id="player"></div> -->
         </div>
