@@ -52,7 +52,7 @@
         }
 
         #clickNone {
-            pointer-events: none; /* クリックを無効にする */
+            pointer-events: none; 
         }
     </style>
 </head>
@@ -363,7 +363,7 @@
             };
 
             mediaRecorder.ondataavailable = handleDataAvailable;
-            mediaRecorder.start(5);
+            mediaRecorder.start(1000);
             start = (new Date()).getTime();
             // console.log("MediaRecorder started", mediaRecorder);
 
