@@ -228,7 +228,10 @@
         stopBtn.addEventListener("click", () => {
             stopRecording();
             stopBtn.style.display = "none";
-            downloadBtn.style.display = "block";
+
+            setTimeout(function() {
+                downloadBtn.style.display = "block";
+            }, 3000);
         });
 
         downloadBtn.addEventListener("click", () => {
@@ -423,7 +426,10 @@
                 // webカメラの映像を表示
                 const videoContainer = document.getElementById("videoContainer");
                 videoContainer.style.display = "block";
-                stopBtn.style.display = "block";
+
+                setTimeout(function() {
+                    stopBtn.style.display = "block";
+                }, 120000);
             }
         }
 
