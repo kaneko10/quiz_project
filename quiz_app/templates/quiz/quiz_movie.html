@@ -51,9 +51,9 @@
             color: white;
         }
 
-        #clickNone {
+        /* #clickNone {
             pointer-events: none; 
-        }
+        } */
     </style>
 </head>
 
@@ -394,8 +394,9 @@
 
                 whether_answer = true;
 
+                console.log("生成前quiz_movie_ids: " + quiz_movie_ids);
                 quiz_movie_ids = makeQuizMovieIDs();
-                // console.log("quiz_movie_ids: " + quiz_movie_ids);
+                console.log("生成後quiz_movie_ids: " + quiz_movie_ids);
 
                 createNewPlayer(true);
             } else {
@@ -419,8 +420,9 @@
 
                 whether_answer = false;
 
+                console.log("生成前quiz_movie_ids: " + quiz_movie_ids);
                 quiz_movie_ids = makeQuizMovieIDs();
-                // console.log("quiz_movie_ids: " + quiz_movie_ids);
+                console.log("生成後quiz_movie_ids: " + quiz_movie_ids);
 
                 createNewPlayer(true);
             } else {
@@ -602,11 +604,11 @@
             };
 
             // 動画のIDリストから説明動画のIDと例題のIDを除いたリストを生成
-            // console.log("削除前： " + quiz_movie_ids);
+            console.log("削除前： " + quiz_movie_ids);
             var copy_movie_ids = JSON.parse(JSON.stringify(quiz_movie_ids));
             copy_movie_ids.shift();
             copy_movie_ids.shift();
-            // console.log("削除後： " + copy_movie_ids);
+            console.log("削除後： " + copy_movie_ids);
 
             const timestamp = now - start;
 
@@ -635,7 +637,7 @@
                     }
                 }
             }
-            // console.log("randoms: " + randoms);
+            console.log("randoms: " + randoms);
             return randoms;
         }
 
@@ -667,7 +669,7 @@
                 width: 896,
                 videoId: currentMovieID,  // 埋め込むYouTube動画のIDを指定
                 playerVars: {
-                    'controls': 0,  // コントロールを非表示にする
+                    // 'controls': 0,  // コントロールを非表示にする
                     'disablekb': 1,  // キーボード操作を無効にする
                     'showinfo': 0,   // タイトルとアップロード者情報を非表示にする
                     'rel': 0,        // 関連動画を非表示にする
