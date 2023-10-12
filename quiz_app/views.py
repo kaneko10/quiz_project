@@ -10,20 +10,21 @@ from .forms import PersonForm
 
 import json
 
-person_id = ""
-whether_answer = False
-
 # 実験1：表情を作成してもらう実験
 def input_name_expt1(request):
-    global person_id
-
     if request.method == "POST":
         # print("POSTリクエスト")
         form = PersonForm(request.POST)
         if form.is_valid():
-            form.save()  # フォームのデータをデータベースに保存
             person_id = form.cleaned_data['person_id']
-            # print("フォームをデータベースに保存しました")
+
+            if person_id.isdigit() == False:
+                redirect_url = redirect("input_name_expt1")
+                url = f"{redirect_url['Location']}"
+                return redirect(url)
+            
+            # print("フォームをデータベースに保存しました"
+            form.save()  # フォームのデータをデータベースに保存
 
             redirect_url = redirect("make_expression", person_id=person_id)
             parameters = urlencode({"person_id": person_id})
@@ -107,8 +108,6 @@ def make_expression_view(request, person_id):
 
 # 実験2：なぞなぞと謎解き
 def input_name_expt2(request, person_id):
-    global whether_answer
-
     if request.method == "POST":
         if 'next' in request.POST:
             # print("person_id: " + person_id)
@@ -119,6 +118,7 @@ def input_name_expt2(request, person_id):
 
     elif request.method == 'GET':
         person_id = request.GET.get('person_id', '')
+        whether_answer = False
 
         # 回答するかしないか決定
         person_id_int = int(person_id)
@@ -270,6 +270,11 @@ def quiz_movie_view(request, person_id):
 
     # print("first access quiz_movie.html")
     person_id = request.GET.get('person_id', '')
+
+    # IDが奇数：回答しない
+    # IDが偶数：回答する
+    whether_answer = (int(person_id) % 2 == 0)
+
     # print("person_id: " + person_id)
     template = loader.get_template("quiz/quiz_movie.html")
     context = {
