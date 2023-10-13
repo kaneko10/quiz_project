@@ -441,6 +441,12 @@
 
             setTimeout(function() {
                 videoOFFBtn.style.display = "block";
+
+                // メモリーを表示
+                const memoryInfo = window.performance.memory;
+                console.log("Total JS Heap Size: " + memoryInfo.totalJSHeapSize / (1024 * 1024) + " MB");
+                console.log("Used JS Heap Size: " + memoryInfo.usedJSHeapSize / (1024 * 1024) + " MB");
+                console.log("JS Heap Size Limit: " + memoryInfo.jsHeapSizeLimit / (1024 * 1024) + " MB");
             }, 3000);
         });
 
@@ -497,7 +503,13 @@
             // person_idの値を取得
             var personId = match && match[1];
             person_id = personId;
-            // console.log("person_idの値は: " + person_id);
+            console.log("person_id: " + person_id);
+
+            // メモリーを表示
+            const memoryInfo = window.performance.memory;
+            console.log("Total JS Heap Size: " + memoryInfo.totalJSHeapSize / (1024 * 1024) + " MB");
+            console.log("Used JS Heap Size: " + memoryInfo.usedJSHeapSize / (1024 * 1024) + " MB");
+            console.log("JS Heap Size Limit: " + memoryInfo.jsHeapSizeLimit / (1024 * 1024) + " MB");
 
             // quiz_movie_ids = makeQuizMovieIDs();
             // console.log("quiz_movie_ids: " + quiz_movie_ids);
@@ -513,6 +525,8 @@
         // ランダムな順番にした動画IDを生成
         function makeQuizMovieIDs() {
             var quiz_movie_ids = [];
+
+            console.log("回答：" + whether_answer);
 
             // 説明動画
             var explain_movie;
@@ -589,40 +603,40 @@
             }
 
             // POSTリクエストを送信して動画の順番データデータをサーバーに送信
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "{% url 'quiz_movie' person_id=person_id %}", true);
-            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");  // JSONデータを送信することを指定
+            // var xhr = new XMLHttpRequest();
+            // xhr.open("POST", "{% url 'quiz_movie' person_id=person_id %}", true);
+            // xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+            // xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");  // JSONデータを送信することを指定
 
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    // レスポンスの処理（任意）
-                    console.log("サーバーレスポンス: " + xhr.responseText);
-                }
-                // フォームをリセット
-                var textForm = document.getElementById("answer");
-                textForm.value = '';
-            };
+            // xhr.onload = function () {
+            //     if (xhr.status === 200) {
+            //         // レスポンスの処理（任意）
+            //         console.log("サーバーレスポンス: " + xhr.responseText);
+            //     }
+            //     // フォームをリセット
+            //     var textForm = document.getElementById("answer");
+            //     textForm.value = '';
+            // };
 
-            // 動画のIDリストから説明動画のIDと例題のIDを除いたリストを生成
-            console.log("削除前： " + quiz_movie_ids);
-            var copy_movie_ids = JSON.parse(JSON.stringify(quiz_movie_ids));
-            copy_movie_ids.shift();
-            copy_movie_ids.shift();
-            console.log("削除後： " + copy_movie_ids);
+            // // 動画のIDリストから説明動画のIDと例題のIDを除いたリストを生成
+            // console.log("削除前： " + quiz_movie_ids);
+            // var copy_movie_ids = JSON.parse(JSON.stringify(quiz_movie_ids));
+            // copy_movie_ids.shift();
+            // copy_movie_ids.shift();
+            // console.log("削除後： " + copy_movie_ids);
 
-            const timestamp = now - start;
+            // const timestamp = now - start;
 
-            var context = { 
-                action: 'quiz_order', 
-                randoms_mystery: randoms_mystery,
-                randoms_riddle: randoms_riddle,
-                movie_ids: copy_movie_ids, 
-                person_id: person_id,
-                timestamp: timestamp,
-            };
-            var data = JSON.stringify(context);  // JSONデータとしてアクションと回答を送信
-            xhr.send(data);
+            // var context = { 
+            //     action: 'quiz_order', 
+            //     randoms_mystery: randoms_mystery,
+            //     randoms_riddle: randoms_riddle,
+            //     movie_ids: copy_movie_ids, 
+            //     person_id: person_id,
+            //     timestamp: timestamp,
+            // };
+            // var data = JSON.stringify(context);  // JSONデータとしてアクションと回答を送信
+            // xhr.send(data);
 
             return quiz_movie_ids;
         }
@@ -881,6 +895,12 @@
         }
 
         function playNextVideo() {
+            // メモリーを表示
+            const memoryInfo = window.performance.memory;
+            console.log("Total JS Heap Size: " + memoryInfo.totalJSHeapSize / (1024 * 1024) + " MB");
+            console.log("Used JS Heap Size: " + memoryInfo.usedJSHeapSize / (1024 * 1024) + " MB");
+            console.log("JS Heap Size Limit: " + memoryInfo.jsHeapSizeLimit / (1024 * 1024) + " MB");
+
             const exampleIndex = 1;
 
             if (quizIndex == exampleIndex) {

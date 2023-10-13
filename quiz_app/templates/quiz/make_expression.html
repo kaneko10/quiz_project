@@ -209,6 +209,12 @@
 
             setTimeout(function() {
                 videoOFFBtn.style.display = "block";
+
+                // メモリーを表示
+                const memoryInfo = window.performance.memory;
+                console.log("Total JS Heap Size: " + memoryInfo.totalJSHeapSize / (1024 * 1024) + " MB");
+                console.log("Used JS Heap Size: " + memoryInfo.usedJSHeapSize / (1024 * 1024) + " MB");
+                console.log("JS Heap Size Limit: " + memoryInfo.jsHeapSizeLimit / (1024 * 1024) + " MB");
             }, 3000);
         });
 
@@ -270,7 +276,13 @@
             // person_idの値を取得
             var personId = match && match[1];
             person_id = personId;
-            // console.log("person_idの値は: " + person_id);
+            console.log("person_id: " + person_id);
+
+            // メモリーを表示
+            const memoryInfo = window.performance.memory;
+            console.log("Total JS Heap Size: " + memoryInfo.totalJSHeapSize / (1024 * 1024) + " MB");
+            console.log("Used JS Heap Size: " + memoryInfo.usedJSHeapSize / (1024 * 1024) + " MB");
+            console.log("JS Heap Size Limit: " + memoryInfo.jsHeapSizeLimit / (1024 * 1024) + " MB");
         }
 
 
@@ -415,6 +427,12 @@
         }
 
         function playNextVideo() {
+
+            // メモリーを表示
+            const memoryInfo = window.performance.memory;
+            console.log("Total JS Heap Size: " + memoryInfo.totalJSHeapSize / (1024 * 1024) + " MB");
+            console.log("Used JS Heap Size: " + memoryInfo.usedJSHeapSize / (1024 * 1024) + " MB");
+            console.log("JS Heap Size Limit: " + memoryInfo.jsHeapSizeLimit / (1024 * 1024) + " MB");
 
             if (quizIndex < quiz_movie_ids.length) {
                 // 再生ボタンを表示
