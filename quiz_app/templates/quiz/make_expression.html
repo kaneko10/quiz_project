@@ -27,9 +27,9 @@
             text-align: center;
         }
 
-        /* #clickNone {
+        #clickNone {
             pointer-events: none;
-        } */
+        }
     </style>
 </head>
 
@@ -162,6 +162,18 @@
 
             mediaRecorder.onstop = event => {
                 // console.log("Recorder stopped: ", event);
+
+    //             console.log("data available after MediaRecorder.stop() called.");
+
+    //             const blob = new Blob(recordedBlobs, { type: "video/webm" });
+    //             const url = window.URL.createObjectURL(blob);
+    //             const a = document.createElement("video");
+    // //           a.style.display = "none";
+    //             a.src = url;
+    //             a.autoplay = true;
+    //             a.muted = true;
+    // //            a.download = "rec.webm";
+    //             document.body.appendChild(a);
             };
 
             mediaRecorder.ondataavailable = handleDataAvailable;
@@ -289,8 +301,8 @@
         // 動画IDを作成
         function makeQuizMovieIDs() {
             var quiz_movie_ids = [
-                'XFWY1_ZizRY',  // 練習用
-                'Vx_zAFPPXbw',  // 本番用
+                '6Fynrx2J-nk',  // 練習用
+                'riY-1QlhYGc',  // 本番用
             ];
 
             return quiz_movie_ids;
@@ -322,7 +334,7 @@
                 width: 896,
                 videoId: currentMovieID,  // 埋め込むYouTube動画のIDを指定
                 playerVars: {
-                    // 'controls': 0,  // コントロールを非表示にする
+                    'controls': 0,  // コントロールを非表示にする
                     'disablekb': 1,  // キーボード操作を無効にする
                     'showinfo': 0,   // タイトルとアップロード者情報を非表示にする
                     'rel': 0,        // 関連動画を非表示にする

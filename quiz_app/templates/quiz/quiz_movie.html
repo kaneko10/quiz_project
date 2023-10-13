@@ -51,9 +51,9 @@
             color: white;
         }
 
-        /* #clickNone {
+        #clickNone {
             pointer-events: none; 
-        } */
+        }
     </style>
 </head>
 
@@ -533,11 +533,11 @@
             if (whether_answer) {
                 // 回答グループ
                 // console.log("回答グループ用の説明動画を設定");
-                explain_movie = 'y8r0XfgVP1I';
+                explain_movie = 'uffIUPy3sLo';
             } else {
                 // 回答しないグループ
                 // console.log("回答しないグループ用の説明動画を設定");
-                explain_movie = 'hGRQWD9b-_g';
+                explain_movie = 'MXZHZSqceYY';
             }
 
             quiz_movie_ids.push(explain_movie);
@@ -684,7 +684,7 @@
                 width: 896,
                 videoId: currentMovieID,  // 埋め込むYouTube動画のIDを指定
                 playerVars: {
-                    // 'controls': 0,  // コントロールを非表示にする
+                    'controls': 0,  // コントロールを非表示にする
                     'disablekb': 1,  // キーボード操作を無効にする
                     'showinfo': 0,   // タイトルとアップロード者情報を非表示にする
                     'rel': 0,        // 関連動画を非表示にする
